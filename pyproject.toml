@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "norvald-lab"
+version = "0.1.0"
+description = "Laboratório independente de observação de deliberação multi-LLM"
+requires-python = ">=3.10"
+dependencies = ["httpx[http2,socks]>=0.27,<1", "psutil>=6,<8", "deepdiff>=8,<9", "fastapi>=0.115,<1", "uvicorn>=0.30,<1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "pytest-asyncio>=0.24,<2"]
+
+[project.scripts]
+norvald-lab = "norvald_lab.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["norvald_lab*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

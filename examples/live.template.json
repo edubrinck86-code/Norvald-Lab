@@ -1,0 +1,67 @@
+{
+  "schema_version": "norvald.lab.spec.v1",
+  "experiment_id": "meu-primeiro-b1",
+  "mode": "live",
+  "task": {
+    "id": "pergunta-demo",
+    "objective": "SUBSTITUA_PELA_TAREFA_DO_EXPERIMENTO",
+    "instructions": "Declare uma decision e uma relação selects para option-a ou option-b."
+  },
+  "participants": [
+    {
+      "id": "analista-1",
+      "name": "Analista 1",
+      "role": "Analista",
+      "provider": "simulador",
+      "model": "SUBSTITUA_PELO_ID_DO_MODELO"
+    },
+    {
+      "id": "analista-2",
+      "name": "Analista 2",
+      "role": "Analista",
+      "provider": "simulador",
+      "model": "SUBSTITUA_PELO_ID_DO_MODELO"
+    },
+    {
+      "id": "analista-3",
+      "name": "Analista 3",
+      "role": "Analista",
+      "provider": "simulador",
+      "model": "SUBSTITUA_PELO_ID_DO_MODELO"
+    }
+  ],
+  "providers": {
+    "simulador": {
+      "kind": "openrouter",
+      "credential_env": "LAB_PROVIDER_KEY"
+    }
+  },
+  "documents": [],
+  "working_context": {
+    "question": "",
+    "items": [
+      {
+        "id": "option-a",
+        "type": "option",
+        "content": "Opção A: prazo"
+      },
+      {
+        "id": "option-b",
+        "type": "option",
+        "content": "Opção B: flexibilidade"
+      }
+    ],
+    "relations": []
+  },
+  "repetitions": 1,
+  "condition": {
+    "id": "B1",
+    "exposure": "blind",
+    "tools": "off"
+  },
+  "budget": {
+    "max_concurrency": 3,
+    "max_concurrency_per_provider": 2,
+    "timeout_seconds": 300
+  }
+}

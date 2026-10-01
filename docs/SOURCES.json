@@ -1,0 +1,1042 @@
+[
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/__init__.py",
+    "destination": "norvald_lab/vendor/norvald_execution/__init__.py",
+    "source_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "destination_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/support/attachment_preparation.py",
+    "destination": "norvald_lab/vendor/norvald_execution/support/attachment_preparation.py",
+    "source_sha256": "6e815af8e52890fbba9049fa012a5c04859ee49ea0556a6afcbc73ff8de5c7f6",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "6be10417c211529e726ee6d8708684ccc7b9bb10",
+    "destination_sha256": "2c2fd07003dc7fe00f99ab3b1e9968d8de0cc35678fdc227ab170c56c7c68b09"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/support/provider_intelligence.py",
+    "destination": "norvald_lab/vendor/norvald_execution/support/provider_intelligence.py",
+    "source_sha256": "78511c12281ecd7bfc6326734aaec23a3dd3f08582e2d5dd255e23baf9bfec42",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "539508b934220773b5e4958df62475a738d12d5c",
+    "destination_sha256": "3e2f083c9df879f6bc618aca8e1ad932b0c7fce1c5d2db6145581eb84251f69f"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/support/provider_errors.py",
+    "destination": "norvald_lab/vendor/norvald_execution/support/provider_errors.py",
+    "source_sha256": "9f1eb4da3773697d1b6ff01ee394850153be2ad6106bb8ce422e9325660cff8f",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "e7ee75e2862ba317c255c40cb6ee44721c981357",
+    "destination_sha256": "439a04b407ed807583e1b6c3f49305656dca8e802e5ec6ce9c8ffb7944ea3aef"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/support/retry.py",
+    "destination": "norvald_lab/vendor/norvald_execution/support/retry.py",
+    "source_sha256": "a252aef40348cf11f4a98f3a29a3558e4c1e336f6274b8a772b6db248e6ec3ae",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "029bba5598013d91bd8c71efdb958bb71f13c3b6",
+    "destination_sha256": "5f49fd815c088a095236672a4a5c9f084a29b59f810e02567122df6a9296b3a6"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/support/__init__.py",
+    "destination": "norvald_lab/vendor/norvald_execution/support/__init__.py",
+    "source_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "destination_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/support/provider_gate.py",
+    "destination": "norvald_lab/vendor/norvald_execution/support/provider_gate.py",
+    "source_sha256": "847cc09cef267e1f98cde96dfdc446c4d5d077ccf330cc4d0252aba4da4b9c78",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "b9fefeed98a83fa5cf3118b1d3a770b4e791c214",
+    "destination_sha256": "8645ab3083f6b4bff48385aec50e56536f280ad458644219ad4afe6138b0f879"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/support/pricing_cache.py",
+    "destination": "norvald_lab/vendor/norvald_execution/support/pricing_cache.py",
+    "source_sha256": "a1f2ae8f0625a6ba22881a3ee952b53c927f625766d9b7e0ac18d946d84446bd",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "c4afe94a84e049c06fcf44b9d307baf026ed0330",
+    "destination_sha256": "a1f2ae8f0625a6ba22881a3ee952b53c927f625766d9b7e0ac18d946d84446bd"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/support/http_client.py",
+    "destination": "norvald_lab/vendor/norvald_execution/support/http_client.py",
+    "source_sha256": "31a2da375c605adef241d1d05c71859dd4e372fb7bb3fa3afa74c4899c3e6026",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "c95d7adc24fd645f9647fdb23cf8aacac66fbb8f",
+    "destination_sha256": "31a2da375c605adef241d1d05c71859dd4e372fb7bb3fa3afa74c4899c3e6026"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/support/stream_metrics.py",
+    "destination": "norvald_lab/vendor/norvald_execution/support/stream_metrics.py",
+    "source_sha256": "82239d20ea0d5fe2009a828709a6fa296b834bb5a77158b62112945deb09ea49",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "43f79772c36a30a0413810e3eb26211732853745",
+    "destination_sha256": "82239d20ea0d5fe2009a828709a6fa296b834bb5a77158b62112945deb09ea49"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/support/rate_limit.py",
+    "destination": "norvald_lab/vendor/norvald_execution/support/rate_limit.py",
+    "source_sha256": "70e13b8cb20c93e22f62e85005cc6941fe6564ef412ef462a477c12f71b8eeea",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "007b33d705b877cc76cb24bd8aee4238f32aa0f7",
+    "destination_sha256": "70e13b8cb20c93e22f62e85005cc6941fe6564ef412ef462a477c12f71b8eeea"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/support/capability_cache.py",
+    "destination": "norvald_lab/vendor/norvald_execution/support/capability_cache.py",
+    "source_sha256": "2f82ec2334aeac281a789f4c260ede0c4db7ddd8e00cfad32ec08e0bb40634d8",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "ccc92a63dde0e447176ab9f491fbcb352c550600",
+    "destination_sha256": "2f82ec2334aeac281a789f4c260ede0c4db7ddd8e00cfad32ec08e0bb40634d8"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/sampling.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/sampling.py",
+    "source_sha256": "518d47d19c1898b86e22d32febf7050b56c578cdbad9aaade6fca278c7776b6e",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "6aaf08c63fd61f25a6765b9e974dab2b2b39cc40",
+    "destination_sha256": "518d47d19c1898b86e22d32febf7050b56c578cdbad9aaade6fca278c7776b6e"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/tool_contract.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/tool_contract.py",
+    "source_sha256": "7a4dee83c4093acfb7b5bb1bb2b7164f2aa5ea87df417fc0070b15ac4226cdbb",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "ec5128402dcfdcdb0def07d286f4664402088bc6",
+    "destination_sha256": "7a4dee83c4093acfb7b5bb1bb2b7164f2aa5ea87df417fc0070b15ac4226cdbb"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/prompt_prefix.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/prompt_prefix.py",
+    "source_sha256": "e848b8960a574db2f1ac9a7e74001198caf420c937df1356be3f35528fbf2390",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "9807969a512c7d5bddc2e08812d9dfbcc7c4e0e2",
+    "destination_sha256": "41e1fd8a3e3335809ee2bcf4c1a27196ebd2471ea7b2e8be0d33875d5916ef8a"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/__init__.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/__init__.py",
+    "source_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "destination_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/model_contracts.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/model_contracts.py",
+    "source_sha256": "fce81d6af9c87c775a45c1982a387a4773ae02afb525e728cc837ee2a9a8bf29",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "e1d68f5f307b9e17f2e2e37dea4bd451ab380cca",
+    "destination_sha256": "fce81d6af9c87c775a45c1982a387a4773ae02afb525e728cc837ee2a9a8bf29"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/provider_model_profiles.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/provider_model_profiles.py",
+    "source_sha256": "2387d97fdd1e419060e0997bb12dea7519776376b401f795637e5a230f11880f",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "ac0e2eb463058467fdd0afa2ece1e5875058406b",
+    "destination_sha256": "2387d97fdd1e419060e0997bb12dea7519776376b401f795637e5a230f11880f"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/model_taxonomy.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/model_taxonomy.py",
+    "source_sha256": "bd12bd31d6f432db7d4c296339671b13cd6b87992a623bd89e1824499570ba47",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "5f33795fe9d6540aef5c0e742942cc98010874ae",
+    "destination_sha256": "bb6c2f608cc5867b43b6eb85d661e38d1c28e228c1f0de047bb3263821a92fa2"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/provider_contract.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/provider_contract.py",
+    "source_sha256": "0b5abccace926bd45a05a68bb2eda4f0c1c8704e2965eaef5acbfb47183a85f7",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "b4c45569d18cf494f24edd35a16b559edffaa359",
+    "destination_sha256": "937da4eb9183146b5803b49b0451ea2e11f12f01a8aa1fc6aca542222e994955"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/provider_kinds.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/provider_kinds.py",
+    "source_sha256": "0b8cc0f1a6e5cae343d401ea4c02e6abc9baf9835d2a240f0f06ea3848d3dce7",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "6927e3cd67c152f60fd520312568ec18d18ab6eb",
+    "destination_sha256": "0b8cc0f1a6e5cae343d401ea4c02e6abc9baf9835d2a240f0f06ea3848d3dce7"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/tool_contracts.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/tool_contracts.py",
+    "source_sha256": "a4219afc549edd019bfdfa44b0f40e66a4f0c2eea2637996fb32d254be5d0fc1",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "dbbfbaa04b266689e577879506e90b5f490d75ce",
+    "destination_sha256": "a3e34d74b7b387d35c31448d10c8f54685a55f09c9d7c9654485cf4ee55193db"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/tool_ports.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/tool_ports.py",
+    "source_sha256": "48940d075d59c8f3ae281d4b1a60ee2d82196e234c76eb8f815c3480e5ccd004",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "f49adfd48b8e47436deb5fa03c3a1f7d6c699a7a",
+    "destination_sha256": "1b805748cabe4cd9e302da4a8763c2db426e8416390b4c9ab6065cf82a0cd064"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/execution_contracts.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/execution_contracts.py",
+    "source_sha256": "e0b65890523996c58de7c97fe4855470c2e6eb9d29bd959170a4aff4f26f9d0d",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "a22a71af733295f0dc29a911323e48824afba9a7",
+    "destination_sha256": "e5a13af23b0ad3591aaf8564cc8e12e4c61adedb18cce7afaaff2751b3999602"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/execution_context.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/execution_context.py",
+    "source_sha256": "afd20128813e7d6e0411e927b105764e4caf9eac8e9244c47509a28f2ea6d07f",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "5e63130ff7eee0a0a532dcb7d819258893ac6896",
+    "destination_sha256": "afd20128813e7d6e0411e927b105764e4caf9eac8e9244c47509a28f2ea6d07f"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/attachment_contracts.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/attachment_contracts.py",
+    "source_sha256": "2d669750eb4f0fd347068d72ddfb07165c07af1575f3b2d04fe7357f4c7a50ba",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "ba72ff4a3064e952a86bb10bd851edb135830af3",
+    "destination_sha256": "2d669750eb4f0fd347068d72ddfb07165c07af1575f3b2d04fe7357f4c7a50ba"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/contracts/tool_catalog_guard.py",
+    "destination": "norvald_lab/vendor/norvald_execution/contracts/tool_catalog_guard.py",
+    "source_sha256": "41e4b755893b85497a06d4fe1404eb291bb98978f2f683408efc8971060e1c2b",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "85b5465ab96a61da0198c47a9994d817322f3fe8",
+    "destination_sha256": "f6a79734779d7ff7d2acffaee283273047a27c2b2652f1b689df1df57c9740b6"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/orchestration/__init__.py",
+    "destination": "norvald_lab/vendor/norvald_execution/orchestration/__init__.py",
+    "source_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "destination_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/orchestration/execution_observer.py",
+    "destination": "norvald_lab/vendor/norvald_execution/orchestration/execution_observer.py",
+    "source_sha256": "8fbdbecaa8a56048bac2ab6efa3695543ce48f4d09671d4d42e4b11123c2745b",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "d1b1721d3f207aade7c633dab35af2b6527545cf",
+    "destination_sha256": "8fbdbecaa8a56048bac2ab6efa3695543ce48f4d09671d4d42e4b11123c2745b"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/orchestration/agent_registry.py",
+    "destination": "norvald_lab/vendor/norvald_execution/orchestration/agent_registry.py",
+    "source_sha256": "b962c8a0fc8c94ed5073da782217161ebb5ee25a76a5fd76809a62b4abe931bf",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "d05cdbfff6cdbf24bbfc2cf2bfdd5506d5c628bb",
+    "destination_sha256": "7b8c7e398a84a2d7739f5008ffb73aa033cb9066d2c31d3f8cf46a310fc8319e"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/orchestration/agent_orchestrator.py",
+    "destination": "norvald_lab/vendor/norvald_execution/orchestration/agent_orchestrator.py",
+    "source_sha256": "9891a8ba442fa947d5690ee3478a2deb3b1f209eacc2e4c5469ae61b4fb22f16",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "b62e129bfe0deecd63ddf51664d999ea14fcff24",
+    "destination_sha256": "a59fdce815d43c02e007ba4ca725a46c2e679545049bba3e1678e09c1ac9fe31"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/providers/gemini_provider.py",
+    "destination": "norvald_lab/vendor/norvald_execution/providers/gemini_provider.py",
+    "source_sha256": "69d0d409a2e86a3fc2f832c7de7ac3287188177c4895ea14ef028aef0ffe9f46",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "31db296ad613caa5c17887c249a1388bded7038c",
+    "destination_sha256": "0b1bd58ead3270c7522b258d93538e31e7baccf73d8598c094a0395ba353bc9a"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/providers/__init__.py",
+    "destination": "norvald_lab/vendor/norvald_execution/providers/__init__.py",
+    "source_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "destination_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/providers/anthropic_provider.py",
+    "destination": "norvald_lab/vendor/norvald_execution/providers/anthropic_provider.py",
+    "source_sha256": "48bbbdc11512ad6a574f0a5d35a746cb0bced03ac1ab35f0cadff0c82e1d8b61",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "28612bcc799721da363887bc4ddb7c488ba999fd",
+    "destination_sha256": "e97a463bc4c3ce827aa0559ca2201244cfc8810793889ecc5718407557b20794"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/providers/ollama_provider.py",
+    "destination": "norvald_lab/vendor/norvald_execution/providers/ollama_provider.py",
+    "source_sha256": "a41be9cb35d093c3f25233be1c7d31c573b4bae733906477c580e0c19883a702",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "a336b335685d1a10329956a493608cbb90dca68e",
+    "destination_sha256": "1ff504af0ee5deb39e3e15b120f1d1d601a8f31bbc6005152c09041ec13f026f"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/providers/openai_compatible_provider.py",
+    "destination": "norvald_lab/vendor/norvald_execution/providers/openai_compatible_provider.py",
+    "source_sha256": "a29715ce9f07765129d3880165d794c1e74ceca18941844dace3d3f3e8379b73",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "c81bf348735c95b560549f33a92323d909585dc9",
+    "destination_sha256": "cf39d0b5df89c045d44d28c745d9280cc653eb3ac935cbe295bb625842f8b53e"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/providers/llm_providers.py",
+    "destination": "norvald_lab/vendor/norvald_execution/providers/llm_providers.py",
+    "source_sha256": "7df320d898b968b751d293fa51f5f272b463172c743663e1ef0168dba745d88a",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "d374920df4b45055794eb6cb107d9225831596df",
+    "destination_sha256": "a1c575806d55f5ab0a3f5e178c8a64e74dd0df6e88e880ed3c0d4b698b7341ea"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/providers/stream_errors.py",
+    "destination": "norvald_lab/vendor/norvald_execution/providers/stream_errors.py",
+    "source_sha256": "643f592163f292eccf35215c3949df1c5bf8d32111cd067c08499a754e808409",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "f6ee040cf8765e35ead3a0272bb8dd7c74157877",
+    "destination_sha256": "643f592163f292eccf35215c3949df1c5bf8d32111cd067c08499a754e808409"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/tools/tool_runtime.py",
+    "destination": "norvald_lab/vendor/norvald_execution/tools/tool_runtime.py",
+    "source_sha256": "47eca3d011ef49c985b33fbc2939558f5c9e88b49123c650049ec62072238f18",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "5160a9389065d2617d3008247fa2ad50caea442a",
+    "destination_sha256": "a0b9205d245c8804fd4350c51ce01ef4d708086d8ad6acea7f1ad4f650c38a51"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/tools/tool_context.py",
+    "destination": "norvald_lab/vendor/norvald_execution/tools/tool_context.py",
+    "source_sha256": "78119cba4a97087328a0d253322230997cf5a01c4267c703cbdba885f5b43ccc",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "ed84b4d64dd201f16add648bbbccb58fd8387664",
+    "destination_sha256": "cc6de8a1beac333d0ab8c980d0f2887fc4bad1eb6b26f0abd7172a6eab4c3f2a"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/tools/registered_tool.py",
+    "destination": "norvald_lab/vendor/norvald_execution/tools/registered_tool.py",
+    "source_sha256": "657f05db12fb6ed8d96ece1a9eab7b8769c2553056135fa7b34f2028975b3b65",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "5af28ebf35b32ae8ab76bb4dd6ddcafa82404a16",
+    "destination_sha256": "d654c375b6d119ec77185be5946b54a0683828faf8ab566dc5730ca3331aa210"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/tools/tool_loop.py",
+    "destination": "norvald_lab/vendor/norvald_execution/tools/tool_loop.py",
+    "source_sha256": "b8b5e28992181409d4e5388365d6aae025c1e6276465ca05043f36ad7830f840",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "fb34a129871b23e3ecd823a7b4be62eed293972e",
+    "destination_sha256": "a1afabe9249bc36c8483aff5908cfdd4ace452faa5c6b7cff3d6351b37561bf7"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/tools/__init__.py",
+    "destination": "norvald_lab/vendor/norvald_execution/tools/__init__.py",
+    "source_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "destination_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/tools/tool_execution.py",
+    "destination": "norvald_lab/vendor/norvald_execution/tools/tool_execution.py",
+    "source_sha256": "492663144d132f67bd4af7de2cb320e7225cd2b9f088ee77ef2516f400a9bbff",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "ef37f726d46e7be504d739df21c7b59a5d093c42",
+    "destination_sha256": "492663144d132f67bd4af7de2cb320e7225cd2b9f088ee77ef2516f400a9bbff"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/tools/tool_syntax.py",
+    "destination": "norvald_lab/vendor/norvald_execution/tools/tool_syntax.py",
+    "source_sha256": "f3a7276cf343447cc95cf7a4430a0f6c966c857c98a9f471085cb7145228cbc8",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "8e96405f24039d8f025b3212b588b0f91b278167",
+    "destination_sha256": "f3a7276cf343447cc95cf7a4430a0f6c966c857c98a9f471085cb7145228cbc8"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "src/tools/tool_permission.py",
+    "destination": "norvald_lab/vendor/norvald_execution/tools/tool_permission.py",
+    "source_sha256": "d377e325a43e98676447e6fa4f331376b89caf645de1bb809d0f5fe754780518",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "12b03eb84582056b89bfb4fe5155d0345377858c",
+    "destination_sha256": "d377e325a43e98676447e6fa4f331376b89caf645de1bb809d0f5fe754780518"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/classification.py",
+    "destination": "norvald_lab/domain/classification.py",
+    "source_sha256": "c9054d5ac4fc642346ce9577766c75a6a56168f554c05869f8c13d6a73a39e71",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "a358c5a3cb751b353039a9dacb20464079b35ed8",
+    "destination_sha256": "c9054d5ac4fc642346ce9577766c75a6a56168f554c05869f8c13d6a73a39e71"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/evidence.py",
+    "destination": "norvald_lab/domain/evidence.py",
+    "source_sha256": "336bb4528eccf80102c12a494b684889117c2a5fff02015911d2d3e38e7bf8f1",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "3e29a747744f0ee4a8d540441f9a18a95bca8fd1",
+    "destination_sha256": "54f8e710f8fc815b66f6c00062091c65aaf8855545ad53f7aa8e321c3ebc87a6"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/vendor/documental_engine/framework/dimension.py",
+    "destination": "norvald_lab/vendor/documental_engine/framework/dimension.py",
+    "source_sha256": "394157d2509d0e07663304238e6c14608445300e6d8a8fb35cc2cebb4bd0c839",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "ebd280f43bdaabb52f36d4f448849797f9978b57",
+    "destination_sha256": "394157d2509d0e07663304238e6c14608445300e6d8a8fb35cc2cebb4bd0c839"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/vendor/documental_engine/framework/dimension_registry.py",
+    "destination": "norvald_lab/vendor/documental_engine/framework/dimension_registry.py",
+    "source_sha256": "7ad88b8c5fe9dd342c1150dd4b14ccb715e83de53cce01e8e12b1b09bdab5adb",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "6392e005ed4a2da8d8052ab9ae85e764c1d9cd4b",
+    "destination_sha256": "f601471fd4281b45e89881c1a29158d5cdfca1ddbf1b2be0e8f751bbc2d98c85"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/vendor/documental_engine/framework/framework_dimensions.py",
+    "destination": "norvald_lab/vendor/documental_engine/framework/framework_dimensions.py",
+    "source_sha256": "08d3acfcba4adf3aaa0293a4d11856cb408a31617b8437f31fc19d29861f92a3",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "dd6a27263900df4a16def609f8e3098a37590d9c",
+    "destination_sha256": "379a572e30551e26941bf89194c1e6bb77a72560c4c2d4554ddcd850b5b8f499"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/deliberation/working_context_updater.py",
+    "destination": "norvald_lab/application/deliberation/working_context_updater.py",
+    "source_sha256": "549a5e42a17dce18abc114b13471b0b2d4886abd5eb8b53bb36e50b62627bbe6",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "d2363cc552f319aacc600273a7311836d8ea69fc",
+    "destination_sha256": "7dc07f6926094f59faafe93de192165d2874b61fcd353aed3eaa879322ebbbfb"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/deliberation/round_prompt.py",
+    "destination": "norvald_lab/application/deliberation/round_prompt.py",
+    "source_sha256": "f790a365ab6403c7a551db287095e9ef33b1c9a9f2280d9a590edcb956ea49c4",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "fb4bdfbb592c464575aa23fe5d2384a5f7c84636",
+    "destination_sha256": "e405b37b78e56062a5aec731e3c2115c0c544b036f4f5a526247c3986e1fb3c6"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/context/wc_contribution_delta.py",
+    "destination": "norvald_lab/application/context/wc_contribution_delta.py",
+    "source_sha256": "a91b37d5de18b0fcd990e869954583bc789e22d6975ec7a08957ed6d48555cc8",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "4642fc3f2a9ea5f56515178f465234fd6d7d09d3",
+    "destination_sha256": "5676ea11d4e6a17f71fd9316cea2548f09b1c754e8daebc121d6a473d57e1880"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/context/wc_snapshot.py",
+    "destination": "norvald_lab/application/context/wc_snapshot.py",
+    "source_sha256": "ec8c4e03c9c5276d186204a16bc916653cf1f397ab99852ce72a56b30e1e84d5",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "5a9f88a043fa588119147997f6d9f615f96d7036",
+    "destination_sha256": "db4d52d0310024aeb9c633c61c6b49f8b431126d2991b4e3b47bc32dc197063e"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/arof/outcome_extract.py",
+    "destination": "norvald_lab/application/arof/outcome_extract.py",
+    "source_sha256": "1237544183d1d140f55364a620fcb207939cf237e97092cd823f682309fcc275",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "1f93c4b03eef3b4693954cf732e7eb6eeaca8275",
+    "destination_sha256": "426d82dd61dddd88467822fec5ad3f4992e7efad54813acb0497ecfbb6f98468"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/arof/prior_contribution.py",
+    "destination": "norvald_lab/application/arof/prior_contribution.py",
+    "source_sha256": "89c6f1ce80e40b8ac8fd061de249099bd64196f1d0371090974370388fe6c2bd",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "65340dc7eb77764559baeb0da1855d9ceb49e335",
+    "destination_sha256": "89c6f1ce80e40b8ac8fd061de249099bd64196f1d0371090974370388fe6c2bd"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/arof/capacity.py",
+    "destination": "norvald_lab/application/arof/capacity.py",
+    "source_sha256": "6bdc39e2f411c5679177ea3fcbaf6b660aad5eb3e26e81b564ce7dc1417e332d",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "1e253e8d1eb46abf88c7f4b1c3a7776f0d064499",
+    "destination_sha256": "63bff997c8fe896f14582a0132c520a3a7a29f06baca895cab37f876562c80bc"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/arof/seed_observation.py",
+    "destination": "norvald_lab/application/arof/seed_observation.py",
+    "source_sha256": "12de05c2a0c7fe0809cdb6cb9a3aa24828491524b4840fd0ad0c9c169e35018b",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "80572f21450e7b346a1f24734dbf8aa886c8eda3",
+    "destination_sha256": "12de05c2a0c7fe0809cdb6cb9a3aa24828491524b4840fd0ad0c9c169e35018b"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/arof/exposed_context.py",
+    "destination": "norvald_lab/application/arof/exposed_context.py",
+    "source_sha256": "7564e6d86140f51f6be770dea6c4b017b04adb8ee7185f4e3996362264cfa976",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "da4031217cb361a06e6cd740f7d57efea468a8c4",
+    "destination_sha256": "001c648264fe9d0cba32116364a37e7fadc9aa96d7aba73acace09623376ced3"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/arof/__init__.py",
+    "destination": "norvald_lab/application/arof/__init__.py",
+    "source_sha256": "a9cdf7d6f45d241bd06e4a80cde78509f8c80d7fa5b415163771c5704ecb1804",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "f74a3eb01ce0208a30eab080b54ab4cff6ee03cd",
+    "destination_sha256": "a9cdf7d6f45d241bd06e4a80cde78509f8c80d7fa5b415163771c5704ecb1804"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/arof/corpus.py",
+    "destination": "norvald_lab/application/arof/corpus.py",
+    "source_sha256": "5721562e238c093b9905832321966e3454e59d3fdb8ac5e9f93ad05b88b2b8bc",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "837a7fe33688bda886da1b716cd89903a4dde0dd",
+    "destination_sha256": "d3d797c58e0a3f6c987c75406e017fb9b12b9302aee0e3e85e2a7f4b70fb7929"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/arof/dataset.py",
+    "destination": "norvald_lab/application/arof/dataset.py",
+    "source_sha256": "68960f61b3ed21356633687cc884097d1d0acee24ae310b96c6558139d9fd7df",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "edcc8aca5622108c37600b108a61c7fe72832500",
+    "destination_sha256": "f6243d85d5623776bd372e30a99a4d0de7b2c394f2524ae6f85be354665d24c7"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/arof/events.py",
+    "destination": "norvald_lab/application/arof/events.py",
+    "source_sha256": "86c6b8d2d04299478c2432704ac88c8e2008d720f8b97c6f68db35ea55dc1e94",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "25eacca4e8777d0f6bd9020904e3f623915d3226",
+    "destination_sha256": "86c6b8d2d04299478c2432704ac88c8e2008d720f8b97c6f68db35ea55dc1e94"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/arof/raw_observation.py",
+    "destination": "norvald_lab/application/arof/raw_observation.py",
+    "source_sha256": "f7452dded0d0059f80ced62bef4139d60542b253947100c66b17dc13e1fbce36",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "979f13c35e629342dac5183b8b1f3ff9effa7485",
+    "destination_sha256": "f14140fdaf1d80afdc60a89d95a7d682ec101e9b7b558930814632768f74c990"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/arof/reference_normalization.py",
+    "destination": "norvald_lab/application/arof/reference_normalization.py",
+    "source_sha256": "6ec39355ad32e96fb3b4b7a68896d20abde86a4d8c169130af530f3c7c900846",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "72741993c31e6da37957bbe2bf20bea9e49d9d5b",
+    "destination_sha256": "5048e858c68ec77d892dbc412e9f079cb2341348c35927b9098d1b5067a3d924"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/application/execution/working_context_commit_service.py",
+    "destination": "norvald_lab/application/execution/working_context_commit_service.py",
+    "source_sha256": "f19e861466137c697c5417c5c9821a58668c1ef0dd511d248ab5ee44a4750000",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "6a08e81dc0d855653c674b11d3e9a1272735099d",
+    "destination_sha256": "b4d7fdee336a146825bf83cb6c9ae86a7b8c5f614bb61c36e980a3c443a58816"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/deliberation/document_structure.py",
+    "destination": "norvald_lab/domain/deliberation/document_structure.py",
+    "source_sha256": "3041d556bbfdffe29e30468ec610b72a499d78bfd9e5f0f7eb43739c9c843d61",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "2589150c0f50f64efef0c17a5a1d46b160f6eaba",
+    "destination_sha256": "3041d556bbfdffe29e30468ec610b72a499d78bfd9e5f0f7eb43739c9c843d61"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/deliberation/working_context_graph.py",
+    "destination": "norvald_lab/domain/deliberation/working_context_graph.py",
+    "source_sha256": "9b15ea19be8c5ed9355f828a8bda3077e497fc4d9d7ad50f9357c4de82913dc3",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "1d913e3730303d11fd5204bbf3327a6ba45dbab9",
+    "destination_sha256": "3a83e4c4b6ec92231c14359c2593bdb10cbeb4a1b8e34e8000f632645ab7fd44"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/deliberation/dimension_registry.py",
+    "destination": "norvald_lab/domain/deliberation/dimension_registry.py",
+    "source_sha256": "339b3dc22f97206fa073ea8f3abbf155456a8433d3011c4ea40ab4142fc717a4",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "59643f74b3647d12fca4562e5e695646092ad2cd",
+    "destination_sha256": "ab0f13aa7ae2948c2ce2233f11b7f4beca199ebabd71f3948eb90322d2735259"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/deliberation/contribution.py",
+    "destination": "norvald_lab/domain/deliberation/contribution.py",
+    "source_sha256": "483d0c8ac26165c7b082f991785dc0b1892ccf4523d95a0ca34a4aa8b683a359",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "9bfc81fc49b6b330c5b7af5b9e0868367ea43826",
+    "destination_sha256": "483d0c8ac26165c7b082f991785dc0b1892ccf4523d95a0ca34a4aa8b683a359"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/deliberation/context_item.py",
+    "destination": "norvald_lab/domain/deliberation/context_item.py",
+    "source_sha256": "545feb8a6f8d61d3ca27aaaf2f35c9aaa99e748fbed81855c257d44a5481cade",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "809a791c18eed476774aa81807ed2fcae6564bca",
+    "destination_sha256": "545feb8a6f8d61d3ca27aaaf2f35c9aaa99e748fbed81855c257d44a5481cade"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/deliberation/turn_policy.py",
+    "destination": "norvald_lab/domain/deliberation/turn_policy.py",
+    "source_sha256": "cf5f2a4793e528c7df2214dd2f7bb21da4ec9ed1e40a7049c3d0960ac6a29be5",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "3f9e31645ec2b8e3635931a5528e5176bbb16b3e",
+    "destination_sha256": "cf5f2a4793e528c7df2214dd2f7bb21da4ec9ed1e40a7049c3d0960ac6a29be5"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/deliberation/context_relation.py",
+    "destination": "norvald_lab/domain/deliberation/context_relation.py",
+    "source_sha256": "cc6a44112ed4281f0e6bc3e9d0ac7fa1637c8dbea4b2b1f6e25ae9455977837f",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "1718df78c58cd89a3ca4add42c0eadf37de76acb",
+    "destination_sha256": "cc6a44112ed4281f0e6bc3e9d0ac7fa1637c8dbea4b2b1f6e25ae9455977837f"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/deliberation/working_context.py",
+    "destination": "norvald_lab/domain/deliberation/working_context.py",
+    "source_sha256": "bd60a0670d5fc7cfa40d06ddd4ffdb874d3d89ae36d2c1a14c2a14c9746f1ea8",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "b92822edc714343957633b7d09c25c9cf1ef7adc",
+    "destination_sha256": "02019a669469bf716e1e0052ca5ca4bfddaafdd78d6ee1097df920f3ed616c47"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/deliberation/contribution_validation.py",
+    "destination": "norvald_lab/domain/deliberation/contribution_validation.py",
+    "source_sha256": "79e8046d280fa403a4a520d933e24b44fe3567e0690c5c8629c48d2222a4d6b0",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "1d55c6bd5086e6d36d3c90b864de7963c8c7396d",
+    "destination_sha256": "538a926b6610519057f5b8a696320ca039bd8ecaad0963fe99e009f505a704d7"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/deliberation/framework_dimensions.py",
+    "destination": "norvald_lab/domain/deliberation/framework_dimensions.py",
+    "source_sha256": "83ae633ba496b23d4e5b7d5f9fcf7b1dcb057bfaff914a46d80ff1ae1179c7ce",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "9cd013d35ce68e794627d825841d30db5192b9c8",
+    "destination_sha256": "2425cef29f1590cf722c7935dff3d9c87cb2254a3a3d996f4a46cd4a1707637b"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/telemetry/pricing.py",
+    "destination": "norvald_lab/domain/telemetry/pricing.py",
+    "source_sha256": "ff24fd77d1232c72f669806a51e681cc1f58b428d97176512908ebad0ebd12f5",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "6afa338a817c0cb79ffd3ea83513a73bd2c5f9ff",
+    "destination_sha256": "af6491df213c14a60c1b7d2161abb4f0aadb1e6d256b312a90beb3784e87bc0c"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/telemetry/telemetry_event.py",
+    "destination": "norvald_lab/domain/telemetry/telemetry_event.py",
+    "source_sha256": "de5713e8208fc1ab85ddcb96bc03a06dc1f833fcbe53c63b88ce5ab209b813fb",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "c51923d31d85916182cd26db2eb05f006e072448",
+    "destination_sha256": "de5713e8208fc1ab85ddcb96bc03a06dc1f833fcbe53c63b88ce5ab209b813fb"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/telemetry/provider_usage.py",
+    "destination": "norvald_lab/domain/telemetry/provider_usage.py",
+    "source_sha256": "a1dc9c1561d6d72821a10b7cb3042304642b85a9455256cbb728b6007cffff16",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "64c0c4451c9838424f4d30048541b9c25f2a5e5b",
+    "destination_sha256": "a1dc9c1561d6d72821a10b7cb3042304642b85a9455256cbb728b6007cffff16"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/domain/execution/execution_usage.py",
+    "destination": "norvald_lab/domain/execution/execution_usage.py",
+    "source_sha256": "ce33e98a0e8670358cbbe19d95593dbf0472c93f2f65aaebd4c5df9a9ca3a891",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "f69489cd4c4deddc86e9387b47c7ffd0256e95e4",
+    "destination_sha256": "e66dcbda64f708533e43d01785d03cc9188f45fa9720445696a2ba91c3c4bf4d"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/infrastructure/change_detection/models.py",
+    "destination": "norvald_lab/infrastructure/change_detection/models.py",
+    "source_sha256": "1d4340d83cdebd2a439b3a3c6ff86e0afb9444b1c19ac06bfdacd94662ad83af",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "ad8fda85bd88fa4f9848ce8b7bb0d54bbdd10006",
+    "destination_sha256": "1d4340d83cdebd2a439b3a3c6ff86e0afb9444b1c19ac06bfdacd94662ad83af"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/infrastructure/change_detection/keyed_diff.py",
+    "destination": "norvald_lab/infrastructure/change_detection/keyed_diff.py",
+    "source_sha256": "c8953f38a4b3950663b9892e6a99207e2f9648209a32991a20959575002357e8",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "ef95f1e0172812504ded3ab9fd1730fd57c37e92",
+    "destination_sha256": "c8953f38a4b3950663b9892e6a99207e2f9648209a32991a20959575002357e8"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/infrastructure/change_detection/__init__.py",
+    "destination": "norvald_lab/infrastructure/change_detection/__init__.py",
+    "source_sha256": "fac5d071efce824754441c047c8453b2034edd1a322008fbd3f81f7d263dff44",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "2102c72c2a4565d9b837c541b358b831f8cc12b3",
+    "destination_sha256": "fac5d071efce824754441c047c8453b2034edd1a322008fbd3f81f7d263dff44"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/infrastructure/change_detection/deepdiff_adapter.py",
+    "destination": "norvald_lab/infrastructure/change_detection/deepdiff_adapter.py",
+    "source_sha256": "ed4efe205529e986d8163c0afd6eafdc650f6a6e29ed7a9172926532b196bc2e",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "71d051bfa33e7be18628cb69cd315d47fb5fcd0b",
+    "destination_sha256": "ed4efe205529e986d8163c0afd6eafdc650f6a6e29ed7a9172926532b196bc2e"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/infrastructure/arof/raw_observation_store.py",
+    "destination": "norvald_lab/infrastructure/arof/raw_observation_store.py",
+    "source_sha256": "35ccccb0d0718be77547fbbdf1fb3ddc01329807e99fbf99de4414ee3fe100a3",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "abfdf399a5e577b0af77c1411182abebd512f7b4",
+    "destination_sha256": "24a00ad8e16231771dce32fb9a2fb69b0c073cf279e1ac588ba695233607a79a"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/infrastructure/arof/__init__.py",
+    "destination": "norvald_lab/infrastructure/arof/__init__.py",
+    "source_sha256": "2277f0c159eda2207227ca8765662203d2d9b2e103583b010ec2ad3d4e41766b",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "8c28848f9cb613a6d79238e3636230050cf4cde9",
+    "destination_sha256": "2277f0c159eda2207227ca8765662203d2d9b2e103583b010ec2ad3d4e41766b"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/infrastructure/arof/outcome_observation_store.py",
+    "destination": "norvald_lab/infrastructure/arof/outcome_observation_store.py",
+    "source_sha256": "84c0ed65d4945618f70aa0b2fe4f25e1c42dc5d330084c861845c5872d73e9db",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "f10ee3e92e983c055038e8a33538deb93d97a59f",
+    "destination_sha256": "3dc6dd943ab45fb2eb7426e89f8cfde4415664b22ada51107f8a7fab58c86295"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/infrastructure/arof/dataset_store.py",
+    "destination": "norvald_lab/infrastructure/arof/dataset_store.py",
+    "source_sha256": "a5dbd2ad9bb02aa7a63ed859001150cf8c7d8a1da0f8d81af1097ba8448a1603",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "cb0c75a7842da74af6b14548e1b39e23e7944033",
+    "destination_sha256": "5ee4a08fb4392f9cc32471ef346f02de06bcd0c8ae8aede768cde786e7bc08a2"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/infrastructure/arof/seed_observation_store.py",
+    "destination": "norvald_lab/infrastructure/arof/seed_observation_store.py",
+    "source_sha256": "65afee55484f0e45842081d2bb38eca0c5d377c0d4f749847c61cf33b31b0f48",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "8ab210d97303f407898d532f2e00f2ed1a74f8b5",
+    "destination_sha256": "ebc339ef7dc5c4dcfee352f88e7e6747fec3e38ac6b8c608d050f2e175ec1e3d"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/tests/test_arof_capacity.py",
+    "destination": "tests/migrated/test_arof_capacity.py",
+    "source_sha256": "9d49b45d4c784fcbf11bd7a49c9affa687d3b728fb8c6efa97a957add8c3c0c9",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "4afccd979cfbe14dde393f917b995656a6075c2d",
+    "destination_sha256": "3f0cfeea0e40614066917d00d2ba7bce9fb2266107ac1962e9a58522a4aa49e0"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/tests/test_arof_raw_view.py",
+    "destination": "tests/migrated/test_arof_raw_view.py",
+    "source_sha256": "324f2656ce8eb3c5ddb86339277c7d303a17c1a77581acfea7d4f7a302c6eb47",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "e67713f2bebffeb94830efd7af71174d808aea14",
+    "destination_sha256": "c1f71906c4458d852d7e4fca21ea3af09a5a70eb4e9d306b3226ce459252bb09"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/tests/test_arof_reference_normalization.py",
+    "destination": "tests/migrated/test_arof_reference_normalization.py",
+    "source_sha256": "08cf497f7e1e790bc039a1a28da2659aa43d9d09ffa2782e1f0cf78345595b56",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "12384663e0a73b5d9d7b8620014af5ab0125da33",
+    "destination_sha256": "ea7e89f576c36506ae7dc4f0d74e9654bb0d0f3790cdd19aa1c2fa0afae6c063"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/tests/test_arof_corpus.py",
+    "destination": "tests/migrated/test_arof_corpus.py",
+    "source_sha256": "005c1c56540a14d2bee0b52713ce3839199bc62eea8cce392a133549ae5713bc",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "6aa056b753f5d819387e5daec011f4d185b15a80",
+    "destination_sha256": "624074a43ac0ee6ec0cca1ae58ad772cce261685f9e8bd7662eef402650eecf5"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/tests/test_arof_dataset.py",
+    "destination": "tests/migrated/test_arof_dataset.py",
+    "source_sha256": "db1317f15c24d0f443bb333ec333d9d046c0a9ed0028d729b63278b3709824c3",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "e131a8cf44fd3aa5a482886593e804adfd899416",
+    "destination_sha256": "02afa2dde8ebcdcb6cde96b066e3c7fec2ccf960a9a1cbbbd6160a2ce0cef2c2"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/tests/test_arof_exposed_and_extract.py",
+    "destination": "tests/migrated/test_arof_exposed_and_extract.py",
+    "source_sha256": "a59f14f697643436eed84b3670f6bde594bdcd5617dfcfd1dafcad604abb6ed7",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "c9e3cfb2df94979fc4ea2d38ca9909d05d18e3eb",
+    "destination_sha256": "8a7ed6c4cda0e18745f40d34100df2cba5024be5d4ec16d307bf6e620818c025"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/tests/test_arof_result_view.py",
+    "destination": "tests/migrated/test_arof_result_view.py",
+    "source_sha256": "725f243e150d85996f98b3579178c3e2ad34ee6970d30319903a8ccb4b9c0435",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "ab2a90b4415dad54dca17313bedd06bb358ee792",
+    "destination_sha256": "1edb60c982a82bb4d8a68063c558bd349d205bad9566e08a09eefd5233faf2de"
+  },
+  {
+    "repository": "Norvald-teste-codex",
+    "revision": "f0d640779324bdde8c1f76e83b1a1869602af089",
+    "source": "backend/tests/test_arof_raw_observation.py",
+    "destination": "tests/migrated/test_arof_raw_observation.py",
+    "source_sha256": "2e55605a788cfa2abeb5c2345d82ceda97644d85bf790017b9479f94ed453d2e",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "70c885881e671563b9deee772e5b27d860d5f537",
+    "destination_sha256": "ea2fddcc84ab412eca809a22e70c29b37ca4588d00308695c62e721a13091a3c"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "tests/test_providers.py",
+    "destination": "tests/execution/test_providers.py",
+    "source_sha256": "e2e0b8d6c28632e47da289989feedd24583deb10f42eb477a0a79a56c912f146",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "5c94c42bb712847bc6aa0dcdd7879157502da4dd",
+    "destination_sha256": "9d258519c6edd1ec439457015f1c87691a3aaf2e8e6187464a4dc0862a4f2192"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "tests/test_contratos_basicos.py",
+    "destination": "tests/execution/test_contratos_basicos.py",
+    "source_sha256": "ce89102d24e289f8fd172faa9aa6892afbbdb09563a854b8628ec1ac7aa4b9a1",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "17efc5654092eac2c5f6658c51f8c68b4888651f",
+    "destination_sha256": "da0866b536a36d3d0d35289fb50c9c8729bfc0459d0a7624a7357c4c48d802b3"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "tests/test_runtime_de_ferramentas.py",
+    "destination": "tests/execution/test_runtime_de_ferramentas.py",
+    "source_sha256": "5cbf5b6afce2dd6cf7441db2dcad36a60f1adc4eb3576dcf9b91cbb3f6f77681",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "a7949b5af63e6ca7533532aa7f97f8f3c5f35498",
+    "destination_sha256": "84e1ff4f705a8a339bf866f3ed2677340f42fb924869c3ae1e4be1b1d1e02192"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "tests/__init__.py",
+    "destination": "tests/execution/__init__.py",
+    "source_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+    "destination_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "tests/test_laco_de_ferramentas.py",
+    "destination": "tests/execution/test_laco_de_ferramentas.py",
+    "source_sha256": "3137e5a544e0c941a419e7f1c12f200775e15d33d541fade11024bb7d954d2ea",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "623c1e74015b5553514addda08dad7ff7d26ce32",
+    "destination_sha256": "f60c53a7605c7056f4fb8d725474b8365720ad2ae52e119c41cc3bd4d6ef7430"
+  },
+  {
+    "repository": "Norvald-Execution",
+    "revision": "c903aa42af8a959c7868c6d8be3b744c9677ac16",
+    "source": "tests/test_orquestracao.py",
+    "destination": "tests/execution/test_orquestracao.py",
+    "source_sha256": "940e7abb45f82d325e6f2a9a49ef35f83c152c3434fa248ac3618e0b17b83809",
+    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "source_git_blob_sha": "f35c6997d416f6d103a1d987f6c2bbbc87c1d36f",
+    "destination_sha256": "d604126395cce2214a52f24ef8db9aca2616d14506c8c78ccc15e35dbaa37aa2"
+  }
+]

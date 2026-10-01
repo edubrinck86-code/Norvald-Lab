@@ -1,0 +1,95 @@
+from __future__ import annotations
+
+import json
+import os
+from typing import Any
+
+from norvald_lab.vendor.norvald_execution.contracts.execution_contracts import ExecutionResult
+from norvald_lab.vendor.norvald_execution.contracts.provider_contract import LLMProvider
+from norvald_lab.vendor.norvald_execution.contracts.tool_contract import ToolDefinition, ToolProvenance
+from norvald_lab.vendor.norvald_execution.orchestration.agent_registry import AgentRegistry
+from norvald_lab.vendor.norvald_execution.providers.llm_providers import build_provider
+from norvald_lab.vendor.norvald_execution.providers.ollama_provider import OllamaProvider
+from norvald_lab.vendor.norvald_execution.tools.registered_tool import RegisteredTool
+from norvald_lab.vendor.norvald_execution.tools.tool_runtime import ToolRuntime
+
+
+class DemoProvider(LLMProvider):
+    """Resposta sintética explícita; demonstra armazenamento, não testa a tese."""
+    kind = "demo"
+
+    async def execute(self, request, model):
+        choices = ["option-a", "option-b"]
+        selected = choices[sum(request.agent_id.encode()) % 2]
+        block = {"knowledge": [{"local_id": f"decision-{request.agent_id}", "type": "decision", "content": f"Escolha simulada: {selected}", "confidence": "média"}], "relations": [{"relation_type": "selects", "source": f"decision-{request.agent_id}", "target": selected}]}
+        return ExecutionResult(content="DEMONSTRAÇÃO: esta resposta foi gerada por código, sem LLM.\n<<CONTRIBUTION>>\n" + json.dumps(block, ensure_ascii=False) + "\n<<END_CONTRIBUTION>>", tokens=0, duration_seconds=0, provider="demo", model=model, metadata={"synthetic": True})
+
+    async def list_models(self):
+        return []
+
+
+def build_registry(spec: dict, *, allow_live: bool = False) -> AgentRegistry:
+    if spec["mode"] == "live" and not allow_live:
+        raise ValueError("Execução real precisa de --live; a demonstração não usa APIs.")
+    registry = AgentRegistry()
+    for name, config in spec["providers"].items():
+        kind = config["kind"]
+        if kind == "demo":
+            provider = DemoProvider()
+        else:
+            env = config.get("credential_env", "")
+            credential = os.environ.get(env, "") if env else ""
+            if kind == "ollama":
+                address = config.get("base_url") or credential
+                if not address:
+                    raise ValueError(f"Provider {name}: informe o endereço do Ollama.")
+                provider = OllamaProvider(address)
+            else:
+                if env and not credential:
+                    raise ValueError(f"Provider {name}: variável {env} não está definida.")
+                if not credential and not config.get("base_url"):
+                    raise ValueError(f"Provider {name}: informe credential_env.")
+                provider = build_provider(kind, credential, config.get("base_url"))
+        registry.register_provider(name, provider, kind=kind)
+    for p in spec["participants"]:
+        registry.register_agent(p["id"], p["provider"], p["model"])
+    return registry
+
+
+async def close_registry(registry):
+    for name in registry.provider_names():
+        client = getattr(registry.get_provider(name), "_client", None)
+        if client is not None:
+            await client.aclose()
+
+
+class LabToolRuntime(ToolRuntime):
+    def context_scan_pending(self) -> bool:
+        """O Lab entrega o contexto integral antes de executar.
+
+        Compatibilidade explícita com o laço do Execution c903aa42,
+        que ainda consulta este gancho mesmo sem scan_context.
+        """
+        return False
+
+
+def corpus_runtime(documents: list[dict], on_event=None) -> ToolRuntime:
+    """Catálogo local somente leitura, limitado ao corpus congelado."""
+    frozen = json.loads(json.dumps(documents))
+    by_id = {doc["id"]: doc for doc in frozen}
+    runtime = LabToolRuntime(on_event=on_event)
+    runtime.register(RegisteredTool(
+        ToolDefinition("list_documents", "Lista os documentos do corpus deste experimento.", {"type": "object", "properties": {}, "additionalProperties": False}),
+        lambda _: json.dumps([{k: d[k] for k in ("id", "title", "source")} for d in frozen], ensure_ascii=False),
+    ))
+    def read(args: dict[str, Any]) -> str:
+        docid = args.get("document_id")
+        if docid not in by_id:
+            raise ValueError("Documento fora do corpus deste experimento.")
+        return json.dumps(by_id[docid], ensure_ascii=False)
+    runtime.register(RegisteredTool(
+        ToolDefinition("read_document", "Lê integralmente um documento do corpus congelado.", {"type": "object", "properties": {"document_id": {"type": "string", "enum": list(by_id)}}, "required": ["document_id"], "additionalProperties": False}),
+        read,
+        provenance=lambda args, _: [ToolProvenance(source_type="lab_corpus", source_id=args["document_id"], title=by_id[args["document_id"]]["title"])],
+    ))
+    return runtime
