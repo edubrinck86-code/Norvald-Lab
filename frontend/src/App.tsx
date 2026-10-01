@@ -39,28 +39,69 @@ export default function App() {
   const [documents, setDocuments] = useState(false);
   const [initialSpec, setInitialSpec] = useState<Spec | undefined>();
   const [refresh, setRefresh] = useState(0);
+  const [awaitingStarts, setAwaitingStarts] = useState(0);
+  const [listPollingFailed, setListPollingFailed] = useState(false);
+  const acceptedStarts = useRef(new Set<string>());
+  const listRequest = useRef<Promise<void> | null>(null);
   const hasSelected = useRef(false);
   const originRequest = useRef<Anchor | null>(null);
 
-  const refreshList = useCallback(async () => {
-    try {
-      const all = await api<ExperimentItem[]>('/api/experiments?include_deleted=true');
-      const values = all.filter(item => !item.deleted);
-      setItems(values); setComparisonItems(all);
-      if (!hasSelected.current && values.length) { setSelected(values.at(-1)!.experiment_id); hasSelected.current = true; }
-    } catch (reason) { setError(String(reason)); }
+  const refreshList = useCallback((): Promise<void> => {
+    if (listRequest.current) return listRequest.current;
+    const request = (async () => {
+      try {
+        const all = await api<ExperimentItem[]>('/api/experiments?include_deleted=true');
+        // Um início aceito pode ainda não ter manifest, ou falhar antes de criá-lo.
+        await Promise.all([...acceptedStarts.current].map(async id => {
+          if (all.some(item => item.experiment_id === id)) { acceptedStarts.current.delete(id); return; }
+          try {
+            const state = await api<{ status: string; error?: string }>('/api/experiments/' + id);
+            if (state.status !== 'running') {
+              acceptedStarts.current.delete(id);
+              if (state.error) setError(state.error);
+            }
+          } catch (reason) {
+            if (reason instanceof ApiError && reason.status === 404) acceptedStarts.current.delete(id);
+            throw reason;
+          }
+        }));
+        setAwaitingStarts(acceptedStarts.current.size);
+        const values = all.filter(item => !item.deleted);
+        setItems(values); setComparisonItems(all); setListPollingFailed(false);
+        if (!hasSelected.current && values.length) { setSelected(values.at(-1)!.experiment_id); hasSelected.current = true; }
+      } catch (reason) { setError(String(reason)); setListPollingFailed(true); }
+    })().finally(() => { listRequest.current = null; });
+    listRequest.current = request;
+    return request;
   }, []);
   useEffect(() => {
     api<{ live_enabled: boolean }>('/health').then(setHealth).catch(reason => setError(String(reason)));
     void refreshList();
-    const timer = setInterval(() => { void refreshList(); }, 2000);
-    return () => clearInterval(timer);
+    const resume = () => {
+      if (document.visibilityState !== 'visible') return;
+      void refreshList(); setObservationFailed(false); setRefresh(value => value + 1);
+    };
+    window.addEventListener('focus', resume);
+    return () => window.removeEventListener('focus', resume);
   }, [refreshList]);
+  const listActive = !listPollingFailed && (awaitingStarts > 0 || comparisonItems.some(item => item.status === 'running'));
+  useEffect(() => {
+    if (!listActive) return;
+    let active = true;
+    let timer: ReturnType<typeof setTimeout>;
+    async function read() {
+      await refreshList();
+      if (active) timer = setTimeout(() => { void read(); }, 2000);
+    }
+    timer = setTimeout(() => { void read(); }, 2000);
+    return () => { active = false; clearTimeout(timer); };
+  }, [listActive, refreshList]);
   const selectedItem = comparisonItems.find(item => item.experiment_id === selected);
-  const pending = !observationFailed && (!snapshot || snapshot.experiment_id !== selected || snapshot.provisional && ['running', 'complete', 'incomplete', 'aborted'].includes(snapshot.status));
+  const pending = !observationFailed && (!snapshot || snapshot.experiment_id !== selected || snapshot.provisional && (snapshot.status === 'running' || selectedItem?.status === 'running'));
   useEffect(() => {
     if (!selected) return;
     let active = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const controller = new AbortController();
     async function read() {
       try {
@@ -78,20 +119,21 @@ export default function App() {
       } catch (reason) {
         if (!active) return;
         // O POST pode retornar antes de o runner reservar e gravar o diretório.
-        if (reason instanceof ApiError && reason.status === 404 && (selectedItem?.status === 'running' || !selectedItem)) return;
+        if (reason instanceof ApiError && reason.status === 404 && (selectedItem?.status === 'running' || acceptedStarts.current.has(selected))) return;
         setError(String(reason));
         setObservationFailed(true);
+      } finally {
+        if (active && pending) timer = setTimeout(() => { void read(); }, 900);
       }
     }
     void read();
-    const timer = pending ? setInterval(() => { void read(); }, 900) : null;
-    return () => { active = false; controller.abort(); if (timer) clearInterval(timer); };
+    return () => { active = false; controller.abort(); clearTimeout(timer); };
   }, [selected, selectedItem?.status, pending, refresh]);
 
   function choose(id: string, nextView: View = 'observe') {
     hasSelected.current = true; setSelected(id); setView(nextView); setRepetition(1); setReplay(null); setSnapshot(null); setError(''); setObservationFailed(false);
   }
-  function started(id: string) { choose(id); void refreshList(); }
+  function started(id: string) { acceptedStarts.current.add(id); setAwaitingStarts(acceptedStarts.current.size); setListPollingFailed(false); choose(id); void refreshList(); }
   async function pin(anchor: Anchor) {
     try {
       const content = anchor.excerpt ? '> ' + anchor.excerpt.replace(/\n/g, '\n> ') + '\n\n## Minha observação\n\n' : '## Momento marcado\n\n' + eventLabel(snapshot!.events[anchor.event_index!]) + '\n\n## Minha observação\n\n';
@@ -152,11 +194,11 @@ export default function App() {
       <aside className="app-sidebar"><a href="/" className="brand"><span className="brand-mark"><FlaskConical size={22} /></span><span>NORVALD <small>LAB</small></span></a>
         <nav aria-label="Navegação principal">{([
           ['observe', 'Bancada', FlaskConical], ['experiments', 'Experimentos', Layers], ['records', 'Registros', List], ['workbook', 'Notebook', BookOpen],
-        ] as const).map(([id, label, Icon]) => <button key={id} aria-label={label} title={label} className={'nav-button ' + ((view === id || id === 'observe' && ['prepare', 'compare'].includes(view)) ? 'active' : '')} onClick={() => setView(id)}><Icon size={18} />{label}</button>)}<button className="nav-button" aria-label="Notes" title="Notes" onClick={() => setNotebook({})}><NotebookPen size={18} />Notes</button></nav>
+        ] as const).map(([id, label, Icon]) => <button key={id} aria-label={label} title={label} className={'nav-button ' + ((view === id || id === 'observe' && ['prepare', 'compare'].includes(view)) ? 'active' : '')} onClick={() => { setView(id); if (id === 'experiments') void refreshList(); }}><Icon size={18} />{label}</button>)}<button className="nav-button" aria-label="Notes" title="Notes" onClick={() => setNotebook({})}><NotebookPen size={18} />Notes</button></nav>
         <div className="sidebar-bottom"><div className="local-label"><span />Ambiente local</div><button className={'nav-button ' + (view === 'settings' ? 'active' : '')} onClick={() => setView('settings')}><Settings2 size={18} />Configurações</button></div>
       </aside>
       <main className="app-main">
-        <header className="app-header"><div><div className="title-line"><h1>{view === 'settings' ? 'Configurações' : view === 'workbook' ? 'Notebook' : view === 'experiments' ? 'Seus experimentos' : view === 'records' ? 'Registros do experimento' : 'Bancada de observação'}</h1>{view === 'settings' ? <span className="badge">Conexões locais</span> : view === 'workbook' ? <span className="badge">Seu espaço de escrita</span> : <span className="badge">{'Modelos reais'}</span>}</div><p>{view === 'settings' ? 'Suas APIs, seus modelos e seus limites.' : view === 'workbook' ? 'Observe, reúna e desenvolva suas ideias.' : (selected || 'Prepare, acompanhe e compare.') + (current ? ' · ' + statusLabel(current.status) : '')}</p></div><div className="header-actions"><button className="icon-button" aria-label="Atualizar registros" onClick={() => { setRefresh(value => value + 1); void refreshList(); }}><RefreshCw size={17} /></button><button className="button secondary" onClick={() => { setInitialSpec(undefined); setView('prepare'); }}><Plus size={15} />Novo experimento</button></div></header>
+        <header className="app-header"><div><div className="title-line"><h1>{view === 'settings' ? 'Configurações' : view === 'workbook' ? 'Notebook' : view === 'experiments' ? 'Seus experimentos' : view === 'records' ? 'Registros do experimento' : 'Bancada de observação'}</h1>{view === 'settings' ? <span className="badge">Conexões locais</span> : view === 'workbook' ? <span className="badge">Seu espaço de escrita</span> : <span className="badge">{'Modelos reais'}</span>}</div><p>{view === 'settings' ? 'Suas APIs, seus modelos e seus limites.' : view === 'workbook' ? 'Observe, reúna e desenvolva suas ideias.' : (selected || 'Prepare, acompanhe e compare.') + (current ? ' · ' + statusLabel(current.status) : '')}</p></div><div className="header-actions"><button className="icon-button" aria-label="Atualizar registros" onClick={() => { setObservationFailed(false); setRefresh(value => value + 1); void refreshList(); }}><RefreshCw size={17} /></button><button className="button secondary" onClick={() => { setInitialSpec(undefined); setView('prepare'); }}><Plus size={15} />Novo experimento</button></div></header>
         {error ? <div role="alert" className="error-banner">{error}<button className="icon-button" onClick={() => setError('')} aria-label="Dispensar aviso"><X size={15} /></button></div> : null}
         {['prepare', 'observe', 'compare'].includes(view) ? <nav className="stage-nav" aria-label="Etapas do experimento">{([['prepare', 'Preparar'], ['observe', 'Acompanhar'], ['compare', 'Comparar']] as const).map(([id, label], index) => <button key={id} className={view === id ? 'active' : ''} onClick={() => setView(id)}><span>{index + 1}</span>{label}</button>)}</nav> : null}
         <Workbook store={workbooks} active={view === 'workbook'} documents={current?.spec.documents ?? []} onResource={setResource} onOrigin={origin} onNotes={id => setNotebook({ id })} onCorpus={capture => { void useCorpus(capture); }} />
