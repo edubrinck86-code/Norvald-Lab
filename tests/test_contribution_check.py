@@ -41,6 +41,39 @@ def test_fenced_json_is_accepted_by_existing_parser_and_diagnostics():
     assert check['usable'] and check['declared_items'] == check['accepted_items'] == 1
 
 
+def test_accepted_knowledge_does_not_claim_rejected_relations_are_valid():
+    payload = {'knowledge': [{'local_id': f'k{i}', 'type': kind, 'content': f'Unidade {i}'}
+                             for i, kind in enumerate(['uncertainty', 'open_question', 'claim', 'option', 'consequence'], 1)],
+               'relations': [{'relation_type': kind, 'source': source, 'target': target}
+                             for kind, source, target in [('motivates', 'k1', 'k2'), ('supports', 'k1', 'k3'),
+                                                         ('addresses', 'k4', 'k2'), ('motivates', 'k1', 'k4'),
+                                                         ('produces', 'k4', 'k5')]]}
+    content = block(payload)
+    check = check_contribution(content, 'p1', WorkingContext())
+    assert check['usable'] and not check['fully_valid'] and check['code'] == 'partial'
+    assert check['declared_items'] == check['accepted_items'] == 5
+    assert check['declared_relations'] == 5 and check['accepted_relations'] == 0
+    assert len(check['rejected']) == 5 and all(part['kind'] == 'relation' for part in check['rejected'])
+    assert content == block(payload)
+
+
+def test_partial_adjustment_diagnostic_identifies_local_relation_and_allowed_pairs():
+    from norvald_lab.adjustment_prompt import adjustment_diagnostic, diagnostic_instructions
+    content = block({'knowledge': [{'local_id': 'option-a', 'type': 'option', 'content': 'Uma opção'},
+                                   {'local_id': 'outcome', 'type': 'consequence', 'content': 'Uma consequência'}],
+                     'relations': [{'relation_type': 'produces', 'source': 'option-a', 'target': 'outcome'}]})
+    record = {'participant_id': 'p1', 'result': {'content': content}, 'error': None}
+    request = {'context': {'working_context': '{"items":[],"relations":[]}'}}
+    diagnostic = adjustment_diagnostic(record, request)
+    instructions = diagnostic_instructions(diagnostic, previous_limit=None, new_limit=None)
+    assert diagnostic['code'] == 'partial'
+    assert 'relations[0] (option-a → outcome)' in instructions
+    assert 'option -produces-> consequence não é permitido' in instructions
+    assert 'Pares permitidos para produces: decision → consequence' in instructions
+    assert 'Não troque tipos nem fabrique relações' in instructions
+    assert record['result']['content'] == content
+
+
 @pytest.mark.asyncio
 async def test_origin_diagnostic_identifies_participant_and_repetition_without_modifying_dataset(tmp_path):
     class Mixed(DemoProvider):

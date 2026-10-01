@@ -101,6 +101,12 @@
 .contribution-diagnostic { padding: 16px; border: 1px solid hsl(var(--border)); border-radius: 9px; margin-top: 16px; }
 .contribution-diagnostic.unusable { border-color: hsl(var(--primary) / .45); }
 .contribution-diagnostic small { display: block; margin-top: 10px; }
+.adjustment-outcome { border-left: 2px solid hsl(var(--primary) / .45); padding: 8px 12px; margin: 8px 0; }
+.adjustment-valid { color: hsl(var(--ok)); border-color: hsl(var(--ok) / .35); background: hsl(var(--ok) / .08); }
+.adjustment-success, .adjustment-partial { padding: 14px; border: 1px solid hsl(var(--ok) / .35); border-radius: 9px; background: hsl(var(--ok) / .05); margin: 12px 0; }
+.adjustment-partial { border-color: hsl(var(--primary) / .45); background: hsl(var(--primary) / .05); }
+.adjustment-check details { margin: 10px 0; }
+.adjustment-check ul { padding-left: 18px; font-size: 12px; line-height: 1.7; }
 
 /* Compact participant cards, with full reading in a centered overlay. */
 .participant-table { grid-auto-flow: row; grid-template-columns: minmax(0, 1fr); grid-auto-columns: auto; overflow: visible; }
@@ -114,6 +120,7 @@
 .participant-identity small, .participant-activity small, .participant-card-status small { font-size: 11px; color: hsl(var(--muted-foreground)); }
 .participant-activity > span { font-size: 12px; overflow-wrap: anywhere; }
 .participant-card-status { align-items: flex-end; }
+.participant-card-status .badge { white-space: normal; text-align: right; }
 .participant-card-status small { color: hsl(var(--primary-button-hover)); }
 .participant-running { color: hsl(var(--primary-button-hover)); border-color: hsl(var(--primary) / .4); }
 .modal-scrim:has(.observation-modal), .modal-scrim:has(.comparison-modal) { padding: 2.5dvh 2.5vw; }

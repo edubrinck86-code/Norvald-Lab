@@ -91,7 +91,7 @@ class AdjustmentStore:
         data["instructions"] += "\n\nAJUSTE SOLICITADO PELO OBSERVADOR. Reavalie a resposta abaixo com o mesmo material. Entregue uma resposta completa e o bloco CONTRIBUTION com JSON válido e ambos os delimitadores. Esta chamada é um ajuste assistido, separado da coleta experimental.\n" + diagnostic_instructions(diagnostic, previous_limit=previous_request["sampling"].get("max_tokens"), new_limit=data["sampling"].get("max_tokens")) + ("\nOrientações anteriores: " + json.dumps(history, ensure_ascii=False) if history else "") + "\nOrientação atual: " + instruction
         saved = {"id": aid, "experiment_id": expid, "observation_id": record["observation_id"], "participant_name": record["participant_name"], "parent_id": parent_id,
                  "instruction": instruction, "instruction_history": history, "max_tokens": data["sampling"].get("max_tokens"), "created_at": datetime.now(timezone.utc).isoformat(),
-                 "protocol": "lab-observer-adjustment-v1", "prompt_profile": "lab-observer-adjustment-diagnostic-v2", "diagnostic": diagnostic, "independent_sample": False,
+                 "protocol": "lab-observer-adjustment-v1", "prompt_profile": "lab-observer-adjustment-diagnostic-v3", "diagnostic": diagnostic, "independent_sample": False,
                  "source_integrity_sha256": digest(self.root / "experiments" / expid / "integrity.json"), "request": data}
         directory = self.directory(expid) / aid
         if persist:

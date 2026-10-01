@@ -1,21 +1,29 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, ChevronLeft, ChevronRight, FileText, Pause, Pin, Play, RotateCcw } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, FileText, Pause, Pin, Play, RefreshCw, RotateCcw } from 'lucide-react';
 import { conditions, statusLabel, type Snapshot, type PreparedRequest, type RawRecord, type Anchor } from '../api';
 import { elapsed, eventLabel, eventParticipant, eventRun, responseProjection } from '../lib/observation';
 import { AdjustResponse } from './AdjustResponse';
 import { Modal } from './Modal';
 import { NorvaldMarkdown } from '../ui/markdown/NorvaldMarkdown';
 import { MarkdownToolbar } from '../ui/MarkdownToolbar';
+import { useAdjustments } from '../hooks/useAdjustments';
+import { adjustmentLabel, contributionSummary, latestAdjustment, validAdjustment } from '../lib/adjustments';
 
-export function Observe({ snapshot, repetition, onRepetition, onContext, onDocuments, onPin, onDerive, replay, onReplay }: {
+export function Observe({ snapshot, repetition, onRepetition, onContext, onDocuments, onPin, onDerive, replay, onReplay, refreshKey = 0 }: {
   snapshot: Snapshot; repetition: number; onRepetition(index: number): void;
   onContext(request: PreparedRequest): void; onDocuments(): void; onPin(anchor: Anchor): void;
-  onDerive(exposure: 'self' | 'exposed'): void; replay: number | null; onReplay(index: number | null): void;
+  onDerive(exposure: 'self' | 'exposed'): void; replay: number | null; onReplay(index: number | null): void; refreshKey?: number;
 }) {
   const [opened, setOpened] = useState<string | null>(null);
+  const [openedSection, setOpenedSection] = useState<'original' | 'adjustments'>('original');
+  const canAdjust = !snapshot.provisional && !!snapshot.integrity?.valid && snapshot.spec.mode === 'live';
+  const adjustments = useAdjustments(snapshot.experiment_id, canAdjust, refreshKey);
   const [playing, setPlaying] = useState(false);
   const [visibleIds, setVisibleIds] = useState<string[]>([]);
   useEffect(() => { setVisibleIds(snapshot.spec.participants.map(p => p.id).slice(0, 3)); setPlaying(false); setOpened(null); }, [snapshot.experiment_id]);
+  useEffect(() => {
+    if (opened && openedSection === 'adjustments') document.getElementById('response-adjustments')?.scrollIntoView({ block: 'start' });
+  }, [opened, openedSection, repetition]);
   useEffect(() => {
     if (!playing) return;
     const timer = setTimeout(() => {
@@ -31,6 +39,7 @@ export function Observe({ snapshot, repetition, onRepetition, onContext, onDocum
   const run = 'r' + repetition.toString().padStart(4, '0');
   const candidates = snapshot.records.filter(r => r.run_id === run && Date.parse(r.captured_at) <= cutoff);
   const invalidContributions = (snapshot.contribution_checks ?? []).filter(check => !check.usable);
+  const problemContributions = (snapshot.contribution_checks ?? []).filter(check => !check.usable || check.rejected.length > 0);
   const openedCheck = snapshot.contribution_checks?.find(check => check.observation_id === candidates.find(r => r.participant_id === opened)?.observation_id);
   const openedParticipant = snapshot.spec.participants.find(p => p.id === opened);
   const openedRecord = candidates.find(r => r.participant_id === opened);
@@ -50,7 +59,11 @@ export function Observe({ snapshot, repetition, onRepetition, onContext, onDocum
       <div className="participant-filter"><span className="muted">Na mesa</span>{snapshot.spec.participants.map((p, index) => <label className={'filter-chip tone-' + index % 4} key={p.id}><input type="checkbox" checked={visibleIds.includes(p.id)} onChange={event => setVisibleIds(current => event.target.checked ? [...current, p.id] : current.filter(id => id !== p.id))} />{p.name}</label>)}</div>
       {snapshot.provisional ? <span className="badge">Coleta provisória · {statusLabel(snapshot.status)}</span> : <span className="badge">Integridade conferida</span>}
     </div>
-    {snapshot.spec.condition.exposure === 'blind' && invalidContributions.length ? <section className="contribution-warning" role="status"><h3>Respostas salvas · exposição estruturada indisponível</h3><p>Para reconsideração individual ou exposição aos colegas, todos os participantes precisam declarar um bloco CONTRIBUTION válido. Esta conferência verifica o formato e a validação do bloco, sem avaliar a qualidade da resposta.</p><ul>{invalidContributions.map(check => <li key={check.observation_id}><strong>{check.participant_name} · repetição {Number(check.run_id.slice(1))} · {check.model}</strong><p>{check.message}</p><button className="text-button" onClick={() => { onRepetition(Number(check.run_id.slice(1))); onReplay(null); setPlaying(false); setOpened(check.participant_id); }}>Ver diagnóstico e resposta original</button></li>)}</ul></section> : null}
+    {snapshot.spec.condition.exposure === 'blind' && problemContributions.length ? <section className="contribution-warning" role="status"><h3>Coleta original · partes ausentes ou recusadas</h3><p>Este aviso verifica as respostas originais. Os ajustes são conferidos separadamente e aparecem junto de cada participante. Ter unidades aceitas não significa que todas as relações foram aceitas.</p><ul>{problemContributions.map(check => {
+      const latest = latestAdjustment(adjustments.attempts, check.observation_id);
+      return <li key={check.observation_id}><strong>{check.participant_name} · repetição {Number(check.run_id.slice(1))} · {check.model}</strong><p>Original: {contributionSummary(check)}</p>{latest ? <div className="adjustment-outcome"><span className={'badge ' + (validAdjustment(latest) ? 'adjustment-valid' : '')}>{adjustmentLabel(latest)}</span>{latest.check ? <p>{contributionSummary(latest.check)}</p> : null}<button className="text-button" onClick={() => { onRepetition(Number(check.run_id.slice(1))); onReplay(null); setPlaying(false); setOpenedSection('adjustments'); setOpened(check.participant_id); }}>Ver ajustes deste participante</button></div> : null}<button className="text-button" onClick={() => { onRepetition(Number(check.run_id.slice(1))); onReplay(null); setPlaying(false); setOpenedSection('original'); setOpened(check.participant_id); }}>Ver diagnóstico e resposta original</button></li>;
+    })}</ul></section> : null}
+    {adjustments.error && !opened ? <div role="alert" className="error-banner">Não foi possível conferir os ajustes: {adjustments.error}<button className="button secondary" onClick={adjustments.refresh}><RefreshCw size={15} />Atualizar ajustes</button></div> : null}
     <div className="participant-table">
       {snapshot.spec.participants.filter(p => visibleIds.includes(p.id)).map(p => {
         const index = snapshot.spec.participants.findIndex(item => item.id === p.id);
@@ -58,23 +71,24 @@ export function Observe({ snapshot, repetition, onRepetition, onContext, onDocum
         const ownEvents = events.filter(event => eventParticipant(event, snapshot) === p.id && eventRun(event, snapshot) === run);
         const started = ownEvents.some(event => event.event === 'execution.started');
         const check = snapshot.contribution_checks?.find(item => item.observation_id === row?.observation_id);
+        const latest = row ? latestAdjustment(adjustments.attempts, row.observation_id) : undefined;
         const status = row ? row.error ? 'Falhou' : 'Concluído' : started ? 'Em execução' : 'Aguardando';
-        return <button className={'participant-card participant-horizontal tone-' + index % 4} key={p.id} aria-label={'Abrir participante · ' + p.name} onClick={() => setOpened(p.id)}>
+        return <button className={'participant-card participant-horizontal tone-' + index % 4} key={p.id} aria-label={'Abrir participante · ' + p.name} onClick={() => { setOpenedSection('original'); setOpened(p.id); }}>
           <span className="participant-avatar">{p.name.slice(0, 1).toUpperCase()}</span>
           <span className="participant-identity"><strong>{p.name}</strong><small>{p.provider} · {p.model}</small></span>
           <span className="participant-activity"><span>{ownEvents.length ? eventLabel(ownEvents.at(-1)!) : 'Sem eventos nesta repetição'}</span><small>{ownEvents.length} eventos{row?.result ? ' · ' + row.result.tokens + ' tokens' : ''}</small></span>
-          <span className="participant-card-status"><span className={'badge ' + (started && !row ? 'participant-running' : '')}>{status}</span>{check?.usable === false ? <small>Contribuição indisponível</small> : null}</span><ChevronRight size={18} />
+          <span className="participant-card-status"><span className={'badge ' + (started && !row ? 'participant-running' : '')}>{status}</span>{check && (!check.usable || check.rejected.length) ? <small>{check.usable ? 'Original: aceitação parcial' : 'Original: contribuição indisponível'}</small> : null}{latest ? <span className={'badge ' + (validAdjustment(latest) ? 'adjustment-valid' : '')}>{adjustmentLabel(latest)}</span> : null}</span><ChevronRight size={18} />
         </button>;
       })}
       {!visibleIds.length ? <div className="empty-state">Selecione um participante para observar.</div> : null}
     </div>
     {openedParticipant ? <Modal className="observation-modal" title={openedParticipant.name + ' · Bancada'} onClose={() => setOpened(null)}>
-      <div className="observation-navigation"><label>Participante<select aria-label="Participante na bancada" value={openedParticipant.id} onChange={event => setOpened(event.target.value)}>{snapshot.spec.participants.map(p => <option value={p.id} key={p.id}>{p.name}</option>)}</select></label><span className="badge">Repetição {repetition} · {replay === null ? 'Registros disponíveis' : 'Revisão de eventos'}</span></div>
+      <div className="observation-navigation"><label>Participante<select aria-label="Participante na bancada" value={openedParticipant.id} onChange={event => { setOpenedSection('original'); setOpened(event.target.value); }}>{snapshot.spec.participants.map(p => <option value={p.id} key={p.id}>{p.name}</option>)}</select></label><span className="badge">Repetição {repetition} · {replay === null ? 'Registros disponíveis' : 'Revisão de eventos'}</span></div>
       <div className="observation-content"><div className="observation-meta"><span className="eyebrow">{openedParticipant.provider}</span><h3>{openedParticipant.model}</h3><p>Solicitação de reasoning: {openedParticipant.reasoning_effort === 'off' ? 'padrão / sem solicitação' : openedParticipant.reasoning_effort}</p></div>
         {openedRequest ? <button className="context-button" onClick={() => onContext(openedRequest)}><FileText size={15} />Contexto preparado<ChevronRight size={14} /></button> : null}
-        {openedCheck ? <section className={'contribution-diagnostic ' + (openedCheck.usable ? '' : 'unusable')}><h3>Diagnóstico da contribuição</h3><p>{openedCheck.message}</p><small>{openedCheck.declared_items} unidades declaradas · {openedCheck.accepted_items} unidades aceitas pelo validador</small>{openedCheck.rejected.length ? <details><summary>Partes recusadas</summary><ul>{openedCheck.rejected.map((part, index) => <li key={index}>{part.kind} · {part.identifier || 'Sem identificador'}: {part.reason}</li>)}</ul></details> : null}<p className="muted">A resposta original está abaixo. Você pode pedir um ajuste separado à LLM, preservando este registro.</p></section> : null}
+        {openedCheck ? <section className={'contribution-diagnostic ' + (openedCheck.usable && !openedCheck.rejected.length ? '' : 'unusable')}><h3>Diagnóstico da resposta original</h3><p>{contributionSummary(openedCheck)}</p><small>{openedCheck.declared_items} unidades declaradas · {openedCheck.accepted_items} unidades aceitas pelo validador</small>{openedCheck.rejected.length ? <details open><summary>Partes recusadas no original</summary><ul>{openedCheck.rejected.map((part, index) => <li key={index}>{part.kind}: {part.reason}</li>)}</ul></details> : null}<p className="muted">Este diagnóstico permanece ligado ao original. O resultado de cada ajuste é mostrado na seção Pedir ajuste à LLM.</p></section> : null}
         <section className="observation-response" id="observation-response"><span className="eyebrow">Resposta registrada</span>{openedRecord?.error ? <p className="danger">{openedRecord.error.message}</p> : openedRecord?.result ? <><NorvaldMarkdown content={responseProjection(openedRecord.result.content).markdown} />{openedRecord.result.reasoning ? <details><summary>Reasoning disponibilizado · {openedRecord.reasoning_exposure_mode}</summary><NorvaldMarkdown content={openedRecord.result.reasoning} /></details> : <p className="trace-note">O provedor não disponibilizou reasoning neste registro.</p>}<details open={openedCheck?.usable === false}><summary>Resposta original em Markdown</summary><pre>{openedRecord.result.content}</pre></details>{responseProjection(openedRecord.result.content).structured ? <details><summary>Contribuição estruturada original</summary><pre>{responseProjection(openedRecord.result.content).structured}</pre></details> : null}</> : <p className="muted">A resposta aparecerá quando for registrada pelo motor.</p>}</section>
-        {openedRecord && !snapshot.provisional && snapshot.integrity?.valid && snapshot.spec.mode === 'live' ? <AdjustResponse key={openedRecord.observation_id} experimentId={snapshot.experiment_id} record={openedRecord} invalid={openedCheck?.usable === false} maxTokens={openedParticipant.sampling.max_tokens} /> : null}
+        {openedRecord && canAdjust ? <AdjustResponse key={openedRecord.observation_id} experimentId={snapshot.experiment_id} record={openedRecord} invalid={openedCheck?.usable === false || !!openedCheck?.rejected.length} maxTokens={openedParticipant.sampling.max_tokens} attempts={adjustments.attempts.filter(attempt => attempt.observation_id === openedRecord.observation_id)} historyError={adjustments.error} onRefresh={adjustments.refresh} onAccepted={adjustments.accepted} /> : null}
         <section className="observation-events"><h3>Eventos registrados</h3>{openedEvents.map(event => <div className="recorded-event" key={event.index}><time title={event.at}>{elapsed(event.at, origin)}</time><span>{eventLabel(event)}</span></div>)}{!openedEvents.length ? <p className="muted">Aguardando eventos desta execução.</p> : null}</section>
       </div><footer className="modal-footer">{openedRecord?.result ? <><button className="text-button" onClick={() => { const element = document.getElementById('observation-response'); if (element) pin(openedRecord, element); }}><Pin size={14} />Fixar trecho</button><MarkdownToolbar markdown={openedRecord.result.content} filename={openedParticipant.name + '-' + snapshot.experiment_id} /></> : <span className="muted">A coleta continua ao fechar a bancada.</span>}</footer>
     </Modal> : null}
@@ -99,7 +113,7 @@ export function Observe({ snapshot, repetition, onRepetition, onContext, onDocum
         <div className="selected-event">{eventLabel(snapshot.events[replay ?? snapshot.events.length - 1])}<time>{new Date(snapshot.events[replay ?? snapshot.events.length - 1].at).toLocaleString('pt-BR')}</time></div>
       </> : <p className="muted">Os primeiros eventos ainda não foram registrados.</p>}
     </section>
-    {snapshot.spec.condition.exposure === 'blind' && snapshot.status === 'complete' && snapshot.integrity?.valid ? <div className="derive-actions"><span>Observe a mesma base em outra condição</span><button className="button secondary" disabled={invalidContributions.length > 0} onClick={() => onDerive('self')}>Reconsideração individual</button><button className="button secondary" disabled={snapshot.spec.participants.length < 2 || invalidContributions.length > 0} onClick={() => onDerive('exposed')}>Exposição aos colegas</button></div> : null}
+    {snapshot.spec.condition.exposure === 'blind' && snapshot.status === 'complete' && snapshot.integrity?.valid ? <div className="derive-actions"><span>{invalidContributions.length ? 'Comparação controlada bloqueada pela coleta original. Ajustes assistidos têm registro e validação próprios.' : 'Observe a mesma base em outra condição'}</span><button className="button secondary" disabled={invalidContributions.length > 0} onClick={() => onDerive('self')}>Reconsideração individual</button><button className="button secondary" disabled={snapshot.spec.participants.length < 2 || invalidContributions.length > 0} onClick={() => onDerive('exposed')}>Exposição aos colegas</button></div> : null}
   </div>;
 }
 function EyeIcon() { return <FileText size={15} />; }

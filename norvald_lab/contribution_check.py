@@ -12,11 +12,16 @@ from norvald_lab.domain.deliberation.working_context import WorkingContext
 def check_contribution(content, author_id, context):
     contribution = Contribution.parse(content, author_id=author_id, round_number=1)
     validated = validate_and_convert(contribution, context)
-    result = {"usable": bool(validated.items), "declared_items": len(contribution.knowledge),
-              "accepted_items": len(validated.items), "rejected": [asdict(p) for p in validated.rejected]}
+    result = {"usable": bool(validated.items), "fully_valid": bool(validated.items) and not validated.rejected,
+              "declared_items": len(contribution.knowledge), "accepted_items": len(validated.items),
+              "declared_relations": len(contribution.relations), "accepted_relations": len(validated.relations),
+              "rejected": [asdict(p) for p in validated.rejected]}
     if not content.strip():
         return result | {"code": "empty_response", "message": "Nenhum conteúdo de resposta foi disponibilizado."}
     if validated.items:
+        if validated.rejected:
+            return result | {"code": "partial", "message":
+                f"Contribuição aceita parcialmente: {len(validated.items)} unidades e {len(validated.relations)} relações aceitas; {len(validated.rejected)} partes recusadas. Confira as recusas antes de pedir um ajuste."}
         return result | {"code": "usable", "message": "Contribuição estruturada disponível para exposição."}
     match = _CONTRIBUTION_RE.search(content)
     if match is None:
@@ -50,7 +55,7 @@ def check_records(records, requests):
         context = WorkingContext.from_dict(json.loads(request["context"]["working_context"]))
         check = check_contribution(content, record["participant_id"], context)
         if record.get("error"):
-            check = check | {"usable": False, "code": "execution_failed", "message": "A execução falhou; não há resposta válida para exposição."}
+            check = check | {"usable": False, "fully_valid": False, "code": "execution_failed", "message": "A execução falhou; não há resposta válida para exposição."}
         result.append(check | {"observation_id": record["observation_id"], "participant_id": record["participant_id"],
                               "participant_name": record["participant_name"], "run_id": record["run_id"],
                               "model": record["requested_model"]})

@@ -47,6 +47,8 @@ No overlay de um participante, **Pedir ajuste à LLM** permite escrever uma orie
 
 Um ajuste assistido tem protocolo próprio e **não é uma nova amostra independente**. Ele não altera o RAW original nem substitui uma base B1 em comparações pareadas. Uma contribuição inválida na coleta original continua bloqueando a exposição controlada. Não há loop automático de correção; cada nova tentativa exige clicar em Enviar ajuste e pode consumir a API. Um erro de transporte também é preservado e pode ser tentado novamente sem chamar os demais participantes.
 
+A Bancada distingue **original**, **último ajuste válido**, **aceitação parcial** e **ajuste sem resposta**. A existência de unidades aceitas não torna válidas relações recusadas: cada recusa aparece na própria tentativa, inclusive em históricos anteriores. **Corrigir partes recusadas** prepara uma orientação a partir daquela tentativa; **Ver pedido de ajuste** mostra o campo `relations[i]`, os IDs locais e os pares de tipos permitidos, antes de qualquer chamada. Nenhuma parte recusada é corrigida automaticamente ou tratada como aceita. O aviso da coleta original permanece identificado como original; ele não é o diagnóstico da última tentativa.
+
 O editor de blocos do Notebook ocupa 95% da largura e da altura disponíveis, com índice, inspector e navegação. O documento central usa toda a largura adicional.
 
 Os dados ficam em `~/.norvald/lab/`, separados do Studio.
