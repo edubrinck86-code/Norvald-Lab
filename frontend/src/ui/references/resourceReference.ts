@@ -1,4 +1,4 @@
-export type ResourceSource = "auto" | "library" | "repository" | "artifact" | "assistant_artifact" | "cloud" | "attachment" | "note";
+export type ResourceSource = "auto" | "library" | "repository" | "artifact" | "assistant_artifact" | "cloud" | "attachment" | "note" | "notebook";
 export interface ResourceReference {
   source: ResourceSource;
   id: string;
@@ -13,7 +13,7 @@ export function resourceFromHref(href: string, origin: string, apiOrigin = origi
   if (!href || href.startsWith("#")) return null;
   let url: URL;
   try { url = new URL(href, origin + "/"); } catch { return null; }
-  const custom = /^(library|repository|artifact|cloud|note|attachment):(?:\/\/)?(.+)$/i.exec(href);
+  const custom = /^(library|repository|artifact|cloud|note|notebook|attachment):(?:\/\/)?(.+)$/i.exec(href);
   if (custom) {
     try { const [id, section] = custom[2].split("#", 2); return { source: custom[1].toLowerCase() as ResourceSource, id: decodeURIComponent(id), section: section ? decodeURIComponent(section) : undefined }; } catch { return null; }
   }

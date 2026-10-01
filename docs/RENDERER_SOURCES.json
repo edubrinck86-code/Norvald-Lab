@@ -1,11 +1,11 @@
 {
   "repository": "edubrinck86-code/Norvald-teste-codex",
-  "source_tree": "82cbf32f8270a97d235b7cab525c590382c8a231",
+  "source_tree": "edfef099d673030d39c726c59da280e2284bf265",
   "files": [
     {
       "path": "frontend/src/ui/markdown/NorvaldMarkdown.tsx",
       "source_blob": "88b8ccaae7006ca99fba38d52783a7e20ce1104e",
-      "destination_sha256": "93da0f215ea1bba68e700d3cf431cd5d5b167559abef259c6aaa80c5ab2330f9"
+      "destination_sha256": "44fe5327b94e08a69afbad0a599909de80391c0659281d8c8a7977c8b8f33734"
     },
     {
       "path": "frontend/src/ui/markdown/MermaidDiagram.tsx",
@@ -65,7 +65,7 @@
     {
       "path": "frontend/src/ui/references/resourceReference.ts",
       "source_blob": "7f99d85b345932d1faadda57e47770f4d74aa72a",
-      "destination_sha256": "e2d965e947d9467d76907234b69c0daaefbcfe89e4d3a7241cc2cb2b65a07450"
+      "destination_sha256": "3da8e18e00959ad219fe4d7a03b9019000adb6ec03950c67c13fca46f171340a"
     },
     {
       "path": "frontend/src/styles/foundations/base.css",
@@ -86,6 +86,8 @@
     "Studio tokens and Markdown stylesheet retained; Lab CSS overrides neutral surfaces and info color.",
     "Reference buttons receive explicit accessible labels.",
     "Markdown syntax help describes local references.",
-    "Trailing blank lines normalized; original source blobs remain identified above."
-  ]
+    "Trailing blank lines normalized; original source blobs remain identified above.",
+    "Notebook references use a local notebook: scheme, intercepted into overlays; captured note source links preserve the original snapshot."
+  ],
+  "source_commit": "82cbf32f8270a97d235b7cab525c590382c8a231"
 }

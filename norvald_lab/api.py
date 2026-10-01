@@ -15,6 +15,7 @@ from norvald_lab.infrastructure.arof.dataset_store import arof_data_root
 from norvald_lab.runner import ExperimentRunner
 from norvald_lab.storage import verify_experiment
 from norvald_lab.observer import NotebookStore, snapshot
+from norvald_lab.workbook import WorkbookStore, RevisionConflict
 from norvald_lab.cli import demo_spec, derive_spec
 from uuid import uuid4
 
@@ -25,6 +26,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
     jobs = {}
     failures = {}
     notebook = NotebookStore(root)
+    workbooks = WorkbookStore(root)
 
     @asynccontextmanager
     async def lifespan(app):
@@ -191,6 +193,40 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
             return verify_experiment(root, experiment_id)
         except (OSError, ValueError) as exc:
             raise HTTPException(409, "Experimento sem fechamento verificável.") from exc
+
+    def workbook_action(action):
+        try:
+            return action()
+        except RevisionConflict as exc:
+            raise HTTPException(409, str(exc)) from exc
+        except FileNotFoundError as exc:
+            raise HTTPException(404, "Caderno ou nota não encontrado.") from exc
+        except (ValueError, TypeError, KeyError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.get("/api/workbooks")
+    def list_workbooks():
+        return workbooks.list()
+
+    @app.post("/api/workbooks", status_code=201)
+    def create_workbook(payload: dict):
+        return workbook_action(lambda: workbooks.save(payload))
+
+    @app.get("/api/workbooks/{book_id}")
+    def get_workbook(book_id: str):
+        return workbook_action(lambda: workbooks.get(book_id))
+
+    @app.put("/api/workbooks/{book_id}")
+    def save_workbook(book_id: str, payload: dict):
+        return workbook_action(lambda: workbooks.save(payload, book_id))
+
+    @app.post("/api/workbooks/{book_id}/capture-note")
+    def capture_note(book_id: str, payload: dict):
+        return workbook_action(lambda: workbooks.capture_note(book_id, payload["note_id"], payload["revision"]))
+
+    @app.post("/api/workbooks/{book_id}/corpus")
+    def workbook_corpus(book_id: str, payload: dict):
+        return workbook_action(lambda: workbooks.corpus(book_id, payload["revision"], payload.get("block_ids")))
 
     @app.get("/api/experiments/{experiment_id}/raw")
     def raw(experiment_id: str):

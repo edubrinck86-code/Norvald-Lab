@@ -22,6 +22,9 @@ export type RawRecord = {
 export type Snapshot = { experiment_id: string; status: string; provisional: boolean; integrity: { valid: boolean; issues: string[] } | null; spec: Spec; requests: PreparedRequest[]; events: RecordedEvent[]; records: RawRecord[] };
 export type Anchor = { experiment_id: string; observation_id?: string; excerpt?: string; event_index?: number };
 export type Note = { id: string; title: string; content: string; anchor: Anchor | null; created_at: string; updated_at: string };
+export type WorkBlock = { id: string; title: string; content: string; type: string; source_note: (Note & { captured_at: string }) | null };
+export type Workbook = { id: string; title: string; blocks: WorkBlock[]; revision: number; created_at: string; updated_at: string };
+export type CorpusCapture = { workbook_id: string; revision: number; block_ids: string[]; sha256: string; document: DocumentItem };
 
 export class ApiError extends Error {
   constructor(message: string, public status: number) { super(message); }

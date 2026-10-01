@@ -17,9 +17,16 @@ O comando prepara Python e a interface, inicia o laboratório e abre o navegador
 - **Preparar:** escreva a pergunta, configure participantes e documentos e confira o contrato que será enviado antes de iniciar.
 - **Acompanhar:** veja os participantes lado a lado, escolha a repetição, abra o contexto e reveja eventos reais na linha do tempo.
 - **Comparar:** veja o mesmo participante e a mesma repetição nas condições ligadas à mesma base independente, com alterações literais destacadas.
-- **Minhas notas:** abra o caderno em overlay, com lista à esquerda, título e toolbar no topo, edição/preview, tags e contagem de palavras. O salvamento é automático; copiar e baixar preservam o Markdown.
+- **Minhas notas:** anotações rápidas em overlay, com lista à esquerda, título e toolbar no topo, edição/preview, tags e contagem de palavras. O salvamento é automático; copiar e baixar preservam o Markdown.
+- **Caderno de trabalho:** organize suas hipóteses, protocolos e análises em cartões de blocos, seguindo a estrutura do Notebook do Studio. Abra um bloco para escrever com o índice à esquerda, inspector e navegação abertos à direita. Há múltiplos cadernos, busca, duplicação, exclusão e reordenação por arraste ou setas.
 
 Selecione um trecho e use **Fixar trecho**, ou **Marcar momento** na linha do tempo. A nota mantém uma referência à observação original. As notas ficam em `observer/notes/`, fora dos experimentos e dos contextos das LLMs. Alterá-las não modifica o dataset.
+
+No Caderno de trabalho, **Trazer anotação** cria um bloco com uma cópia do texto, da data e da origem da nota. O inspector permite conferir a cópia original, abrir a nota atual e voltar ao experimento. A cópia permanece mesmo se a nota for alterada ou excluída. Os cadernos ficam em `observer/workbooks/`, também fora do dataset.
+
+**Usar caderno no corpus** (ou **Usar este bloco no corpus**) mostra uma cópia identificada pela revisão e pelo hash do texto. Depois de conferir, **Preparar experimento com esta versão** inclui esse documento na preparação de um novo experimento. Nenhuma LLM é chamada nessa etapa. A versão copiada permanece igual no experimento, mesmo que você continue editando o caderno. As condições derivadas mantêm o corpus da base, como antes.
+
+O editor salva automaticamente e informa falhas. Uma edição atrasada de outra aba é recusada, preservando o rascunho na tela para conferência. Referências `[[título ou ID do bloco]]`, `[bloco](notebook:ID_CADERNO/ID_BLOCO)` e `[anotação capturada](notebook:ID_CADERNO/ID_BLOCO/source)` abrem em overlay; os links web continuam externos.
 
 O replay navega pelos registros gravados; não pausa a coleta. A resposta e o reasoning aparecem quando são capturados, sem simular chegada de tokens. Os destaques comparam texto, sem avaliar qualidade ou atribuir causalidade. Registros ainda sem fechamento são identificados como provisórios; registros fechados alterados têm sua leitura bloqueada.
 
@@ -120,7 +127,7 @@ O perfil de ferramentas é explícito: `off` ou `corpus` (consulta somente aos d
 
 Escuta apenas em `http://127.0.0.1:8766`; documentação da API em `/docs`. O servidor aceita demonstrações por padrão; `serve --live` habilita configurações reais. Não há autenticação de serviço público nesta entrega.
 
-Endpoints: `GET /health`, `GET/POST /api/experiments`, `GET /api/experiments/{id}` e suas leituras `/manifest`, `/raw`, `/verify`, `/observe`. `POST /api/prepare` confere sem executar; `POST /api/derive` prepara outra condição; `POST /api/demo` inicia a demonstração. O caderno usa `/api/notes`. A coleta roda em segundo plano. CLI e API usam o mesmo executor.
+Endpoints: `GET /health`, `GET/POST /api/experiments`, `GET /api/experiments/{id}` e suas leituras `/manifest`, `/raw`, `/verify`, `/observe`. `POST /api/prepare` confere sem executar; `POST /api/derive` prepara outra condição; `POST /api/demo` inicia a demonstração. As anotações usam `/api/notes`; os cadernos, `GET/POST /api/workbooks`, `GET/PUT /api/workbooks/{id}` e `POST` nas ações `/capture-note` e `/corpus`. Escritas e capturas de caderno exigem a revisão atual. A coleta roda em segundo plano. CLI e API usam o mesmo executor.
 
 ## Limites científicos e da migração
 

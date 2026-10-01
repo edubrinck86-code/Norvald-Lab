@@ -105,7 +105,7 @@ function isSafeUrl(value: string): boolean {
     trimmed.startsWith("./") ||
     trimmed.startsWith("../")
   ) return true;
-  return /^(https?:|mailto:|tel:|data:image\/|library:|repository:|artifact:|cloud:|note:|attachment:)/i.test(trimmed) || /^[^:]+\.(?:md|txt|pdf|csv|json|docx?|xlsx?|png|jpe?g|svg|zip)(?:#.*)?$/i.test(trimmed);
+  return /^(https?:|mailto:|tel:|data:image\/|library:|repository:|artifact:|cloud:|note:|notebook:|attachment:)/i.test(trimmed) || /^[^:]+\.(?:md|txt|pdf|csv|json|docx?|xlsx?|png|jpe?g|svg|zip)(?:#.*)?$/i.test(trimmed);
 }
 
 function sanitizeRenderedHtml(html: string): string {

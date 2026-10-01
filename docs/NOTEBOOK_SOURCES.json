@@ -1,0 +1,21 @@
+{
+  "repository": "edubrinck86-code/Norvald-teste-codex",
+  "source_commit": "82cbf32f8270a97d235b7cab525c590382c8a231",
+  "source_tree": "edfef099d673030d39c726c59da280e2284bf265",
+  "reference_files": [
+    { "path": "frontend/src/features/workspace/components/WorkspaceEditor.tsx", "source_blob": "6dc812daa209c371719e5447e4575877c8a1c996" },
+    { "path": "frontend/src/features/workspace/components/BlockEditorOverlay.tsx", "source_blob": "0f2e2a029569b40071462afb4e559a2f8f4e2acd" },
+    { "path": "frontend/src/features/workspace/components/SortableBlock.tsx", "source_blob": "e5d4bb6894d5b3db0cd8bba47cea1e45172d9373" },
+    { "path": "frontend/src/features/home/hooks/useWorkspaceBlocks.ts", "source_blob": "e9ee53e1797a0d0d14ffc78f9d6bae8b991ae94c" },
+    { "path": "frontend/src/shell/Inspector.tsx", "source_blob": "277a723472c947cbe327fc7743ea53ea06a39e42" }
+  ],
+  "adaptation": [
+    "WorkspaceEditor is the Studio work Notebook; NotebookPanel/View are its separate quick notes.",
+    "Preserve block cards, knowledge overview and editor with Markdown index plus inspector and navigation. Both right panels start open together.",
+    "Reuse the imported Studio NorvaldMarkdown, MarkdownIndexSidebar, heading scrolling, word count and MarkdownToolbar. Adapt surrounding components to the Lab API and matte palette.",
+    "Use native drag plus accessible arrow controls instead of importing the Studio DnD dependency.",
+    "Replace Studio Library/Repository services with local captured annotations, blocks and the frozen corpus of the selected experiment.",
+    "Store workbooks outside the experimental dataset, with atomic writes and revision checks. Captured note provenance is immutable.",
+    "Export only an explicitly reviewed revision to a new experiment. The corpus contains a frozen Markdown copy with a SHA-256 source identifier. No automatic participant access to personal workbooks."
+  ]
+}
