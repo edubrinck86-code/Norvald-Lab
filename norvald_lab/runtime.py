@@ -28,25 +28,26 @@ class DemoProvider(LLMProvider):
         return []
 
 
-def build_registry(spec: dict, *, allow_live: bool = False) -> AgentRegistry:
+def build_registry(spec: dict, *, allow_live: bool = False, credential_resolver=None) -> AgentRegistry:
     if spec["mode"] == "live" and not allow_live:
         raise ValueError("Execução real precisa de --live; a demonstração não usa APIs.")
     registry = AgentRegistry()
+    used = {p["provider"] for p in spec["participants"]}
     for name, config in spec["providers"].items():
+        if name not in used:
+            continue
         kind = config["kind"]
         if kind == "demo":
             provider = DemoProvider()
         else:
             env = config.get("credential_env", "")
-            credential = os.environ.get(env, "") if env else ""
+            credential = credential_resolver(kind, env, config.get("base_url")) if credential_resolver else os.environ.get(env, "") if env else ""
             if kind == "ollama":
-                address = config.get("base_url") or credential
-                if not address:
-                    raise ValueError(f"Provider {name}: informe o endereço do Ollama.")
+                address = config.get("base_url") or credential or "http://localhost:11434"
                 provider = OllamaProvider(address)
             else:
                 if env and not credential:
-                    raise ValueError(f"Provider {name}: variável {env} não está definida.")
+                    raise ValueError(f"Provider {name}: variável {env} não está definida e não há chave local para este endereço.")
                 if not credential and not config.get("base_url"):
                     raise ValueError(f"Provider {name}: informe credential_env.")
                 provider = build_provider(kind, credential, config.get("base_url"))

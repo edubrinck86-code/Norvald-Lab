@@ -26,6 +26,7 @@ from norvald_lab.domain.deliberation.working_context import WorkingContext
 from norvald_lab.infrastructure.arof.dataset_store import arof_data_root, close_experiment, write_capacity_report, write_manifest
 from norvald_lab.infrastructure.arof.raw_observation_store import JsonlRawObservationStore
 from norvald_lab.runtime import build_registry, close_registry, corpus_runtime
+from norvald_lab.settings import LocalSettings
 from norvald_lab.storage import read_verified_records, seal, write_once
 from norvald_lab.vendor.norvald_execution.contracts.execution_context import ExecutionContext
 from norvald_lab.vendor.norvald_execution.contracts.execution_contracts import ExecutionRequest
@@ -67,6 +68,7 @@ def _comparison_base(spec):
 class ExperimentRunner:
     def __init__(self, root: str | Path | None = None):
         self.root = Path(root).expanduser() if root is not None else arof_data_root()
+        self.credentials = LocalSettings(self.root)
 
     def prepare(self, payload: dict) -> PreparedExperiment:
         spec = validate_spec(payload)
@@ -151,7 +153,7 @@ class ExperimentRunner:
     async def run(self, prepared: PreparedExperiment, *, allow_live=False, registry=None, on_event: Callable | None = None, monitor_capacity=True):
         spec = prepared.spec
         own_registry = registry is None
-        registry = registry or build_registry(spec, allow_live=allow_live)
+        registry = registry or build_registry(spec, allow_live=allow_live, credential_resolver=self.credentials.resolve)
         if spec["mode"] == "live" and not allow_live:
             raise ValueError("Execução real precisa ser habilitada explicitamente.")
         try:
@@ -168,6 +170,11 @@ class ExperimentRunner:
 
     async def _run(self, prepared, registry, on_event, monitor_capacity):
         spec = prepared.spec
+        # Capture as credenciais efetivamente entregues ao transporte: uma chave
+        # pode ser removida/substituída na UI enquanto a coleta está em curso.
+        keys = [getattr(registry.get_provider(name), "_api_key", "") for name in registry.provider_names()]
+        keys += [self.credentials.resolve(c["kind"], c.get("credential_env", ""), c.get("base_url")) for c in spec["providers"].values() if c["kind"] != "demo"]
+        redact = lambda value: self.credentials.redact(value, keys)
         expid = spec["experiment_id"]
         directory = self.root / "experiments" / expid
         # Reserva exclusiva entre processos: nenhuma segunda execução reutiliza o ID.
@@ -181,6 +188,7 @@ class ExperimentRunner:
         write_once(directory / "seed_audits.json", json.loads(prepared.seed_audits_json))
         events = directory / "events.jsonl"
         def emit(event, data):
+            data = redact(data)
             with events.open("a", encoding="utf-8") as out:
                 out.write(_json({"at": _utc(), "event": event, "data": data}) + "\n")
             if on_event:
@@ -217,10 +225,12 @@ class ExperimentRunner:
                     cancelled = True
                 except Exception as exc:
                     error = exc
+                if result is not None:
+                    result.metadata = redact(result.metadata)
                 observation = build_raw_observation(request=request, attempt_index=1, started_at=started, requested_provider_kind=spec["providers"][participant["provider"]]["kind"], requested_model=participant["model"], available_tool_names=[d.name for d in runtime.definitions()] if request.allow_tools else [], result=result, error=error)
-                observation = replace(observation, request=observation.request | {"boundary": "norvald_lab_execution", "studio_metadata": observation.request["studio_metadata"] | {k: metadata[k] for k in ("repetition_index", "lab_exposure_mode", "source_experiment_id", "source_observation_ids")}})
+                observation = replace(observation, error=redact(observation.error), request=observation.request | {"boundary": "norvald_lab_execution", "studio_metadata": observation.request["studio_metadata"] | {k: metadata[k] for k in ("repetition_index", "lab_exposure_mode", "source_experiment_id", "source_observation_ids")}})
                 sink.record(observation)
-                output = {"participant_id": participant["id"], "run_id": metadata["run_id"], "ok": error is None, "error": str(error) if error else None, "provider": participant["provider"], "model": participant["model"], "reasoning_captured": bool(result and result.reasoning), "input_tokens": result.input_tokens if result else None, "output_tokens": result.output_tokens if result else None}
+                output = {"participant_id": participant["id"], "run_id": metadata["run_id"], "ok": error is None, "error": redact(str(error)) if error else None, "provider": participant["provider"], "model": participant["model"], "reasoning_captured": bool(result and result.reasoning), "input_tokens": result.input_tokens if result else None, "output_tokens": result.output_tokens if result else None}
                 outputs.append(output)
                 emit("execution.completed" if error is None else "execution.failed", output)
                 if cancelled:

@@ -14,8 +14,9 @@ Para abrir a interface, dentro da pasta do projeto:
 
 O comando prepara Python e a interface, inicia o laboratório e abre o navegador em `http://127.0.0.1:8766`. Na primeira vez requer internet, Python 3.10+ e Node.js 22.12+. Clique em **Abrir demonstração**: ela produz três condições, com três participantes sintéticos e sem chamadas às APIs.
 
-- **Preparar:** escreva a pergunta, configure participantes e documentos e confira o contrato que será enviado antes de iniciar.
-- **Acompanhar:** veja os participantes lado a lado, escolha a repetição, abra o contexto e reveja eventos reais na linha do tempo.
+- **Configurações:** cadastre, substitua ou remova chaves por provedor; consulte a conexão sem gerar resposta e habilite chamadas reais.
+- **Preparar:** escreva a pergunta, selecione modelos no catálogo com filtros de preço, tools e reasoning declarados, configure documentos e confira o contrato antes de iniciar.
+- **Acompanhar:** veja os participantes em cartões e abra cada um na bancada lateral. Arraste a borda esquerda do drawer para ajustar somente a largura. Respostas, reasoning disponibilizado, eventos e contexto continuam ligados ao registro original.
 - **Comparar:** veja o mesmo participante e a mesma repetição nas condições ligadas à mesma base independente, com alterações literais destacadas.
 - **Minhas notas:** anotações rápidas em overlay, com lista à esquerda, título e toolbar no topo, edição/preview, tags e contagem de palavras. O salvamento é automático; copiar e baixar preservam o Markdown.
 - **Caderno de trabalho:** organize suas hipóteses, protocolos e análises em cartões de blocos, seguindo a estrutura do Notebook do Studio. Abra um bloco para escrever com o índice à esquerda, inspector e navegação abertos à direita. Há múltiplos cadernos, busca, duplicação, exclusão e reordenação por arraste ou setas.
@@ -30,13 +31,9 @@ O editor salva automaticamente e informa falhas. Uma edição atrasada de outra 
 
 O replay navega pelos registros gravados; não pausa a coleta. A resposta e o reasoning aparecem quando são capturados, sem simular chegada de tokens. Os destaques comparam texto, sem avaliar qualidade ou atribuir causalidade. Registros ainda sem fechamento são identificados como provisórios; registros fechados alterados têm sua leitura bloqueada.
 
-Para habilitar modelos reais, com as variáveis de credencial já definidas no computador:
+Para usar modelos reais, abra **Configurações**, salve a chave do provedor e habilite **Chamadas reais**. No **Preparar**, escolha o modo **Modelos reais** e use **Selecionar modelo · filtros**. O catálogo é consultado na API do provedor: preço ou capacidade ausentes aparecem como **não declarados**. Ollama aparece como **local**; isso não é uma declaração de preço zero.
 
-```bash
-./scripts/start.sh --live
-```
-
-Você informa **o nome** da variável da credencial na interface, nunca sua chave. A execução real começa apenas no botão **Iniciar experimento**, após a conferência. Configurações JSON existentes também podem ser importadas.
+As chaves ficam em `private/settings.json` dentro da pasta de dados, fora dos experimentos e do Git, com permissões de acesso do usuário (diretório `0700`, arquivo `0600`). A interface não recupera a chave após salvar. A execução real começa apenas no botão **Iniciar experimento**, após a conferência. Variáveis de ambiente e configurações JSON existentes continuam aceitas.
 
 Use `NORVALD_LAB_DATA_DIR` para escolher a pasta de dados da bancada. Quem já compilou a interface pode iniciar apenas o servidor com `./scripts/lab.sh serve --open`.
 
@@ -125,9 +122,9 @@ O perfil de ferramentas é explícito: `off` ou `corpus` (consulta somente aos d
 ./scripts/lab.sh serve
 ```
 
-Escuta apenas em `http://127.0.0.1:8766`; documentação da API em `/docs`. O servidor aceita demonstrações por padrão; `serve --live` habilita configurações reais. Não há autenticação de serviço público nesta entrega.
+Escuta apenas em `http://127.0.0.1:8766`; documentação da API em `/docs`. O servidor inicia em demonstração se ainda não houver preferência salva. Habilite chamadas reais em Configurações; essa preferência persiste entre reinicializações. `serve --live` continua disponível como alternativa. Não há autenticação de serviço público nesta entrega.
 
-Endpoints: `GET /health`, `GET/POST /api/experiments`, `GET /api/experiments/{id}` e suas leituras `/manifest`, `/raw`, `/verify`, `/observe`. `POST /api/prepare` confere sem executar; `POST /api/derive` prepara outra condição; `POST /api/demo` inicia a demonstração. As anotações usam `/api/notes`; os cadernos, `GET/POST /api/workbooks`, `GET/PUT /api/workbooks/{id}` e `POST` nas ações `/capture-note` e `/corpus`. Escritas e capturas de caderno exigem a revisão atual. A coleta roda em segundo plano. CLI e API usam o mesmo executor.
+Endpoints: `GET /health`, `GET/POST /api/experiments`, `GET /api/experiments/{id}` e suas leituras `/manifest`, `/raw`, `/verify`, `/observe`. `POST /api/prepare` confere sem executar; `POST /api/derive` prepara outra condição; `POST /api/demo` inicia a demonstração. As anotações usam `/api/notes`; os cadernos, `GET/POST /api/workbooks`, `GET/PUT /api/workbooks/{id}` e `POST` nas ações `/capture-note` e `/corpus`. Escritas e capturas de caderno exigem a revisão atual. Conexões e execução usam `/api/settings`; `POST /api/models` consulta o catálogo sem gerar respostas. Essas rotas recusam origens web diferentes e retornam `Cache-Control: no-store`. A coleta roda em segundo plano. CLI e API usam o mesmo executor.
 
 ## Limites científicos e da migração
 

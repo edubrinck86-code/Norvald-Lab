@@ -1,4 +1,8 @@
 export type Exposure = 'blind' | 'self' | 'exposed';
+export type Connection = { kind: string; credential_env: string; base_url: string; has_key: boolean; saved_key: boolean; credential_source: 'environment' | 'local' | 'none' };
+export type LabSettings = { live_enabled: boolean; connections: Connection[] };
+export type CatalogModel = { id: string; name: string; tools: boolean | null; reasoning: boolean | null; free: boolean | null; local: boolean; context_length: number | null; pricing: Record<string, string>; dynamic_router: boolean };
+export type Catalog = { kind: string; fetched_at: string; models: CatalogModel[] };
 export type Participant = { id: string; name: string; role: string; provider: string; model: string; reasoning_effort: string; sampling: { temperature?: number; top_p?: number; max_tokens?: number } };
 export type DocumentItem = { id: string; title: string; text: string; source: string };
 export type Spec = {

@@ -6,7 +6,8 @@ import json
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -16,6 +17,8 @@ from norvald_lab.runner import ExperimentRunner
 from norvald_lab.storage import verify_experiment
 from norvald_lab.observer import NotebookStore, snapshot
 from norvald_lab.workbook import WorkbookStore, RevisionConflict
+from norvald_lab.settings import LocalSettings
+from norvald_lab.models import ModelCatalog
 from norvald_lab.cli import demo_spec, derive_spec
 from uuid import uuid4
 
@@ -23,6 +26,9 @@ from uuid import uuid4
 def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
     root = Path(root).expanduser() if root is not None else arof_data_root()
     runner = ExperimentRunner(root)
+    local_settings = LocalSettings(root)
+    catalog = ModelCatalog(local_settings)
+    execution_live = bool(allow_live or local_settings.read()["live_enabled"])
     jobs = {}
     failures = {}
     notebook = NotebookStore(root)
@@ -39,6 +45,17 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
     app = FastAPI(title="Norvald Lab", version="0.2.0", lifespan=lifespan)
     app.state.jobs = jobs
 
+    @app.middleware("http")
+    async def settings_origin(request: Request, call_next):
+        if request.url.path.startswith(("/api/settings", "/api/models")):
+            origin = request.headers.get("origin")
+            if origin and origin.rstrip("/") != str(request.base_url).rstrip("/"):
+                return JSONResponse({"detail": "Configurações só aceitam pedidos da própria interface local."}, status_code=403)
+        response = await call_next(request)
+        if request.url.path.startswith(("/api/settings", "/api/models")):
+            response.headers["Cache-Control"] = "no-store"
+        return response
+
     def directory(expid):
         try:
             identifier(expid)
@@ -53,7 +70,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
 
     @app.get("/health")
     def health():
-        return {"status": "ok", "studio_required": False, "live_enabled": allow_live}
+        return {"status": "ok", "studio_required": False, "live_enabled": execution_live}
 
     @app.get("/api/experiments")
     def experiments():
@@ -68,7 +85,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
     def prepare(spec: dict):
         try:
             prepared = runner.prepare(spec)
-            return {"spec": prepared.spec, "requests": [json.loads(r) for r in prepared.requests_json], "fingerprint": prepared.condition_fingerprint, "live_enabled": allow_live}
+            return {"spec": prepared.spec, "requests": [json.loads(r) for r in prepared.requests_json], "fingerprint": prepared.condition_fingerprint, "live_enabled": execution_live}
         except (ValueError, KeyError, TypeError, OSError) as exc:
             raise HTTPException(422, str(exc)) from exc
 
@@ -111,22 +128,71 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
         try:
             prepared = runner.prepare(spec)
             normalized = prepared.spec
-            if normalized["mode"] == "live" and not allow_live:
-                raise HTTPException(403, "Este backend está em modo demonstração. Inicie serve --live para APIs reais.")
+            if normalized["mode"] == "live" and not execution_live:
+                raise HTTPException(403, "Habilite chamadas reais em Configurações antes de iniciar.")
             expid = normalized["experiment_id"]
             if expid in jobs or directory(expid).exists():
                 raise HTTPException(409, "ID de experimento já utilizado.")
         except (ValueError, KeyError, TypeError, OSError) as exc:
             raise HTTPException(422, str(exc)) from exc
+        authorized_live = execution_live
         async def run():
             try:
-                await runner.run(prepared, allow_live=allow_live)
+                await runner.run(prepared, allow_live=authorized_live)
             except Exception as exc:
-                failures[expid] = str(exc)
+                failures[expid] = local_settings.redact(str(exc))
             finally:
                 jobs.pop(expid, None)
         jobs[expid] = asyncio.create_task(run())
         return {"experiment_id": expid, "status": "accepted"}
+
+    @app.get("/api/settings")
+    def settings():
+        return local_settings.public(live_enabled=execution_live)
+
+    @app.put("/api/settings/connections/{kind}")
+    def save_connection(kind: str, payload: dict):
+        try:
+            local_settings.save_connection(kind, payload)
+            return local_settings.public(live_enabled=execution_live)
+        except (ValueError, TypeError, KeyError) as exc:
+            raise HTTPException(422, "Não foi possível salvar: " + str(exc)) from exc
+
+    @app.delete("/api/settings/connections/{kind}/key")
+    def delete_key(kind: str):
+        try:
+            local_settings.delete_key(kind)
+            return local_settings.public(live_enabled=execution_live)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.put("/api/settings/execution")
+    def set_execution(payload: dict):
+        nonlocal execution_live
+        try:
+            local_settings.set_execution(payload["live_enabled"])
+            execution_live = payload["live_enabled"]
+            return local_settings.public(live_enabled=execution_live)
+        except (ValueError, TypeError, KeyError) as exc:
+            raise HTTPException(422, "Informe live_enabled como booleano.") from exc
+
+    @app.post("/api/models")
+    async def models(payload: dict):
+        try:
+            return await catalog.get(payload)
+        except (ValueError, KeyError, TypeError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+        except Exception as exc:
+            raise HTTPException(502, "Não foi possível consultar o catálogo. Confira a conexão, a chave e o endereço nas Configurações.") from exc
+
+    @app.post("/api/settings/connections/{kind}/test")
+    async def test_connection(kind: str):
+        try:
+            return await catalog.test(kind)
+        except (ValueError, KeyError, TypeError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+        except Exception as exc:
+            raise HTTPException(502, "Não foi possível verificar a conexão. Confira a chave, o endereço e tente novamente.") from exc
 
     @app.get("/api/experiments/{experiment_id}")
     def experiment(experiment_id: str):
