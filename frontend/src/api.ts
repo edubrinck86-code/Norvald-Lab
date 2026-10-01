@@ -23,7 +23,8 @@ export type RawRecord = {
   result: { content: string; reasoning: string | null; tokens: number; duration_seconds: number; metadata: Record<string, unknown> } | null;
   error: { message: string; type: string } | null;
 };
-export type Snapshot = { experiment_id: string; status: string; provisional: boolean; integrity: { valid: boolean; issues: string[] } | null; spec: Spec; requests: PreparedRequest[]; events: RecordedEvent[]; records: RawRecord[] };
+export type ContributionCheck = { observation_id: string; participant_id: string; participant_name: string; run_id: string; model: string; usable: boolean; code: string; message: string; declared_items: number; accepted_items: number; rejected: { kind: string; identifier: string; reason: string }[] };
+export type Snapshot = { experiment_id: string; status: string; provisional: boolean; integrity: { valid: boolean; issues: string[] } | null; spec: Spec; requests: PreparedRequest[]; events: RecordedEvent[]; records: RawRecord[]; contribution_checks?: ContributionCheck[] };
 export type Anchor = { experiment_id: string; observation_id?: string; excerpt?: string; event_index?: number };
 export type Note = { id: string; title: string; content: string; anchor: Anchor | null; created_at: string; updated_at: string };
 export type WorkBlock = { id: string; title: string; content: string; type: string; source_note: (Note & { captured_at: string }) | null };

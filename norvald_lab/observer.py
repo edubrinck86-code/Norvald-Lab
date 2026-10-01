@@ -8,6 +8,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from norvald_lab.config import identifier
+from norvald_lab.contribution_check import check_records
 from norvald_lab.storage import verify_experiment
 
 
@@ -39,13 +40,15 @@ def snapshot(root: Path, experiment_id: str, status: str) -> dict:
     if check and not check["valid"]:
         return {"experiment_id": experiment_id, "status": status, "integrity": check,
                 "provisional": False, "spec": {}, "requests": [], "events": [], "records": []}
-    return {"experiment_id": experiment_id, "status": status, "integrity": check,
+    result = {"experiment_id": experiment_id, "status": status, "integrity": check,
             "provisional": check is None,
             "spec": json.loads((directory / "spec.json").read_text()),
             "requests": json.loads((directory / "requests.json").read_text()),
             "events": read_jsonl(directory / "events.jsonl", provisional=check is None),
             "records": [item for path in sorted((directory / "raw").rglob("*.jsonl"))
                         for item in read_jsonl(path, provisional=check is None)]}
+    result["contribution_checks"] = check_records(result["records"], result["requests"])
+    return result
 
 
 class NotebookStore:

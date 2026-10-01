@@ -21,6 +21,7 @@ from norvald_lab.application.arof.prior_contribution import PriorContribution
 from norvald_lab.application.arof.raw_observation import build_raw_observation
 from norvald_lab.application.deliberation.round_prompt import render_shared_instructions
 from norvald_lab.config import validate_spec
+from norvald_lab.contribution_check import check_contribution
 from norvald_lab.domain.deliberation.context_item import ContextItem
 from norvald_lab.domain.deliberation.working_context import WorkingContext
 from norvald_lab.infrastructure.arof.dataset_store import arof_data_root, close_experiment, write_capacity_report, write_manifest
@@ -115,7 +116,9 @@ class ExperimentRunner:
                     if visibility_key not in frozen_contexts:
                         seeded, authors, audit = seed_peer_contributions(wc, [PriorContribution(raw["participant_id"], raw["result"]["content"]) for raw in visible])
                         if set(authors) != {raw["participant_id"] for raw in visible}:
-                            raise ValueError("Uma resposta da origem não produziu conhecimento estruturado; exposição incompleta recusada.")
+                            missing = [raw for raw in visible if raw["participant_id"] not in authors]
+                            details = [f"{raw['participant_name']} ({raw['participant_id']}, {raw['requested_model']}), repetição {index}: " + check_contribution(raw["result"]["content"], raw["participant_id"], wc)["message"] for raw in missing]
+                            raise ValueError("Exposição incompleta recusada. " + " | ".join(details) + " A coleta original permanece salva. Confira o diagnóstico e a resposta original na bancada.")
                         frozen_contexts[visibility_key] = (seeded.to_dict(), audit)
                     context_snapshot, audit = frozen_contexts[visibility_key]
                     wc = WorkingContext.from_dict(context_snapshot)

@@ -112,7 +112,7 @@ Depois de uma condição cega completa e íntegra:
 ./scripts/lab.sh run e.json --live
 ```
 
-A origem precisa ter respostas estruturadas de todos os participantes. O laboratório verifica os arquivos, mantém as repetições pareadas e recusa mudanças de tarefa, participantes, documentos ou ferramentas nessa derivação. B3 e E usam as mesmas instruções de reconsideração; o contexto exposto é diferente.
+A origem precisa ter respostas estruturadas de todos os participantes. Quando um bloco CONTRIBUTION estiver ausente, inválido ou sem fechamento, a bancada mostra **Ver diagnóstico e resposta original**, com participante, modelo e repetição. Essa conferência não modifica o RAW e não avalia qualidade. Aumentar limite de saída ou ajustar instruções exige uma nova coleta base; a anterior permanece preservada. O laboratório verifica os arquivos, mantém as repetições pareadas e recusa mudanças de tarefa, participantes, documentos ou ferramentas nessa derivação. B3 e E usam as mesmas instruções de reconsideração; o contexto exposto é diferente.
 
 O perfil de ferramentas é explícito: `off` ou `corpus` (consulta somente aos documentos congelados). O mecanismo vem do Execution. O catálogo externo de Library, Repository, Web e MCP do Studio não está conectado nesta versão.
 

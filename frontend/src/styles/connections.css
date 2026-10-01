@@ -91,3 +91,13 @@
   .drawer-content { padding: 18px; }
   .drawer-navigation { padding: 12px 18px; }
 }
+
+.contribution-warning { margin: 18px 0; padding: 20px; border: 1px solid hsl(var(--primary) / .45); border-radius: 10px; background: hsl(var(--primary) / .05); }
+.contribution-warning h3 { color: hsl(var(--primary-button-hover)); }
+.contribution-warning p, .contribution-diagnostic p { margin-top: 8px; font-size: 12px; line-height: 1.75; color: hsl(var(--muted-foreground)); }
+.contribution-warning ul { padding-left: 18px; margin-top: 15px; }
+.contribution-warning li { margin-top: 12px; overflow-wrap: anywhere; font-size: 12px; }
+.contribution-warning .text-button { color: hsl(var(--primary-button-hover)); }
+.contribution-diagnostic { padding: 16px; border: 1px solid hsl(var(--border)); border-radius: 9px; margin-top: 16px; }
+.contribution-diagnostic.unusable { border-color: hsl(var(--primary) / .45); }
+.contribution-diagnostic small { display: block; margin-top: 10px; }
