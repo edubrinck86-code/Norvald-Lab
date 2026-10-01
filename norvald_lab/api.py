@@ -201,6 +201,15 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         except (ValueError, OSError, KeyError, TypeError) as exc:
             raise HTTPException(409, "Histórico de ajustes inconsistente; confira os registros salvos.") from exc
 
+    @app.post("/api/adjustments/{experiment_id}/preview")
+    def preview_adjustment(experiment_id: str, payload: dict):
+        directory(experiment_id)
+        try:
+            saved, _ = adjustments.prepare(experiment_id, payload, persist=False)
+            return saved
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+
     @app.post("/api/adjustments/{experiment_id}", status_code=202)
     async def adjust_response(experiment_id: str, payload: dict):
         directory(experiment_id)

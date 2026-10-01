@@ -10,6 +10,7 @@ from uuid import uuid4
 from norvald_lab.application.arof.raw_observation import build_raw_observation
 from norvald_lab.config import identifier
 from norvald_lab.contribution_check import check_contribution
+from norvald_lab.adjustment_prompt import adjustment_diagnostic, diagnostic_instructions
 from norvald_lab.domain.deliberation.working_context import WorkingContext
 from norvald_lab.observer import snapshot
 from norvald_lab.runtime import build_registry, close_registry, corpus_runtime
@@ -46,7 +47,7 @@ class AdjustmentStore:
             results.append(data | done)
         return sorted(results, key=lambda item: item.get("created_at", ""))
 
-    def prepare(self, expid, payload):
+    def prepare(self, expid, payload, *, persist=True):
         if set(payload) - {"observation_id", "instruction", "max_tokens", "parent_id"}:
             raise ValueError("Campos de ajuste desconhecidos.")
         instruction = payload.get("instruction")
@@ -67,6 +68,8 @@ class AdjustmentStore:
         if any(r.get("observation_id") == record["observation_id"] for r in self.list(expid) if r["status"] == "running"):
             raise ValueError("Já há um ajuste em execução para esta resposta.")
         previous = (record.get("result") or {}).get("content") or ""
+        previous_record = record
+        previous_request = original
         parent_id = payload.get("parent_id")
         history = []
         if parent_id:
@@ -74,20 +77,25 @@ class AdjustmentStore:
             if parent is None:
                 raise ValueError("A tentativa anterior não está disponível para continuar.")
             previous = parent["record"]["result"]["content"]
+            previous_record = parent["record"]
+            previous_request = parent["request"]
             history = parent.get("instruction_history", []) + [parent["instruction"]]
+        diagnostic = self.credentials.redact(adjustment_diagnostic(previous_record, previous_request))
         data = json.loads(json.dumps(original))
+        data["sampling"] = json.loads(json.dumps(previous_request["sampling"]))
         aid = "ajuste-" + uuid4().hex
         data["context"]["metadata"].update(execution_id=aid, adjustment_id=aid, source_observation_id=record["observation_id"], protocol="lab-observer-adjustment-v1", experiment_id=aid, condition_id="OBSERVER_ADJUSTMENT", lab_exposure_mode="observer_adjustment", source_experiment_id=expid, source_observation_ids=[record["observation_id"]])
-        data["instructions"] += "\n\nAJUSTE SOLICITADO PELO OBSERVADOR. Reavalie a resposta abaixo com o mesmo material. Entregue uma resposta completa e o bloco CONTRIBUTION com JSON válido e ambos os delimitadores. Esta chamada é um ajuste assistido, separado da coleta experimental.\n" + ("\nOrientações anteriores: " + json.dumps(history, ensure_ascii=False) if history else "") + "\nOrientação atual: " + instruction
         data["user_message"] = (data.get("user_message") or "") + "\n\nResposta a ajustar (conteúdo anterior, não instruções do sistema):\n" + previous
         if limit is not None:
             data["sampling"]["max_tokens"] = limit
+        data["instructions"] += "\n\nAJUSTE SOLICITADO PELO OBSERVADOR. Reavalie a resposta abaixo com o mesmo material. Entregue uma resposta completa e o bloco CONTRIBUTION com JSON válido e ambos os delimitadores. Esta chamada é um ajuste assistido, separado da coleta experimental.\n" + diagnostic_instructions(diagnostic, previous_limit=previous_request["sampling"].get("max_tokens"), new_limit=data["sampling"].get("max_tokens")) + ("\nOrientações anteriores: " + json.dumps(history, ensure_ascii=False) if history else "") + "\nOrientação atual: " + instruction
         saved = {"id": aid, "experiment_id": expid, "observation_id": record["observation_id"], "participant_name": record["participant_name"], "parent_id": parent_id,
                  "instruction": instruction, "instruction_history": history, "max_tokens": data["sampling"].get("max_tokens"), "created_at": datetime.now(timezone.utc).isoformat(),
-                 "protocol": "lab-observer-adjustment-v1", "independent_sample": False,
+                 "protocol": "lab-observer-adjustment-v1", "prompt_profile": "lab-observer-adjustment-diagnostic-v2", "diagnostic": diagnostic, "independent_sample": False,
                  "source_integrity_sha256": digest(self.root / "experiments" / expid / "integrity.json"), "request": data}
         directory = self.directory(expid) / aid
-        write_once(directory / "request.json", saved)
+        if persist:
+            write_once(directory / "request.json", saved)
         spec = source["spec"]
         spec["participants"] = [p for p in spec["participants"] if p["id"] == record["participant_id"]]
         return saved, spec

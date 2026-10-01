@@ -71,6 +71,8 @@ async def test_adjustment_calls_only_one_participant_and_preserves_original_and_
     saved2, spec2 = store.prepare('source', {'observation_id': record['observation_id'], 'instruction': 'Desenvolva o argumento', 'parent_id': saved['id'], 'max_tokens': 3000})
     await store.run(saved2, spec2)
     assert len(provider.calls) == 2 and VALID in provider.calls[1].user_message
+    assert saved2['diagnostic']['code'] == 'usable'
+    assert 'Código: usable.' in provider.calls[1].instructions
     assert saved['instruction'] in provider.calls[1].instructions
     assert original == {str(p): p.read_bytes() for p in (tmp_path / 'experiments').rglob('*') if p.is_file()}
     assert verify_experiment(tmp_path, 'source')['valid']
@@ -127,3 +129,64 @@ async def test_failed_transport_is_saved_and_secret_redacted(tmp_path, monkeypat
     result = store.list('source')[0]
     assert result['status'] == 'failed' and '[API_KEY_REDACTED]' in result['error']
     assert provider._api_key not in json.dumps(result)
+
+
+@pytest.mark.asyncio
+async def test_diagnosis_preview_is_read_only_and_reaches_actual_provider_payload(tmp_path, monkeypatch):
+    import httpx
+    from norvald_lab.settings import LocalSettings
+    from norvald_lab.vendor.norvald_execution.providers import openai_compatible_provider as transport
+    observed = await source(tmp_path)
+    obsid = observed['records'][0]['observation_id']
+    calls = []
+    def handler(request):
+        if request.url.path.endswith('/chat/completions'):
+            calls.append(json.loads(request.content))
+            return httpx.Response(200, json={'id': 'test-adjustment', 'choices': [{'message': {'content': VALID}}], 'usage': {'prompt_tokens': 12, 'completion_tokens': 6}})
+        return httpx.Response(200, json={'data': []})
+    monkeypatch.setattr(transport, 'build_client', lambda **kw: httpx.AsyncClient(transport=httpx.MockTransport(handler), trust_env=False))
+    LocalSettings(tmp_path).save_connection('openrouter', {'api_key': 'fake-key'})
+    payload = {'observation_id': obsid, 'instruction': 'Ajuste isto', 'max_tokens': 2048}
+    with TestClient(create_app(tmp_path, allow_live=True)) as client:
+        preview = client.post('/api/adjustments/source/preview', json=payload)
+        assert preview.status_code == 200
+        saved = preview.json()
+        assert saved['diagnostic']['code'] == 'unclosed_block'
+        assert BAD in saved['request']['user_message']
+        assert 'não foi encontrado' in saved['request']['instructions']
+        assert 'O diagnóstico não comprova' in saved['request']['instructions']
+        assert not (tmp_path / 'observer/adjustments').exists() and not calls
+        assert client.post('/api/adjustments/source', json=payload).status_code == 202
+        async def wait():
+            await asyncio.gather(*list(client.app.state.adjustment_jobs.values()))
+        client.portal.call(wait)
+        assert len(calls) == 1
+        system = calls[0]['messages'][0]['content']
+        if isinstance(system, list):
+            system = '\n\n'.join(part['text'] for part in system)
+        assert saved['request']['instructions'] in system
+        assert saved['request']['shared_instructions'] in system
+        assert saved['request']['wave_instructions'] in system
+        assert calls[0]['messages'][1]['content'] == saved['request']['user_message']
+        assert calls[0]['max_tokens'] == 2048
+        assert saved['instruction'] in system
+        assert client.get('/api/experiments/source/verify').json()['valid']
+
+
+def test_diagnostic_identifies_json_location_missing_field_and_rejected_part():
+    from norvald_lab.adjustment_prompt import adjustment_diagnostic, diagnostic_instructions
+    from norvald_lab.domain.deliberation.working_context import WorkingContext
+    request = {'context': {'working_context': json.dumps(WorkingContext().to_dict())}}
+    def diagnose(content, error=None):
+        return adjustment_diagnostic({'participant_id': 'p1', 'result': {'content': content}, 'error': error}, request)
+    json_error = diagnose('<<CONTRIBUTION>>\n{"knowledge": [}\n<<END_CONTRIBUTION>>')
+    assert json_error['code'] == 'invalid_json' and 'linha 1, coluna 16' in json_error['details'][0]
+    schema = diagnose('<<CONTRIBUTION>>' + json.dumps({'knowledge': [{'type': 'claim', 'content': 'Argumento'}], 'relations': []}) + '<<END_CONTRIBUTION>>')
+    assert 'knowledge[0].local_id: campo obrigatório ausente.' in schema['details']
+    rejected = diagnose('<<CONTRIBUTION>>' + json.dumps({'knowledge': [{'local_id': 'k1', 'type': 'evidence', 'content': 'Argumento'}], 'relations': []}) + '<<END_CONTRIBUTION>>')
+    text = diagnostic_instructions(rejected, previous_limit=64, new_limit=64)
+    assert 'knowledge / k1: tipo semântico não declarável' in text
+    assert 'Tipos declaráveis' in text and 'O limite de saída não foi aumentado' in text
+    failure = diagnose('', {'type': 'TimeoutError', 'message': 'Tempo esgotado'})
+    assert failure['code'] == 'execution_failed'
+    assert 'Tempo esgotado' in diagnostic_instructions(failure, previous_limit=None, new_limit=2000)
