@@ -18,7 +18,7 @@ def block(id="primeiro", content="## Minha hipótese\n\n$N_{eff}$\n\nTexto."):
 
 
 def test_workbook_corpus_freezes_exact_markdown_and_preserves_dataset(tmp_path):
-    with TestClient(create_app(tmp_path)) as client:
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
         expid = client.post("/api/demo").json()["experiment_id"]
         settle(client)
         book = client.post("/api/workbooks", json={"title": "Meu estudo", "blocks": [block()]}).json()
@@ -39,7 +39,7 @@ def test_workbook_corpus_freezes_exact_markdown_and_preserves_dataset(tmp_path):
 
 
 def test_revision_conflict_does_not_overwrite_or_export_stale_draft(tmp_path):
-    with TestClient(create_app(tmp_path)) as client:
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
         book = client.post("/api/workbooks", json={"blocks": [block()]}).json()
         url = '/api/workbooks/' + book["id"]
         assert client.put(url, json={"revision": 1, "blocks": [block(content="Nova versão")]}).status_code == 200
@@ -49,7 +49,7 @@ def test_revision_conflict_does_not_overwrite_or_export_stale_draft(tmp_path):
 
 
 def test_note_capture_remains_when_note_is_changed_or_removed(tmp_path):
-    with TestClient(create_app(tmp_path)) as client:
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
         expid = client.post("/api/demo").json()["experiment_id"]
         settle(client)
         record = client.get(f"/api/experiments/{expid}/observe").json()["records"][0]
@@ -72,7 +72,7 @@ def test_note_capture_remains_when_note_is_changed_or_removed(tmp_path):
 
 
 def test_workbook_rejects_fabricated_sources_invalid_blocks_and_paths(tmp_path):
-    with TestClient(create_app(tmp_path)) as client:
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
         assert client.post("/api/workbooks", json={"blocks": [block(), block()]}).status_code == 422
         assert client.post("/api/workbooks", json={"blocks": [{**block(), "source_note": {"id": "inventada"}}]}).status_code == 422
         assert client.get("/api/workbooks/bad!id").status_code == 422

@@ -229,7 +229,7 @@ def test_studio_data_path_is_not_inherited(tmp_path, monkeypatch):
 
 
 def test_api_runs_and_reads_without_studio(tmp_path):
-    with TestClient(create_app(tmp_path)) as client:
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
         assert client.get("/health").json()["studio_required"] is False
         accepted = client.post("/api/experiments", json=demo_spec("api-demo"))
         assert accepted.status_code == 202

@@ -58,7 +58,7 @@ async def test_origin_diagnostic_identifies_participant_and_repetition_without_m
     runner = ExperimentRunner(tmp_path)
     await runner.run(runner.prepare(spec), registry=registry, monitor_capacity=False)
     before = {str(p): p.read_bytes() for p in (tmp_path / 'experiments').rglob('*') if p.is_file()}
-    with TestClient(create_app(tmp_path)) as client:
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
         observed = client.get('/api/experiments/source-format/observe').json()
         assert observed['status'] == 'complete' and observed['integrity']['valid']
         checks = observed['contribution_checks']

@@ -20,10 +20,12 @@ from norvald_lab.workbook import WorkbookStore, RevisionConflict
 from norvald_lab.settings import LocalSettings
 from norvald_lab.models import ModelCatalog
 from norvald_lab.cli import demo_spec, derive_spec
+from norvald_lab.experiment_management import ExperimentManagement, experiment_template
+from norvald_lab.adjustments import AdjustmentStore
 from uuid import uuid4
 
 
-def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
+def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=False) -> FastAPI:
     root = Path(root).expanduser() if root is not None else arof_data_root()
     runner = ExperimentRunner(root)
     local_settings = LocalSettings(root)
@@ -33,26 +35,29 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
     failures = {}
     notebook = NotebookStore(root)
     workbooks = WorkbookStore(root)
+    management = ExperimentManagement(root)
+    adjustments = AdjustmentStore(root)
 
     @asynccontextmanager
     async def lifespan(app):
         yield
-        tasks = list(jobs.values())
+        tasks = list(jobs.values()) + list(adjustments.jobs.values())
         for task in tasks:
             task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
 
     app = FastAPI(title="Norvald Lab", version="0.2.0", lifespan=lifespan)
     app.state.jobs = jobs
+    app.state.adjustment_jobs = adjustments.jobs
 
     @app.middleware("http")
     async def settings_origin(request: Request, call_next):
-        if request.url.path.startswith(("/api/settings", "/api/models")):
+        if request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments")):
             origin = request.headers.get("origin")
             if origin and origin.rstrip("/") != str(request.base_url).rstrip("/"):
                 return JSONResponse({"detail": "Configurações só aceitam pedidos da própria interface local."}, status_code=403)
         response = await call_next(request)
-        if request.url.path.startswith(("/api/settings", "/api/models")):
+        if request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments")):
             response.headers["Cache-Control"] = "no-store"
         return response
 
@@ -73,24 +78,37 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
         return {"status": "ok", "studio_required": False, "live_enabled": execution_live}
 
     @app.get("/api/experiments")
-    def experiments():
+    def experiments(include_deleted: bool = False):
         result = []
         for path in sorted((root / "experiments").glob("*/manifest.json")):
+            excluded = management.is_deleted(path.parent.name)
+            if excluded and not include_deleted:
+                continue
             final = path.parent / "result.json"
             spec = read(path.parent / "spec.json")
-            result.append({"experiment_id": path.parent.name, "status": read(final)["status"] if final.exists() else "running" if path.parent.name in jobs else "unclosed", "task": spec["task"]["objective"], "exposure": spec["condition"]["exposure"], "source_experiment_id": spec["condition"].get("prior_experiment"), "synthetic": spec["mode"] == "demo"})
+            if spec["mode"] == "demo" and not enable_demo:
+                continue
+            result.append({"deleted": excluded, "experiment_id": path.parent.name, "status": read(final)["status"] if final.exists() else "running" if path.parent.name in jobs else "unclosed", "task": spec["task"]["objective"], "exposure": spec["condition"]["exposure"], "source_experiment_id": spec["condition"].get("prior_experiment"), "synthetic": spec["mode"] == "demo"})
         return result
 
     @app.post("/api/prepare")
     def prepare(spec: dict):
+        if spec.get("mode", "demo") != "live" and not enable_demo:
+            raise HTTPException(422, "O laboratório aceita somente modelos reais.")
         try:
             prepared = runner.prepare(spec)
             return {"spec": prepared.spec, "requests": [json.loads(r) for r in prepared.requests_json], "fingerprint": prepared.condition_fingerprint, "live_enabled": execution_live}
         except (ValueError, KeyError, TypeError, OSError) as exc:
             raise HTTPException(422, str(exc)) from exc
 
+    @app.get("/api/experiment-template")
+    def empty_template():
+        return experiment_template()
+
     @app.get("/api/demo-template")
     def template():
+        if not enable_demo:
+            raise HTTPException(404, "Demonstração removida do ambiente de uso.")
         return demo_spec("experimento-" + uuid4().hex[:10])
 
     @app.post("/api/derive")
@@ -106,6 +124,8 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
 
     @app.post("/api/demo", status_code=202)
     async def demo():
+        if not enable_demo:
+            raise HTTPException(404, "Demonstração removida do ambiente de uso.")
         label = "demo-" + uuid4().hex[:12]
         ids = [label + suffix for suffix in ("-b1", "-b3", "-e")]
         async def suite():
@@ -128,6 +148,8 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
         try:
             prepared = runner.prepare(spec)
             normalized = prepared.spec
+            if normalized["mode"] != "live" and not enable_demo:
+                raise HTTPException(422, "O laboratório aceita somente modelos reais.")
             if normalized["mode"] == "live" and not execution_live:
                 raise HTTPException(403, "Habilite chamadas reais em Configurações antes de iniciar.")
             expid = normalized["experiment_id"]
@@ -145,6 +167,51 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
                 jobs.pop(expid, None)
         jobs[expid] = asyncio.create_task(run())
         return {"experiment_id": expid, "status": "accepted"}
+
+    @app.get("/api/experiments/{experiment_id}/editable-copy")
+    def editable_copy(experiment_id: str):
+        directory(experiment_id)
+        try:
+            return management.editable_copy(experiment_id)
+        except FileNotFoundError as exc:
+            raise HTTPException(404, "Experimento não encontrado.") from exc
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    @app.delete("/api/experiments/{experiment_id}", status_code=204)
+    def exclude_experiment(experiment_id: str):
+        directory(experiment_id)
+        if experiment_id in jobs:
+            raise HTTPException(409, "Aguarde o término da execução para excluir da lista.")
+        try:
+            management.exclude(experiment_id)
+        except FileNotFoundError as exc:
+            raise HTTPException(404, "Experimento não encontrado.") from exc
+
+    @app.post("/api/experiments/{experiment_id}/restore", status_code=204)
+    def restore_experiment(experiment_id: str):
+        directory(experiment_id)
+        management.restore(experiment_id)
+
+    @app.get("/api/adjustments/{experiment_id}")
+    def list_adjustments(experiment_id: str):
+        directory(experiment_id)
+        try:
+            return adjustments.list(experiment_id)
+        except (ValueError, OSError, KeyError, TypeError) as exc:
+            raise HTTPException(409, "Histórico de ajustes inconsistente; confira os registros salvos.") from exc
+
+    @app.post("/api/adjustments/{experiment_id}", status_code=202)
+    async def adjust_response(experiment_id: str, payload: dict):
+        directory(experiment_id)
+        if not execution_live:
+            raise HTTPException(403, "Habilite chamadas reais em Configurações antes de pedir um ajuste.")
+        try:
+            saved, spec = adjustments.prepare(experiment_id, payload)
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+        adjustments.start(saved, spec)
+        return {"id": saved["id"], "status": "accepted"}
 
     @app.get("/api/settings")
     def settings():
@@ -312,4 +379,6 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
             raise HTTPException(503, "Inicie ./scripts/start.sh para preparar e abrir a interface.")
         return FileResponse(web / "index.html")
 
+    if not enable_demo:
+        app.router.routes = [route for route in app.router.routes if getattr(route, "path", "") not in {"/api/demo", "/api/demo-template"}]
     return app

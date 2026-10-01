@@ -5,9 +5,7 @@ import asyncio
 import copy
 import json
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
-from uuid import uuid4
 
 from norvald_lab.config import identifier
 from norvald_lab.infrastructure.arof.dataset_store import arof_data_root
@@ -50,7 +48,6 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog="norvald-lab", description="Laboratório independente Norvald — execute, observe e confira os registros.")
     parser.add_argument("--data-dir", type=Path, default=None, help="Pasta própria de dados do laboratório")
     commands = parser.add_subparsers(dest="command", required=True)
-    commands.add_parser("demo", help="Demonstra B1, B3 e E sem API ou custo")
     run = commands.add_parser("run", help="Executa uma configuração JSON")
     run.add_argument("spec", type=Path)
     run.add_argument("--live", action="store_true", help="Habilita chamadas reais aos providers configurados")
@@ -73,18 +70,11 @@ def main(argv=None):
     root = args.data_dir.expanduser() if args.data_dir else arof_data_root()
     runner = ExperimentRunner(root)
     try:
-        if args.command == "demo":
-            async def demonstration():
-                label = datetime.now(timezone.utc).strftime("demo-%Y%m%d-%H%M%S-") + uuid4().hex[:6]
-                source = label + "-b1"
-                print("DEMONSTRAÇÃO SINTÉTICA: sem LLM, sem API e sem evidência sobre a tese.")
-                await _run(runner, demo_spec(source))
-                for exposure, suffix in (("self", "b3"), ("exposed", "e")):
-                    await _run(runner, derive_spec(root, source, label + "-" + suffix, exposure))
-                print("Concluído: três condições, nove registros. Os dados ficam na pasta indicada acima.")
-            asyncio.run(demonstration())
-        elif args.command == "run":
-            result = asyncio.run(_run(runner, _read(args.spec), args.live))
+        if args.command == "run":
+            spec = _read(args.spec)
+            if spec.get("mode") != "live":
+                raise ValueError("O laboratório aceita somente modelos reais.")
+            result = asyncio.run(_run(runner, spec, args.live))
             return 0 if result["status"] == "complete" else 1
         elif args.command == "prepare":
             prepared = runner.prepare(_read(args.spec))

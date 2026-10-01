@@ -12,18 +12,18 @@ Para abrir a interface, dentro da pasta do projeto:
 ./scripts/start.sh
 ```
 
-O comando prepara Python e a interface, inicia o laboratório e abre o navegador em `http://127.0.0.1:8766`. Na primeira vez requer internet, Python 3.10+ e Node.js 22.12+. Clique em **Abrir demonstração**: ela produz três condições, com três participantes sintéticos e sem chamadas às APIs.
+O comando prepara Python e a interface, inicia o laboratório e abre o navegador em `http://127.0.0.1:8766`. Na primeira vez requer internet, Python 3.10+ e Node.js 22.12+. Cadastre sua conexão em **Configurações** e clique em **Novo experimento**. O ambiente inicia sem demonstrações, perguntas ou documentos fictícios.
 
 - **Configurações:** cadastre, substitua ou remova chaves por provedor; consulte a conexão sem gerar resposta e habilite chamadas reais.
 - **Preparar:** escreva a pergunta, selecione modelos no catálogo com filtros de preço, tools e reasoning declarados, configure documentos e confira o contrato antes de iniciar.
 - **Acompanhar:** veja os participantes em cartões e abra cada um na bancada lateral. Arraste a borda esquerda do drawer para ajustar somente a largura. Respostas, reasoning disponibilizado, eventos e contexto continuam ligados ao registro original.
 - **Comparar:** veja o mesmo participante e a mesma repetição nas condições ligadas à mesma base independente, com alterações literais destacadas.
-- **Minhas notas:** anotações rápidas em overlay, com lista à esquerda, título e toolbar no topo, edição/preview, tags e contagem de palavras. O salvamento é automático; copiar e baixar preservam o Markdown.
-- **Caderno de trabalho:** organize suas hipóteses, protocolos e análises em cartões de blocos, seguindo a estrutura do Notebook do Studio. Abra um bloco para escrever com o índice à esquerda, inspector e navegação abertos à direita. Há múltiplos cadernos, busca, duplicação, exclusão e reordenação por arraste ou setas.
+- **Notes:** anotações rápidas em overlay, com lista à esquerda, título e toolbar no topo, edição/preview, tags e contagem de palavras. O salvamento é automático; copiar e baixar preservam o Markdown.
+- **Notebook:** organize suas hipóteses, protocolos e análises em cartões de blocos, seguindo a estrutura do Notebook do Studio. Abra um bloco para escrever com o índice à esquerda, inspector e navegação abertos à direita. Há múltiplos cadernos, busca, duplicação, exclusão e reordenação por arraste ou setas.
 
 Selecione um trecho e use **Fixar trecho**, ou **Marcar momento** na linha do tempo. A nota mantém uma referência à observação original. As notas ficam em `observer/notes/`, fora dos experimentos e dos contextos das LLMs. Alterá-las não modifica o dataset.
 
-No Caderno de trabalho, **Trazer anotação** cria um bloco com uma cópia do texto, da data e da origem da nota. O inspector permite conferir a cópia original, abrir a nota atual e voltar ao experimento. A cópia permanece mesmo se a nota for alterada ou excluída. Os cadernos ficam em `observer/workbooks/`, também fora do dataset.
+No Notebook, **Trazer anotação** cria um bloco com uma cópia do texto, da data e da origem da nota. O inspector permite conferir a cópia original, abrir a nota atual e voltar ao experimento. A cópia permanece mesmo se a nota for alterada ou excluída. Os cadernos ficam em `observer/workbooks/`, também fora do dataset.
 
 **Usar caderno no corpus** (ou **Usar este bloco no corpus**) mostra uma cópia identificada pela revisão e pelo hash do texto. Depois de conferir, **Preparar experimento com esta versão** inclui esse documento na preparação de um novo experimento. Nenhuma LLM é chamada nessa etapa. A versão copiada permanece igual no experimento, mesmo que você continue editando o caderno. As condições derivadas mantêm o corpus da base, como antes.
 
@@ -37,27 +37,17 @@ As chaves ficam em `private/settings.json` dentro da pasta de dados, fora dos ex
 
 Use `NORVALD_LAB_DATA_DIR` para escolher a pasta de dados da bancada. Quem já compilou a interface pode iniciar apenas o servidor com `./scripts/lab.sh serve --open`.
 
-### Demonstração no terminal
+### Gerenciar e ajustar
 
-No terminal, dentro desta pasta, execute:
+Em **Experimentos**, use **Selecionar**, marque um registro e escolha **Editar** ou **Excluir**. Editar abre uma cópia da configuração em Preparar, com um novo ID e como nova coleta independente; os registros anteriores permanecem intactos. Excluir retira da lista sem apagar as referências existentes. **Mostrar excluídos → Restaurar** desfaz a exclusão.
 
-```bash
-./scripts/lab.sh demo
-```
+No drawer de um participante, **Pedir ajuste à LLM** permite escrever uma orientação e ajustar o limite de saída. Só a resposta escolhida é reenviada, com seu contexto e material originais. Cada tentativa registra instrução, pedido, resposta, consumo, diagnóstico e ligação à origem em `observer/adjustments/`, com fechamento de integridade separado. Você pode fechar o drawer, voltar depois, continuar uma tentativa ou salvar sua resposta nas Notes para trazê-la ao Notebook.
 
-Na primeira vez o comando prepara o ambiente Python e instala as dependências (requer internet). Depois mostra três condições:
+Um ajuste assistido tem protocolo próprio e **não é uma nova amostra independente**. Ele não altera o RAW original nem substitui uma base B1 em comparações pareadas. Uma contribuição inválida na coleta original continua bloqueando a exposição controlada. Não há loop automático de correção; cada nova tentativa exige clicar em Enviar ajuste e pode consumir a API. Um erro de transporte também é preservado e pode ser tentado novamente sem chamar os demais participantes.
 
-1. **B1 — resposta cega:** cada participante responde sem receber respostas dos colegas.
-2. **B3 — reconsideração individual:** cada participante recebe apenas sua própria contribuição anterior.
-3. **E — exposição aos pares:** cada participante recebe sua contribuição e as dos demais.
+O editor de blocos do Notebook ocupa 95% da largura e da altura disponíveis, com índice, inspector e navegação. O documento central usa toda a largura adicional.
 
-Você verá o início, a conclusão de cada participante e a pasta dos registros. A demonstração usa três participantes simulados e produz nove registros. **Não usa LLM, não consome API e não produz evidência sobre a tese.** As escolhas simuladas servem apenas para conferir o instrumento.
-
-Os dados ficam em `~/.norvald/lab/`. Não são gravados nas pastas do Studio. Para escolher outra pasta:
-
-```bash
-./scripts/lab.sh --data-dir ./data demo
-```
+Os dados ficam em `~/.norvald/lab/`, separados do Studio.
 
 ## O que olhar nos resultados
 
@@ -122,9 +112,9 @@ O perfil de ferramentas é explícito: `off` ou `corpus` (consulta somente aos d
 ./scripts/lab.sh serve
 ```
 
-Escuta apenas em `http://127.0.0.1:8766`; documentação da API em `/docs`. O servidor inicia em demonstração se ainda não houver preferência salva. Habilite chamadas reais em Configurações; essa preferência persiste entre reinicializações. `serve --live` continua disponível como alternativa. Não há autenticação de serviço público nesta entrega.
+Escuta apenas em `http://127.0.0.1:8766`; documentação da API em `/docs`. O servidor inicia com chamadas reais desabilitadas se ainda não houver preferência salva. Habilite chamadas reais em Configurações; essa preferência persiste entre reinicializações. `serve --live` continua disponível como alternativa. Não há autenticação de serviço público nesta entrega.
 
-Endpoints: `GET /health`, `GET/POST /api/experiments`, `GET /api/experiments/{id}` e suas leituras `/manifest`, `/raw`, `/verify`, `/observe`. `POST /api/prepare` confere sem executar; `POST /api/derive` prepara outra condição; `POST /api/demo` inicia a demonstração. As anotações usam `/api/notes`; os cadernos, `GET/POST /api/workbooks`, `GET/PUT /api/workbooks/{id}` e `POST` nas ações `/capture-note` e `/corpus`. Escritas e capturas de caderno exigem a revisão atual. Conexões e execução usam `/api/settings`; `POST /api/models` consulta o catálogo sem gerar respostas. Essas rotas recusam origens web diferentes e retornam `Cache-Control: no-store`. A coleta roda em segundo plano. CLI e API usam o mesmo executor.
+Endpoints: `GET /health`, `GET/POST /api/experiments`, `GET /api/experiments/{id}` e suas leituras `/manifest`, `/raw`, `/verify`, `/observe`. `POST /api/prepare` confere sem executar; `POST /api/derive` prepara outra condição; `GET /api/experiment-template` oferece uma configuração vazia para modelos reais. `GET /api/experiments/{id}/editable-copy` prepara uma cópia editável; `DELETE /api/experiments/{id}` exclui da lista e `POST /api/experiments/{id}/restore` restaura. `GET/POST /api/adjustments/{id}` lê ou solicita ajustes separados da coleta. As anotações usam `/api/notes`; os cadernos, `GET/POST /api/workbooks`, `GET/PUT /api/workbooks/{id}` e `POST` nas ações `/capture-note` e `/corpus`. Escritas e capturas de caderno exigem a revisão atual. Conexões e execução usam `/api/settings`; `POST /api/models` consulta o catálogo sem gerar respostas. Essas rotas recusam origens web diferentes e retornam `Cache-Control: no-store`. A coleta roda em segundo plano. CLI e API usam o mesmo executor.
 
 ## Limites científicos e da migração
 

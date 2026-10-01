@@ -30,4 +30,4 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: python -m pip install -e '.[dev]'
       - run: python -m pytest -q
-      - run: python -m norvald_lab --data-dir ./data demo
+      - run: python -m norvald_lab prepare examples/live.template.json

@@ -485,3 +485,28 @@ summary { cursor: pointer; padding: 8px 0; }
   .work-block-panels { grid-template-columns: minmax(0,1fr); }
   .work-block-scroll article, .work-block-scroll textarea { padding: 20px; }
 }
+
+/* The work editor fills 95% of the viewport; all added width goes to the document. */
+.modal-scrim:has(.work-block-modal) { padding: 2.5dvh 2.5vw; }
+.work-block-modal.modal-panel { width: 95vw; max-width: 95vw; height: 95dvh; max-height: 95dvh; }
+.work-block-modal .work-block-scroll article,
+.work-block-modal .work-block-scroll textarea { width: 100%; max-width: none; margin: 0; }
+.work-block-modal .work-block-scroll article > div { max-width: none; }
+.experiment-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
+.experiment-actions > label { margin-left: auto; }
+.experiment-entry { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.experiment-entry > .experiment-row { flex: 1; min-width: 0; }
+.experiment-entry > .experiment-row > div { min-width: 0; overflow-wrap: anywhere; }
+.experiment-entry.excluded { opacity: .7; }
+.execution-mode { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.adjustment-panel { border-top: 1px solid hsl(var(--border)); padding: 22px 0; margin-top: 20px; }
+.adjustment-panel textarea { width: 100%; min-height: 115px; }
+.adjustment-attempt { border: 1px solid hsl(var(--border)); border-radius: 10px; margin-top: 14px; padding: 16px; overflow-wrap: anywhere; }
+.adjustment-attempt .note-markdown { max-width: none; }
+.adjustment-form { display: grid; gap: 14px; margin-top: 16px; }
+.adjustment-form .button { justify-self: start; }
+@media (max-width: 600px) {
+  .experiment-entry { flex-wrap: wrap; }
+  .experiment-entry .badge { max-width: 85px; white-space: normal; }
+  .experiment-actions > label { margin-left: 0; }
+}

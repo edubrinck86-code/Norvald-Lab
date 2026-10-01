@@ -14,7 +14,7 @@ def settle(client):
 
 
 def test_ui_demo_family_prepare_and_notebook_preserve_dataset(tmp_path):
-    with TestClient(create_app(tmp_path)) as client:
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
         template = client.get("/api/demo-template").json()
         prepared = client.post("/api/prepare", json=template)
         assert prepared.status_code == 200
@@ -56,7 +56,7 @@ def test_ui_demo_family_prepare_and_notebook_preserve_dataset(tmp_path):
 
 
 def test_observer_blocks_tampered_closed_data_and_bad_paths(tmp_path):
-    with TestClient(create_app(tmp_path)) as client:
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
         expid = client.post("/api/demo").json()["experiment_id"]
         settle(client)
         target = next((tmp_path / "experiments" / expid / "raw").rglob("*.jsonl"))

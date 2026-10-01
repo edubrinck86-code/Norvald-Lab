@@ -9,6 +9,7 @@ import { useWorkbooks } from './hooks/useWorkbooks';
 import { Settings } from './components/Settings';
 import { Observe } from './components/Observe';
 import { Compare } from './components/Compare';
+import { Experiments } from './components/Experiments';
 import { ContextView, Prepare } from './components/Prepare';
 import { NorvaldMarkdown } from './ui/markdown/NorvaldMarkdown';
 import { MarkdownToolbar } from './ui/MarkdownToolbar';
@@ -22,6 +23,7 @@ export default function App() {
   const workbooks = useWorkbooks();
   const [view, setView] = useState<View>('observe');
   const [items, setItems] = useState<ExperimentItem[]>([]);
+  const [comparisonItems, setComparisonItems] = useState<ExperimentItem[]>([]);
   const [selected, setSelected] = useState('');
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [observationFailed, setObservationFailed] = useState(false);
@@ -36,15 +38,15 @@ export default function App() {
   const [resource, setResource] = useState<Resource | null>(null);
   const [documents, setDocuments] = useState(false);
   const [initialSpec, setInitialSpec] = useState<Spec | undefined>();
-  const [search, setSearch] = useState('');
   const [refresh, setRefresh] = useState(0);
   const hasSelected = useRef(false);
   const originRequest = useRef<Anchor | null>(null);
 
   const refreshList = useCallback(async () => {
     try {
-      const values = await api<ExperimentItem[]>('/api/experiments');
-      setItems(values);
+      const all = await api<ExperimentItem[]>('/api/experiments?include_deleted=true');
+      const values = all.filter(item => !item.deleted);
+      setItems(values); setComparisonItems(all);
       if (!hasSelected.current && values.length) { setSelected(values.at(-1)!.experiment_id); hasSelected.current = true; }
     } catch (reason) { setError(String(reason)); }
   }, []);
@@ -54,7 +56,7 @@ export default function App() {
     const timer = setInterval(() => { void refreshList(); }, 2000);
     return () => clearInterval(timer);
   }, [refreshList]);
-  const selectedItem = items.find(item => item.experiment_id === selected);
+  const selectedItem = comparisonItems.find(item => item.experiment_id === selected);
   const pending = !observationFailed && (!snapshot || snapshot.experiment_id !== selected || snapshot.provisional && ['running', 'complete', 'incomplete', 'aborted'].includes(snapshot.status));
   useEffect(() => {
     if (!selected) return;
@@ -90,12 +92,6 @@ export default function App() {
     hasSelected.current = true; setSelected(id); setView(nextView); setRepetition(1); setReplay(null); setSnapshot(null); setError(''); setObservationFailed(false);
   }
   function started(id: string) { choose(id); void refreshList(); }
-  async function demo() {
-    setBusy(true); setError('');
-    try { const result = await api<{ experiment_id: string }>('/api/demo', { method: 'POST' }); started(result.experiment_id); }
-    catch (reason) { setError(String(reason)); }
-    finally { setBusy(false); }
-  }
   async function pin(anchor: Anchor) {
     try {
       const content = anchor.excerpt ? '> ' + anchor.excerpt.replace(/\n/g, '\n> ') + '\n\n## Minha observação\n\n' : '## Momento marcado\n\n' + eventLabel(snapshot!.events[anchor.event_index!]) + '\n\n## Minha observação\n\n';
@@ -143,9 +139,8 @@ export default function App() {
   }
   async function useCorpus(capture: CorpusCapture) {
     try {
-      const spec = await api<Spec>('/api/demo-template');
-      const prepared = await api<{ spec: Spec }>('/api/prepare', { method: 'POST', body: JSON.stringify({ ...spec, documents: [...spec.documents, capture.document] }) });
-      setInitialSpec(prepared.spec); setView('prepare');
+      const spec = await api<Spec>('/api/experiment-template');
+      setInitialSpec({ ...spec, documents: [capture.document] }); setView('prepare');
     } catch (reason) { setError(String(reason)); }
   }
   const resourceValue = { open: (reference: ResourceReference) => { void openResource(reference); } };
@@ -156,25 +151,23 @@ export default function App() {
     <div className={'app-shell ' + (['workbook', 'settings'].includes(view) ? 'workbook-shell' : '')}>
       <aside className="app-sidebar"><a href="/" className="brand"><span className="brand-mark"><FlaskConical size={22} /></span><span>NORVALD <small>LAB</small></span></a>
         <nav aria-label="Navegação principal">{([
-          ['observe', 'Bancada', FlaskConical], ['experiments', 'Experimentos', Layers], ['records', 'Registros', List], ['workbook', 'Caderno de trabalho', BookOpen],
-        ] as const).map(([id, label, Icon]) => <button key={id} aria-label={label} title={label} className={'nav-button ' + ((view === id || id === 'observe' && ['prepare', 'compare'].includes(view)) ? 'active' : '')} onClick={() => setView(id)}><Icon size={18} />{label}</button>)}<button className="nav-button" aria-label="Minhas notas" title="Minhas notas" onClick={() => setNotebook({})}><NotebookPen size={18} />Minhas notas</button></nav>
-        <div className="sidebar-divider" /><div className="sidebar-label">NA BANCADA<button className="icon-button" aria-label="Novo experimento" onClick={() => { setInitialSpec(undefined); setView('prepare'); }}><Plus size={14} /></button></div>
-        <div className="sidebar-experiments">{items.slice(-5).reverse().map(item => <button key={item.experiment_id} className={'sidebar-experiment ' + (item.experiment_id === selected ? 'active' : '')} onClick={() => choose(item.experiment_id)}><span className="condition-dot" /><div><strong>{conditions[item.exposure].title}</strong><small>{item.experiment_id}</small></div></button>)}</div>
+          ['observe', 'Bancada', FlaskConical], ['experiments', 'Experimentos', Layers], ['records', 'Registros', List], ['workbook', 'Notebook', BookOpen],
+        ] as const).map(([id, label, Icon]) => <button key={id} aria-label={label} title={label} className={'nav-button ' + ((view === id || id === 'observe' && ['prepare', 'compare'].includes(view)) ? 'active' : '')} onClick={() => setView(id)}><Icon size={18} />{label}</button>)}<button className="nav-button" aria-label="Notes" title="Notes" onClick={() => setNotebook({})}><NotebookPen size={18} />Notes</button></nav>
         <div className="sidebar-bottom"><div className="local-label"><span />Ambiente local</div><button className={'nav-button ' + (view === 'settings' ? 'active' : '')} onClick={() => setView('settings')}><Settings2 size={18} />Configurações</button></div>
       </aside>
       <main className="app-main">
-        <header className="app-header"><div><div className="title-line"><h1>{view === 'settings' ? 'Configurações' : view === 'workbook' ? 'Caderno de trabalho' : view === 'experiments' ? 'Seus experimentos' : view === 'records' ? 'Registros do experimento' : 'Bancada de observação'}</h1>{view === 'settings' ? <span className="badge">Conexões locais</span> : view === 'workbook' ? <span className="badge">Seu espaço de escrita</span> : <span className="badge">{verified && current.spec.mode === 'live' ? 'Modelos reais' : 'Demonstração · dados sintéticos'}</span>}</div><p>{view === 'settings' ? 'Suas APIs, seus modelos e seus limites.' : view === 'workbook' ? 'Observe, reúna e desenvolva suas ideias.' : (selected || 'Prepare, acompanhe e compare.') + (current ? ' · ' + statusLabel(current.status) : '')}</p></div><div className="header-actions"><button className="icon-button" aria-label="Atualizar registros" onClick={() => { setRefresh(value => value + 1); void refreshList(); }}><RefreshCw size={17} /></button><button className="button secondary" onClick={() => { setInitialSpec(undefined); setView('prepare'); }}><Plus size={15} />Novo experimento</button></div></header>
+        <header className="app-header"><div><div className="title-line"><h1>{view === 'settings' ? 'Configurações' : view === 'workbook' ? 'Notebook' : view === 'experiments' ? 'Seus experimentos' : view === 'records' ? 'Registros do experimento' : 'Bancada de observação'}</h1>{view === 'settings' ? <span className="badge">Conexões locais</span> : view === 'workbook' ? <span className="badge">Seu espaço de escrita</span> : <span className="badge">{'Modelos reais'}</span>}</div><p>{view === 'settings' ? 'Suas APIs, seus modelos e seus limites.' : view === 'workbook' ? 'Observe, reúna e desenvolva suas ideias.' : (selected || 'Prepare, acompanhe e compare.') + (current ? ' · ' + statusLabel(current.status) : '')}</p></div><div className="header-actions"><button className="icon-button" aria-label="Atualizar registros" onClick={() => { setRefresh(value => value + 1); void refreshList(); }}><RefreshCw size={17} /></button><button className="button secondary" onClick={() => { setInitialSpec(undefined); setView('prepare'); }}><Plus size={15} />Novo experimento</button></div></header>
         {error ? <div role="alert" className="error-banner">{error}<button className="icon-button" onClick={() => setError('')} aria-label="Dispensar aviso"><X size={15} /></button></div> : null}
         {['prepare', 'observe', 'compare'].includes(view) ? <nav className="stage-nav" aria-label="Etapas do experimento">{([['prepare', 'Preparar'], ['observe', 'Acompanhar'], ['compare', 'Comparar']] as const).map(([id, label], index) => <button key={id} className={view === id ? 'active' : ''} onClick={() => setView(id)}><span>{index + 1}</span>{label}</button>)}</nav> : null}
         <Workbook store={workbooks} active={view === 'workbook'} documents={current?.spec.documents ?? []} onResource={setResource} onOrigin={origin} onNotes={id => setNotebook({ id })} onCorpus={capture => { void useCorpus(capture); }} />
-        {view === 'settings' ? <Settings onChanged={setHealth} /> : view === 'workbook' ? null : view === 'prepare' ? <Prepare onSettings={() => setView('settings')} liveEnabled={health?.live_enabled ?? false} initialSpec={initialSpec} onStarted={started} onDemo={() => { void demo(); }} /> :
-          view === 'experiments' ? <section className="experiments-view"><div className="row-heading"><h2>Histórico</h2><input className="experiment-search" aria-label="Buscar experimentos" placeholder="Buscar pergunta ou registro…" value={search} onChange={event => setSearch(event.target.value)} /></div>{items.filter(item => (item.task + item.experiment_id).toLowerCase().includes(search.toLowerCase())).reverse().map(item => <button className="experiment-row" key={item.experiment_id} onClick={() => choose(item.experiment_id)}><span className="condition-dot" /><div><strong>{conditions[item.exposure].title}</strong><p>{item.task}</p><small>{item.experiment_id}</small></div><span className="badge">{statusLabel(item.status)}</span><ChevronRight size={18} /></button>)}{!items.length ? <Empty onDemo={demo} busy={busy} /> : null}</section> :
-          !selected ? <Empty onDemo={demo} busy={busy} /> :
+        {view === 'settings' ? <Settings onChanged={setHealth} /> : view === 'workbook' ? null : view === 'prepare' ? <Prepare onSettings={() => setView('settings')} liveEnabled={health?.live_enabled ?? false} initialSpec={initialSpec} onStarted={started} /> :
+          view === 'experiments' ? <Experiments items={items} onChoose={choose} onRefresh={refreshList} onEdit={spec => { setInitialSpec(spec); setView('prepare'); }} onDeleted={ids => { if (ids.includes(selected)) { setSelected(''); setSnapshot(null); hasSelected.current = true; } }} onNew={() => { setInitialSpec(undefined); setView('prepare'); }} /> :
+          !selected ? <Empty onNew={() => { setInitialSpec(undefined); setView('prepare'); }} /> :
           !current ? <div className="empty-state">{observationFailed ? <p>Não foi possível abrir esta coleta. Confira o aviso acima.</p> : <><span className="activity-dot" /><p>Carregando os registros…</p></>}</div> :
           !verified ? <div role="alert" className="error-banner">O experimento contém registros ausentes ou alterados. A leitura foi bloqueada para preservar a análise.<ul>{current.integrity?.issues.map(issue => <li key={issue}>{issue}</li>)}</ul></div> :
           view === 'records' ? <Records snapshot={current} onContext={setContext} /> :
-          view === 'compare' && currentItem ? <><div className="compare-intro"><span className="eyebrow">Comparação entre condições</span><h2>Observe as respostas na mesma base</h2><label>Repetição<select value={repetition} onChange={event => setRepetition(Number(event.target.value))}>{Array.from({ length: current.spec.repetitions }, (_, i) => <option key={i} value={i + 1}>{i + 1}</option>)}</select></label></div><Compare selected={currentItem} items={items} repetition={repetition} /></> :
-          <><Observe snapshot={current} repetition={repetition} onRepetition={setRepetition} onContext={setContext} onDocuments={() => setDocuments(true)} onPin={anchor => { void pin(anchor); }} onDerive={exposure => { void derive(exposure); }} replay={replay} onReplay={setReplay} />{currentItem ? <Compare selected={currentItem} items={items} repetition={repetition} /> : null}</>}
+          view === 'compare' && currentItem ? <><div className="compare-intro"><span className="eyebrow">Comparação entre condições</span><h2>Observe as respostas na mesma base</h2><label>Repetição<select value={repetition} onChange={event => setRepetition(Number(event.target.value))}>{Array.from({ length: current.spec.repetitions }, (_, i) => <option key={i} value={i + 1}>{i + 1}</option>)}</select></label></div><Compare selected={currentItem} items={comparisonItems} repetition={repetition} /></> :
+          <><Observe snapshot={current} repetition={repetition} onRepetition={setRepetition} onContext={setContext} onDocuments={() => setDocuments(true)} onPin={anchor => { void pin(anchor); }} onDerive={exposure => { void derive(exposure); }} replay={replay} onReplay={setReplay} />{currentItem ? <Compare selected={currentItem} items={comparisonItems} repetition={repetition} /> : null}</>}
       </main>
       {!['workbook', 'settings'].includes(view) ? <aside className="inspector"><div className="inspector-heading"><Pin size={16} /><h3>Seu olhar</h3></div>{pinned ? <><span className="eyebrow">{pinned.anchor?.excerpt ? 'Trecho fixado' : 'Momento marcado'}</span>{pinned.anchor?.excerpt ? <blockquote>{pinned.anchor.excerpt}</blockquote> : null}<small>{pinned.anchor?.experiment_id}</small><h3>Minha observação</h3><button className="note-open-card" onClick={() => setNotebook({ id: pinned.id })}><NotebookPen size={17} />Abrir esta nota<ArrowUpRight size={14} /></button><span className="hypothesis-badge">Hipótese para investigar</span>{pinned.anchor ? <button className="button secondary" onClick={() => origin(pinned)}>Conferir origem</button> : null}</> : <><p>Selecione um trecho de uma resposta e clique em <strong>Fixar trecho</strong>.</p><div className="inspector-empty"><Pin size={24} /><span>Uma particularidade pode virar uma pergunta para investigar.</span></div><button className="button secondary" onClick={() => setNotebook({})}><NotebookPen size={15} />Abrir anotações</button></>}<div className="inspector-footnote"><FileText size={14} />Suas notas ficam separadas dos registros originais.</div></aside> : null}
     </div>
@@ -185,8 +178,8 @@ export default function App() {
   </ResourceReferenceContext.Provider>;
 }
 
-function Empty({ onDemo, busy }: { onDemo(): void; busy: boolean }) {
-  return <section className="welcome"><span className="welcome-symbol"><FlaskConical size={38} /></span><span className="eyebrow">Norvald Lab</span><h2>Uma bancada para observar<br />o que muda entre participantes.</h2><p>Comece com três participantes sintéticos. A demonstração cria as condições independente, reconsideração individual e exposição aos colegas.</p><button className="button" onClick={onDemo} disabled={busy}><FlaskConical size={17} />{busy ? 'Preparando…' : 'Abrir demonstração'}</button><small>Sem LLM, sem chamadas de API, sem valor empírico para a tese.</small></section>;
+function Empty({ onNew }: { onNew(): void }) {
+  return <section className="welcome"><span className="welcome-symbol"><FlaskConical size={38} /></span><span className="eyebrow">Norvald Lab</span><h2>Uma bancada para observar<br />o que muda entre participantes.</h2><p>Prepare sua pergunta, escolha os modelos e reúna o material do experimento.</p><button className="button" onClick={onNew}><Plus size={17} />Preparar experimento</button></section>;
 }
 function ResourceModal({ resource, onClose }: { resource: Resource; onClose(): void }) {
   const root = useRef<HTMLDivElement>(null);

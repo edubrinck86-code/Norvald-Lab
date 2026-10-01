@@ -13,7 +13,7 @@ export type Spec = {
   condition: { id: string; exposure: Exposure; prior_experiment?: string; tools: 'off' | 'corpus'; max_tool_calls?: number; max_tool_iterations?: number };
   budget: { max_concurrency: number; max_concurrency_per_provider: number; timeout_seconds: number; max_logical_executions: number };
 };
-export type ExperimentItem = { experiment_id: string; status: string; task: string; exposure: Exposure; source_experiment_id?: string; synthetic: boolean };
+export type ExperimentItem = { experiment_id: string; status: string; task: string; exposure: Exposure; source_experiment_id?: string; synthetic: boolean; deleted?: boolean };
 export type RecordedEvent = { at: string; event: string; data: Record<string, unknown> };
 export type PreparedRequest = { agent_id: string; instructions: string; shared_instructions: string; wave_instructions: string; user_message: string; reasoning_effort: string; context: { working_context: string; metadata: { run_id: string; repetition_index: number; execution_id: string; source_observation_ids: string[] } } };
 export type RawRecord = {

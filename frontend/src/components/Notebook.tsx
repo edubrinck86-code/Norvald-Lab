@@ -102,10 +102,10 @@ export function Notebook({ initialId, onClose, onOrigin, onSaved }: { initialId?
     } catch (reason) { setError(String(reason)); }
   }
   const tags = [...new Set(draft?.content.match(/(?:^|\s)#[\p{L}\p{N}_-]+/gu)?.map(value => value.trim()) ?? [])];
-  return <Modal title="Caderno de notas" onClose={() => { void close(); }} className="notebook-modal">
+  return <Modal title="Notes" onClose={() => { void close(); }} className="notebook-modal">
     <div className="notebook-layout">
       <aside className="notebook-sidebar">
-        <header><BookOpen size={19} /><div><h2>Caderno de notas</h2><p>Suas notas pessoais em Markdown.</p></div><button className="icon-button" onClick={create} aria-label="Criar nota"><Pencil size={17} /></button></header>
+        <header><BookOpen size={19} /><div><h2>Notes</h2><p>Suas notas pessoais em Markdown.</p></div><button className="icon-button" onClick={create} aria-label="Criar nota"><Pencil size={17} /></button></header>
         <label className="search-field"><Search size={16} /><input aria-label="Buscar notas" placeholder="Buscar notas…" value={search} onChange={event => setSearch(event.target.value)} /></label>
         <nav aria-label="Notas">{notes.filter(note => (note.title + note.content).toLocaleLowerCase('pt-BR').includes(search.toLocaleLowerCase('pt-BR'))).map(note => <button key={note.id} className={'note-list-item ' + (note.id === selected ? 'selected' : '')} onClick={() => { void choose(note); }}><span>{note.title || 'Sem título'}</span><time>{new Date(note.updated_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</time></button>)}</nav>
         <footer><button className="icon-button" onClick={create} aria-label="Nova nota"><Plus size={18} /></button><button className="icon-button" onClick={() => titleRef.current?.focus()} disabled={!draft} aria-label="Renomear nota"><Pencil size={15} /></button><button className={'icon-button ' + (deleting ? 'danger' : '')} onClick={remove} disabled={!draft} aria-label={deleting ? 'Confirmar exclusão' : 'Excluir nota'} title={deleting ? 'Clique para confirmar a exclusão' : 'Excluir nota'}><Trash2 size={16} /></button>{deleting ? <button className="text-button" onClick={() => setDeleting(false)}>Cancelar</button> : null}</footer>

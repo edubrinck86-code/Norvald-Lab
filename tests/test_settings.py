@@ -76,7 +76,7 @@ def test_ui_saved_key_catalog_and_real_adapter_with_tools_without_external_reque
             return httpx.Response(200, json={'id': 'request-mock', 'choices': [{'message': message}], 'usage': {'prompt_tokens': 12, 'completion_tokens': 3}})
         raise AssertionError(str(request.url))
     monkeypatch.setattr(transport, 'build_client', lambda **kw: httpx.AsyncClient(transport=httpx.MockTransport(handler), trust_env=False))
-    with TestClient(create_app(tmp_path)) as client:
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
         assert not client.get('/health').json()['live_enabled']
         response = client.put('/api/settings/connections/openrouter', json={'api_key': KEY})
         assert response.status_code == 200 and KEY not in response.text
@@ -104,7 +104,7 @@ def test_ui_saved_key_catalog_and_real_adapter_with_tools_without_external_reque
         assert any(e['event'].startswith('tool.') for e in observed['events'])
         assert KEY not in json.dumps(observed)
         assert all(KEY not in p.read_text() for p in (tmp_path / 'experiments').rglob('*') if p.is_file())
-    with TestClient(create_app(tmp_path)) as client:
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
         assert client.get('/health').json()['live_enabled']
         assert client.get('/api/settings').json()['connections'][0]['has_key']
 
