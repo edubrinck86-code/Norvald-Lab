@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "norvald-lab"
-version = "0.1.0"
+version = "0.2.0"
 description = "Laboratório independente de observação de deliberação multi-LLM"
 requires-python = ">=3.10"
 dependencies = ["httpx[http2,socks]>=0.27,<1", "psutil>=6,<8", "deepdiff>=8,<9", "fastapi>=0.115,<1", "uvicorn>=0.30,<1"]
@@ -17,6 +17,9 @@ norvald-lab = "norvald_lab.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["norvald_lab*"]
+
+[tool.setuptools.package-data]
+norvald_lab = ["web/index.html", "web/assets/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

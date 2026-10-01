@@ -65,9 +65,10 @@ def main(argv=None):
     derive.add_argument("experiment_id")
     derive.add_argument("--exposure", choices=["self", "exposed"], required=True)
     derive.add_argument("--output", type=Path, required=True)
-    serve = commands.add_parser("serve", help="Inicia o backend local para a futura interface")
+    serve = commands.add_parser("serve", help="Inicia a bancada e o backend local")
     serve.add_argument("--port", type=int, default=8766)
     serve.add_argument("--live", action="store_true")
+    serve.add_argument("--open", action="store_true", help="Abre a bancada no navegador")
     args = parser.parse_args(argv)
     root = args.data_dir.expanduser() if args.data_dir else arof_data_root()
     runner = ExperimentRunner(root)
@@ -110,6 +111,10 @@ def main(argv=None):
         elif args.command == "serve":
             import uvicorn
             from norvald_lab.api import create_app
+            if args.open:
+                import threading
+                import webbrowser
+                threading.Timer(1, lambda: webbrowser.open(f"http://127.0.0.1:{args.port}")).start()
             uvicorn.run(create_app(root, allow_live=args.live), host="127.0.0.1", port=args.port)
         return 0
     except (ValueError, OSError, KeyError, TypeError) as exc:

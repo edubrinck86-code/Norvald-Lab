@@ -1,0 +1,91 @@
+{
+  "repository": "edubrinck86-code/Norvald-teste-codex",
+  "source_tree": "82cbf32f8270a97d235b7cab525c590382c8a231",
+  "files": [
+    {
+      "path": "frontend/src/ui/markdown/NorvaldMarkdown.tsx",
+      "source_blob": "88b8ccaae7006ca99fba38d52783a7e20ce1104e",
+      "destination_sha256": "93da0f215ea1bba68e700d3cf431cd5d5b167559abef259c6aaa80c5ab2330f9"
+    },
+    {
+      "path": "frontend/src/ui/markdown/MermaidDiagram.tsx",
+      "source_blob": "7c900a74bbf2b87d9752e12b95f49c674ee31c63",
+      "destination_sha256": "6820810bbbb3e9751e736d50f6ea53687b8adc7a4f39824e3dd18630195f51ec"
+    },
+    {
+      "path": "frontend/src/lib/markdown.ts",
+      "source_blob": "d4cc35662febf451e0d6b481031e8e0470190215",
+      "destination_sha256": "244568cf8818b8b8563eaf8eb3d5998c88a8fb70d4541816b2837c2499fbe032"
+    },
+    {
+      "path": "frontend/src/lib/markdownText.ts",
+      "source_blob": "47e3b11e611ac595200a49cc7e2e7c9347b1c5f1",
+      "destination_sha256": "066010c643151a5122d8ebe3e76ddbe4754eab6756bd1dff3979cc6f93204c2b"
+    },
+    {
+      "path": "frontend/src/styles/markdown-norvald.css",
+      "source_blob": "887f4eeee51d140acda89dce0456c12591fc5630",
+      "destination_sha256": "ede02fd977efc21a77e76c8590330bd8f33c36820461e17f74bf89fb4998c7f5"
+    },
+    {
+      "path": "frontend/src/styles/foundations/tokens.css",
+      "source_blob": "4aa9b7836a50ad13599e57338e177f703304610d",
+      "destination_sha256": "4cbebbb23ce7a80d6af726c6d4dbd41a76f1ac3b59ff1bc07d034225a57960f0"
+    },
+    {
+      "path": "frontend/src/ui/MarkdownToolbar.tsx",
+      "source_blob": "4f4061a719978cd3ace727460c463a0fc06ac2f7",
+      "destination_sha256": "79b4ed36f9355d90b1da59ae8c42b3e3cefb79e7b43c324bb9abe4dbd0352fb2"
+    },
+    {
+      "path": "frontend/src/ui/MarkdownSyntaxHelp.tsx",
+      "source_blob": "1e9ab115b11e70a958fc2495bfa8610dae41e86b",
+      "destination_sha256": "a48d8182550b84fe98970fd5a55fab541503908e5620614f0bb5ed471cf305fe"
+    },
+    {
+      "path": "frontend/src/lib/utils.ts",
+      "source_blob": "832e28af9899275cc4605026aa272dbf6462f36c",
+      "destination_sha256": "1466dc4d0d71fa033586344ed80911ad5935accd75d02f0a307fb26dc2f85998"
+    },
+    {
+      "path": "frontend/src/lib/dispensarAoClicarFora.ts",
+      "source_blob": "2f2908b07588cbd9763ec9543d442e890d6bbde0",
+      "destination_sha256": "b62ca1280908b796dd8cd62feeece9c99384112c872242581899e7ecdaace671"
+    },
+    {
+      "path": "frontend/src/ui/markdown/MarkdownIndexSidebar.tsx",
+      "source_blob": "1f9b96be8eb447dbdfd51bc7c838dd6a42a36f17",
+      "destination_sha256": "eae58be28d30e5f90a97642d03f63057c3bde163aecc1464c9b318cd65c80ec7"
+    },
+    {
+      "path": "frontend/src/ui/references/ResourceReferenceContext.ts",
+      "source_blob": "2ef9904eb07a1e7b96f2d54c69fbcfdefc3df0ca",
+      "destination_sha256": "55edd6a3256ced300f45b3b27cdc75b923ece0ba076e5a4930e862d78c1d375f"
+    },
+    {
+      "path": "frontend/src/ui/references/resourceReference.ts",
+      "source_blob": "7f99d85b345932d1faadda57e47770f4d74aa72a",
+      "destination_sha256": "e2d965e947d9467d76907234b69c0daaefbcfe89e4d3a7241cc2cb2b65a07450"
+    },
+    {
+      "path": "frontend/src/styles/foundations/base.css",
+      "source_blob": "1d2b73194a8ac478ce1cfbc98219882b807aa253",
+      "destination_sha256": "73e44f0174212ed0c174100102b1d7f4fd2454c7c2c988fd14d760d61337b0cd"
+    },
+    {
+      "path": "frontend/src/styles/themes/dark.css",
+      "source_blob": "a5dcfa204e3e1919a15f98ebe1f85b8be22f752f",
+      "destination_sha256": "b41ee781cde73b6de41aefdadd29d9b386a943ce27e4617b6131ff0e23dc3a24"
+    }
+  ],
+  "adaptations": [
+    "EvidenceItem is a local read-only type; no Studio library API imported.",
+    "API_BASE uses the Lab origin; references resolve only against the frozen corpus and local notebook.",
+    "Toolbar share action explicitly disabled; accessible copy/download labels added.",
+    "Mermaid uses matte copper/petroleum theme variables.",
+    "Studio tokens and Markdown stylesheet retained; Lab CSS overrides neutral surfaces and info color.",
+    "Reference buttons receive explicit accessible labels.",
+    "Markdown syntax help describes local references.",
+    "Trailing blank lines normalized; original source blobs remain identified above."
+  ]
+}

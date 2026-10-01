@@ -1,4 +1,4 @@
-"""API local sem UI. A execução usa exatamente o mesmo serviço da CLI."""
+"""API e bancada local. A execução usa exatamente o mesmo serviço da CLI."""
 from __future__ import annotations
 
 import asyncio
@@ -7,11 +7,16 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from norvald_lab.config import identifier
 from norvald_lab.infrastructure.arof.dataset_store import arof_data_root
 from norvald_lab.runner import ExperimentRunner
 from norvald_lab.storage import verify_experiment
+from norvald_lab.observer import NotebookStore, snapshot
+from norvald_lab.cli import demo_spec, derive_spec
+from uuid import uuid4
 
 
 def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
@@ -19,6 +24,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
     runner = ExperimentRunner(root)
     jobs = {}
     failures = {}
+    notebook = NotebookStore(root)
 
     @asynccontextmanager
     async def lifespan(app):
@@ -28,7 +34,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
             task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
 
-    app = FastAPI(title="Norvald Lab", version="0.1.0", lifespan=lifespan)
+    app = FastAPI(title="Norvald Lab", version="0.2.0", lifespan=lifespan)
     app.state.jobs = jobs
 
     def directory(expid):
@@ -52,8 +58,51 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
         result = []
         for path in sorted((root / "experiments").glob("*/manifest.json")):
             final = path.parent / "result.json"
-            result.append({"experiment_id": path.parent.name, "status": read(final)["status"] if final.exists() else "running" if path.parent.name in jobs else "unclosed"})
+            spec = read(path.parent / "spec.json")
+            result.append({"experiment_id": path.parent.name, "status": read(final)["status"] if final.exists() else "running" if path.parent.name in jobs else "unclosed", "task": spec["task"]["objective"], "exposure": spec["condition"]["exposure"], "source_experiment_id": spec["condition"].get("prior_experiment"), "synthetic": spec["mode"] == "demo"})
         return result
+
+    @app.post("/api/prepare")
+    def prepare(spec: dict):
+        try:
+            prepared = runner.prepare(spec)
+            return {"spec": prepared.spec, "requests": [json.loads(r) for r in prepared.requests_json], "fingerprint": prepared.condition_fingerprint, "live_enabled": allow_live}
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.get("/api/demo-template")
+    def template():
+        return demo_spec("experimento-" + uuid4().hex[:10])
+
+    @app.post("/api/derive")
+    def derive(payload: dict):
+        try:
+            exposure = payload["exposure"]
+            if exposure not in {"self", "exposed"}:
+                raise ValueError("Exposição deve ser self ou exposed.")
+            spec = derive_spec(root, payload["source_id"], payload["experiment_id"], exposure)
+            return runner.prepare(spec).spec
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.post("/api/demo", status_code=202)
+    async def demo():
+        label = "demo-" + uuid4().hex[:12]
+        ids = [label + suffix for suffix in ("-b1", "-b3", "-e")]
+        async def suite():
+            try:
+                await runner.run(runner.prepare(demo_spec(ids[0])))
+                for expid, exposure in zip(ids[1:], ("self", "exposed")):
+                    await runner.run(runner.prepare(derive_spec(root, ids[0], expid, exposure)))
+            except Exception as exc:
+                failures[ids[0]] = str(exc)
+            finally:
+                for expid in ids:
+                    jobs.pop(expid, None)
+        task = asyncio.create_task(suite())
+        for expid in ids:
+            jobs[expid] = task
+        return {"experiment_id": ids[0], "experiment_ids": ids, "status": "accepted"}
 
     @app.post("/api/experiments", status_code=202)
     async def execute(spec: dict):
@@ -94,6 +143,47 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
     def manifest(experiment_id: str):
         return read(directory(experiment_id) / "manifest.json")
 
+    @app.get("/api/experiments/{experiment_id}/observe")
+    def observe(experiment_id: str):
+        directory(experiment_id)
+        try:
+            return snapshot(root, experiment_id, experiment(experiment_id)["status"])
+        except FileNotFoundError as exc:
+            if experiment_id in failures:
+                raise HTTPException(409, "Coleta não iniciada: " + failures[experiment_id]) from exc
+            raise HTTPException(404, "Experimento ainda não disponível.") from exc
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(409, "Registro inconsistente; confira os arquivos originais.") from exc
+
+    @app.get("/api/notes")
+    def notes():
+        return notebook.list()
+
+    @app.post("/api/notes", status_code=201)
+    def create_note(payload: dict):
+        try:
+            return notebook.save(payload)
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.put("/api/notes/{note_id}")
+    def save_note(note_id: str, payload: dict):
+        try:
+            return notebook.save(payload, note_id)
+        except FileNotFoundError as exc:
+            raise HTTPException(404, "Nota não encontrada.") from exc
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.delete("/api/notes/{note_id}", status_code=204)
+    def delete_note(note_id: str):
+        try:
+            notebook.delete(note_id)
+        except FileNotFoundError as exc:
+            raise HTTPException(404, "Nota não encontrada.") from exc
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+
     @app.get("/api/experiments/{experiment_id}/verify")
     def verify(experiment_id: str):
         directory(experiment_id)
@@ -109,5 +199,15 @@ def create_app(root: str | Path | None = None, *, allow_live=False) -> FastAPI:
         if not check["valid"]:
             raise HTTPException(409, check)
         return [json.loads(line) for path in sorted((target / "raw").rglob("*.jsonl")) for line in path.read_text().splitlines() if line.strip()]
+
+    web = Path(__file__).parent / "web"
+    if (web / "assets").exists():
+        app.mount("/assets", StaticFiles(directory=web / "assets"), name="assets")
+
+    @app.get("/", include_in_schema=False)
+    def index():
+        if not (web / "index.html").exists():
+            raise HTTPException(503, "Inicie ./scripts/start.sh para preparar e abrir a interface.")
+        return FileResponse(web / "index.html")
 
     return app

@@ -11,3 +11,6 @@ dist/
 data/
 *.db
 *.sqlite*
+frontend/node_modules/
+norvald_lab/web/
+frontend/*.tsbuildinfo

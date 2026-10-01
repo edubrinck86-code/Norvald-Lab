@@ -1,0 +1,277 @@
+/* NORVALD STUDIO — design tokens and Tailwind theme bridge */
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-border-hover: hsl(var(--border-hover));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-button: hsl(var(--primary-button));
+  --color-primary-button-hover: hsl(var(--primary-button-hover));
+  --color-primary-button-pressed: hsl(var(--primary-button-pressed));
+  --color-border-selected: hsl(var(--border-selected));
+  --color-muted: hsl(var(--surface-3));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-subtle: hsl(var(--subtle));
+  --color-card: hsl(var(--surface-3));
+  --color-card-foreground: hsl(var(--foreground));
+  --color-sidebar: hsl(var(--sidebar));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-ok: hsl(var(--ok));
+  --color-ok-soft: hsl(var(--ok-soft));
+  --color-ok-fill: hsl(var(--ok) / 0.12);
+  --color-ok-line: hsl(var(--ok) / 0.32);
+  --color-warn: hsl(var(--warn));
+  --color-warn-soft: hsl(var(--warn-soft));
+  --color-warn-fill: hsl(var(--warn) / 0.12);
+  --color-warn-line: hsl(var(--warn) / 0.32);
+  --color-danger: hsl(var(--danger));
+  --color-danger-soft: hsl(var(--danger-soft));
+  --color-danger-fill: hsl(var(--danger) / 0.12);
+  --color-danger-line: hsl(var(--danger) / 0.32);
+  --color-on-accent: hsl(var(--on-accent));
+
+  /* Vidro — filete e poco.
+
+     Eram 17 valores de branco e preto com alfa: border-white/[0.07],
+     /[0.08], /[0.11], /[0.12], /10, /20, /25, e bg-black/10, /15, /20,
+     /30. Sao duas coisas so — a borda superior que pega a luz, e o poco
+     escuro de campo de entrada.
+
+     Em branco e preto literais nao seguem tema nenhum: no claro, o
+     filete branco some contra branco e o poco preto vira mancha. Por
+     isso saem de branco/preto e passam a derivar da superficie. */
+  --color-rim: hsl(0 0% 100% / 0.11);
+  --color-rim-soft: hsl(0 0% 100% / 0.06);
+  --color-rim-strong: hsl(0 0% 100% / 0.2);
+  --color-well: hsl(var(--layer-base) / 0.55);
+  /* O mesmo filete como preenchimento: trilha de barra, realce de topo. */
+  --color-well-deep: hsl(var(--layer-base) / 0.75);
+
+  /* Procedencia — mesmas tres variantes dos estados: cor, tinte, linha. */
+  --color-source-workspace: hsl(var(--source-workspace));
+  --color-source-workspace-fill: hsl(var(--source-workspace) / 0.12);
+  --color-source-workspace-line: hsl(var(--source-workspace) / 0.32);
+  --color-source-web: hsl(var(--source-web));
+  --color-source-web-fill: hsl(var(--source-web) / 0.12);
+  --color-source-web-line: hsl(var(--source-web) / 0.32);
+  --color-source-context: hsl(var(--source-context));
+  --color-source-context-fill: hsl(var(--source-context) / 0.12);
+  --color-source-context-line: hsl(var(--source-context) / 0.32);
+  --color-source-library: hsl(var(--source-library));
+  --color-source-library-fill: hsl(var(--source-library) / 0.12);
+  --color-source-library-line: hsl(var(--source-library) / 0.32);
+
+  /* Papeis de superficie — cor resolvida, sem opacidade no uso. */
+  --color-layer-base: hsl(var(--layer-base));
+  --color-layer-sunken: hsl(var(--layer-sunken));
+  --color-layer-panel: hsl(var(--layer-panel));
+  --color-layer-raised: hsl(var(--layer-raised));
+  --color-layer-overlay: hsl(var(--layer-overlay));
+  --color-layer-input: hsl(var(--layer-input));
+  --color-layer-hover: hsl(var(--layer-hover));
+
+  /* Translucidez em dois niveis, nao em vinte e cinco.
+
+     A camada de vidro e parte da linguagem visual e nao vai embora; o
+     que sai e a escolha do quanto, feita no local de uso. Eram 25
+     opacidades (/10 a /96, com /42, /46, /58, /72, /84, /93 no meio),
+     cada uma calibrada no olho contra um fundo especifico.
+
+     `veil` cobre o que era ate /50; `glass`, o que era acima. Trocar a
+     intensidade do vidro no Studio inteiro passa a ser editar duas
+     linhas. */
+  --color-layer-base-veil: hsl(var(--layer-base) / 0.35);
+  --color-layer-base-glass: hsl(var(--layer-base) / 0.7);
+  --color-layer-sunken-veil: hsl(var(--layer-sunken) / 0.35);
+  --color-layer-sunken-glass: hsl(var(--layer-sunken) / 0.7);
+  --color-layer-panel-veil: hsl(var(--layer-panel) / 0.35);
+  --color-layer-panel-glass: hsl(var(--layer-panel) / 0.7);
+  --color-layer-raised-veil: hsl(var(--layer-raised) / 0.35);
+  --color-layer-raised-glass: hsl(var(--layer-raised) / 0.7);
+  --color-layer-overlay-veil: hsl(var(--layer-overlay) / 0.35);
+  --color-layer-overlay-glass: hsl(var(--layer-overlay) / 0.7);
+  --color-layer-selected: hsl(var(--primary) / 0.14);
+  --color-scrim: hsl(var(--scrim) / 0.64);
+
+  /* Borda — tres pesos, no lugar de treze opacidades. */
+  --color-line: hsl(var(--border) / 0.7);
+  --color-line-soft: hsl(var(--border) / 0.45);
+  --color-line-strong: hsl(var(--border));
+
+  /* Largura de container — pixel solto so por excecao justificada. */
+  --container-narrow: 28rem;
+  --container-form: 42rem;
+  --container-content: 64rem;
+  --container-wide: 80rem;
+  /* `canvas`, nao `full`: --container-full sequestraria o max-w-full
+     nativo, que significa 100% e nao uma medida. */
+  --container-canvas: 100rem;
+  --color-badge-done-bg: hsl(var(--badge-done-bg));
+  --color-badge-done-text: hsl(var(--badge-done-text));
+  --color-badge-template-bg: hsl(var(--badge-template-bg));
+  --color-badge-template-text: hsl(var(--badge-template-text));
+  --color-surface-1: hsl(var(--surface-1));
+  --color-surface-2: hsl(var(--surface-2));
+  --color-surface-3: hsl(var(--surface-3));
+  --color-surface-4: hsl(var(--surface-4));
+  --color-surface-5: hsl(var(--surface-5));
+  --color-panel-right: hsl(var(--panel-right));
+  --color-text-normal: hsl(var(--text-normal));
+  /* Raio por papel. O mapa achou `rounded-lg` (363) e `rounded-xl` (326)
+     empatados, e a escolha dependia da AREA, nao do elemento: o mesmo
+     card era lg na Deliberacao e xl no Cloud. Agora depende do papel. */
+  --radius-control: 0.5rem;
+  --radius-card: 0.625rem;
+  --radius-panel: 0.875rem;
+  --radius-overlay: 1rem;
+
+  /* Sombra. Quatro nomes ja existiam e eram usados de forma consistente
+     entre areas; os outros 110 usos estavam em 75 valores anonimos. O
+     conjunto abaixo e o que basta. Foscas: sem brilho colorido, difusao
+     curta, opacidade baixa. */
+  --shadow-card: 0 8px 20px rgb(0 0 0 / 0.22);
+  --shadow-panel: 0 12px 28px rgb(0 0 0 / 0.26);
+  --shadow-overlay: 0 24px 56px rgb(0 0 0 / 0.38);
+  --shadow-button: 0 2px 6px rgb(0 0 0 / 0.2);
+  --shadow-elevated: 0 10px 24px rgb(0 0 0 / 0.18);
+  --shadow-floating: 0 10px 24px rgb(0 0 0 / 0.18);
+  /* Filete interno de vidro: nao e sombra de elevacao, e o brilho da
+     borda superior. Estava escrito a mao em cinco lugares. */
+  --shadow-rim: inset 0 1px 0 rgb(255 255 255 / 0.05);
+  /* Halo na cor corrente, para selo que precisa brilhar no proprio tom.
+     Tres ocorrencias identicas, nenhuma nomeada. */
+  --shadow-glow-current: 0 0 6px currentColor;
+  --color-accent: hsl(var(--accent));
+  --color-accent-soft: hsl(var(--accent) / 0.12);
+  --color-accent-line: hsl(var(--accent) / 0.32);
+  --shadow-glow-primary: 0 0 0 1px hsl(var(--primary) / 0.25), 0 8px 24px -8px hsl(var(--primary) / 0.35);
+  --shadow-glow-accent: 0 0 0 1px hsl(var(--accent) / 0.28), 0 10px 30px -10px hsl(var(--accent) / 0.45);
+}
+
+/* Empilhamento — uma escala, no lugar de treze z-index avulsos.
+
+   Nao cabe no @theme: z-index nao e um namespace de tema no Tailwind
+   v4, entao `--z-modal` ali nao geraria utilidade nenhuma. Declarado
+   como utilidade, o nome existe e o valor fica num lugar so.
+
+   Os valores arbitrarios que sairam (z-[90], z-[120], z-[170]) existiam
+   para passar na frente de outro valor arbitrario: cada um resolvia um
+   conflito local sem saber da escala. Com seis degraus nomeados, a
+   pergunta deixa de ser "que numero e maior" e passa a ser "que tipo de
+   camada e esta". */
+@utility z-sticky { z-index: 10; }
+@utility z-dropdown { z-index: 20; }
+@utility z-sheet { z-index: 30; }
+@utility z-overlay { z-index: 40; }
+@utility z-modal { z-index: 50; }
+@utility z-toast { z-index: 60; }
+
+:root {
+  color-scheme: dark;
+  /* O acento segue `primary`, por referência.
+
+     Era âmbar, justificado como "a agulha da bússola do logotipo" — mas
+     o logotipo é monocromático, então a justificativa não se sustentava,
+     e o amarelo saturado incomodava. O acento passa a ser a cor que o
+     Studio já usa.
+
+     Por referência, e não por cópia, para que trocar `primary` troque o
+     acento junto: duas cores de marca que precisam ser mantidas em dia
+     uma com a outra divergem no primeiro tema novo — foi assim que o
+     tema claro ficou com `primary` índigo enquanto o escuro é cobre.
+
+     O acento continua marcando ONDE VOCÊ ESTÁ e o que a deliberação
+     espera; a distinção em relação ao botão é de peso e superfície, não
+     mais de matiz. */
+  --accent: var(--primary);
+
+  --background: 215 20% 12%;
+  --foreground: 0 0% 96%;
+  --sidebar: 216 22% 14%;
+  --surface-1: 218 22% 15%;
+  --surface-2: 216 22% 14%;
+  --surface-3: 215 21% 18%;
+  --surface-4: 214 21% 21%;
+  --surface-5: 214 20% 24%;
+  --panel-right: 215 21% 16%;
+  --border: 213 15% 24%;
+  --border-hover: 215 13% 26%;
+  --border-selected: 29 31% 47%;
+  --primary: 29 31% 47%;
+  --primary-button: 29 31% 48%;
+  --primary-button-hover: 30 35% 54%;
+  --primary-button-pressed: 29 32% 42%;
+  --primary-foreground: 0 0% 100%;
+  --muted-foreground: 217 11% 61%;
+  --subtle: 218 8% 45%;
+  --text-normal: 213 16% 86%;
+  --destructive: 4 42% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --badge-done-bg: 164 50% 18%;
+  --badge-done-text: 158 40% 55%;
+  --badge-template-bg: 270 30% 24%;
+  --badge-template-text: 270 40% 72%;
+
+  /* --- Estado -------------------------------------------------------
+     Esmeralda, vermelho e ambar estavam soltos no codigo: ~330 usos em
+     tons diferentes, cada arquivo escolhendo o seu.
+
+     `destructive` e a cor da ACAO destrutiva (botao que apaga);
+     `danger` e o ESTADO de erro (texto, selo, borda). Mesma distincao
+     que existe entre `primary` e `accent`: se dois disputassem o mesmo
+     papel, nenhum significaria nada.
+
+     Todos dessaturados em relacao ao Tailwind cru de onde vieram —
+     emerald-400 a 64% e red-400 a 91% berravam contra o cobre fosco. A
+     paleta inteira e fosca por decisao, nao por acaso. */
+  --ok: 158 42% 46%;
+  --ok-soft: 158 34% 60%;
+  --warn: 36 48% 50%;
+  --warn-soft: 36 38% 64%;
+  --danger: 4 52% 56%;
+  --danger-soft: 4 40% 68%;
+  --on-accent: 0 0% 100%;
+
+  /* --- Procedencia ---------------------------------------------------
+     Categoria identifica; estado alerta. Por isso a saturacao aqui fica
+     em 32–40%, abaixo dos 42–52% dos estados: se as duas familias
+     gritassem igual, o alerta perderia.
+
+     Todas no arco frio (188–282), longe do cobre (29), do aviso (36),
+     do erro (4) e do ok (158). Frio nunca e estado no Studio, e e isso
+     que deixa a leitura imediata.
+
+     A luminosidade sobe ao caminhar para o violeta porque azul e
+     violeta leem mais escuros que ciano no mesmo L; sem o ajuste, a
+     Library pareceria apagada ao lado do Workspace.
+
+     A atribuicao preserva a associacao que ja existia — Library
+     violeta, Workspace ciano, web azul —, entao ninguem reaprende
+     nada: elas so deixam de ser Tailwind saturado e viram fosco, com
+     nome. */
+  --source-workspace: 188 38% 48%;
+  --source-web: 210 40% 56%;
+  --source-context: 246 36% 62%;
+  --source-library: 282 32% 60%;
+
+  /* --- Papeis de superficie ------------------------------------------
+     `surface-1..5` responde "que profundidade na pilha". O codigo
+     precisa responder "que tipo de coisa e isto", e essa pergunta nunca
+     foi feita — entao 378 usos responderam com opacidade, em 25 valores
+     distintos, criando 66 cores anonimas.
+
+     Os papeis abaixo sao cor RESOLVIDA E OPACA. Nenhum se compoe com
+     opacidade no local de uso: e isso que devolve a possibilidade de
+     mexer num token sem deslocar treze relacoes calibradas contra
+     fundos diferentes. */
+  --layer-base: 215 20% 12%;
+  --layer-sunken: 216 22% 14%;
+  --layer-panel: 215 21% 18%;
+  --layer-raised: 214 21% 21%;
+  --layer-overlay: 214 20% 24%;
+  --layer-input: 216 22% 14%;
+  --layer-hover: 214 21% 22%;
+  --scrim: 215 25% 7%;
+}

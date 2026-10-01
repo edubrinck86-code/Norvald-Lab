@@ -1,0 +1,183 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ArrowUpRight, BookOpen, ChevronRight, FileText, FlaskConical, Layers, List, NotebookPen, Pin, Plus, RefreshCw, Settings2, X } from 'lucide-react';
+import { api, ApiError, conditions, statusLabel, type Anchor, type ExperimentItem, type Note, type PreparedRequest, type Snapshot, type Spec } from './api';
+import { familyId, eventLabel } from './lib/observation';
+import { Modal } from './components/Modal';
+import { Notebook } from './components/Notebook';
+import { Observe } from './components/Observe';
+import { Compare } from './components/Compare';
+import { ContextView, Prepare } from './components/Prepare';
+import { NorvaldMarkdown } from './ui/markdown/NorvaldMarkdown';
+import { MarkdownToolbar } from './ui/MarkdownToolbar';
+import { ResourceReferenceContext } from './ui/references/ResourceReferenceContext';
+import type { ResourceReference } from './ui/references/resourceReference';
+
+type View = 'prepare' | 'observe' | 'compare' | 'experiments' | 'records';
+type Resource = { title: string; content: string; section?: string };
+
+export default function App() {
+  const [view, setView] = useState<View>('observe');
+  const [items, setItems] = useState<ExperimentItem[]>([]);
+  const [selected, setSelected] = useState('');
+  const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
+  const [observationFailed, setObservationFailed] = useState(false);
+  const [health, setHealth] = useState<{ live_enabled: boolean } | null>(null);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [repetition, setRepetition] = useState(1);
+  const [replay, setReplay] = useState<number | null>(null);
+  const [notebook, setNotebook] = useState<{ id?: string } | null>(null);
+  const [pinned, setPinned] = useState<Note | null>(null);
+  const [context, setContext] = useState<PreparedRequest | null>(null);
+  const [resource, setResource] = useState<Resource | null>(null);
+  const [documents, setDocuments] = useState(false);
+  const [settings, setSettings] = useState(false);
+  const [initialSpec, setInitialSpec] = useState<Spec | undefined>();
+  const [search, setSearch] = useState('');
+  const [refresh, setRefresh] = useState(0);
+  const hasSelected = useRef(false);
+  const originRequest = useRef<Anchor | null>(null);
+
+  const refreshList = useCallback(async () => {
+    try {
+      const values = await api<ExperimentItem[]>('/api/experiments');
+      setItems(values);
+      if (!hasSelected.current && values.length) { setSelected(values.at(-1)!.experiment_id); hasSelected.current = true; }
+    } catch (reason) { setError(String(reason)); }
+  }, []);
+  useEffect(() => {
+    api<{ live_enabled: boolean }>('/health').then(setHealth).catch(reason => setError(String(reason)));
+    void refreshList();
+    const timer = setInterval(() => { void refreshList(); }, 2000);
+    return () => clearInterval(timer);
+  }, [refreshList]);
+  const selectedItem = items.find(item => item.experiment_id === selected);
+  const pending = !observationFailed && (!snapshot || snapshot.experiment_id !== selected || snapshot.provisional && ['running', 'complete', 'incomplete', 'aborted'].includes(snapshot.status));
+  useEffect(() => {
+    if (!selected) return;
+    let active = true;
+    const controller = new AbortController();
+    async function read() {
+      try {
+        const value = await api<Snapshot>('/api/experiments/' + selected + '/observe', { signal: controller.signal });
+        if (!active) return;
+        setSnapshot(value); setError('');
+        const origin = originRequest.current;
+        if (origin?.experiment_id === selected) {
+          if (origin.observation_id) {
+            const record = value.records.find(row => row.observation_id === origin.observation_id);
+            if (record) setRepetition(Number(record.run_id.slice(1)));
+          }
+          setReplay(origin.event_index ?? null); originRequest.current = null;
+        }
+      } catch (reason) {
+        if (!active) return;
+        // O POST pode retornar antes de o runner reservar e gravar o diretório.
+        if (reason instanceof ApiError && reason.status === 404 && (selectedItem?.status === 'running' || !selectedItem)) return;
+        setError(String(reason));
+        setObservationFailed(true);
+      }
+    }
+    void read();
+    const timer = pending ? setInterval(() => { void read(); }, 900) : null;
+    return () => { active = false; controller.abort(); if (timer) clearInterval(timer); };
+  }, [selected, selectedItem?.status, pending, refresh]);
+
+  function choose(id: string, nextView: View = 'observe') {
+    hasSelected.current = true; setSelected(id); setView(nextView); setRepetition(1); setReplay(null); setSnapshot(null); setError(''); setObservationFailed(false);
+  }
+  function started(id: string) { choose(id); void refreshList(); }
+  async function demo() {
+    setBusy(true); setError('');
+    try { const result = await api<{ experiment_id: string }>('/api/demo', { method: 'POST' }); started(result.experiment_id); }
+    catch (reason) { setError(String(reason)); }
+    finally { setBusy(false); }
+  }
+  async function pin(anchor: Anchor) {
+    try {
+      const content = anchor.excerpt ? '> ' + anchor.excerpt.replace(/\n/g, '\n> ') + '\n\n## Minha observação\n\n' : '## Momento marcado\n\n' + eventLabel(snapshot!.events[anchor.event_index!]) + '\n\n## Minha observação\n\n';
+      const note = await api<Note>('/api/notes', { method: 'POST', body: JSON.stringify({ title: anchor.excerpt ? 'Observação de um trecho' : 'Observação de um momento', content, anchor }) });
+      setPinned(note); setNotebook({ id: note.id });
+    } catch (reason) { setError(String(reason)); }
+  }
+  async function derive(exposure: 'self' | 'exposed') {
+    if (!snapshot) return;
+    setBusy(true);
+    try {
+      const spec = await api<Spec>('/api/derive', { method: 'POST', body: JSON.stringify({ source_id: snapshot.experiment_id, experiment_id: 'experimento-' + crypto.randomUUID().slice(0, 12), exposure }) });
+      setInitialSpec(spec); setView('prepare');
+    } catch (reason) { setError(String(reason)); }
+    finally { setBusy(false); }
+  }
+  function origin(note: Note) {
+    if (!note.anchor) return;
+    originRequest.current = note.anchor;
+    setPinned(note); choose(note.anchor.experiment_id);
+  }
+  async function openResource(reference: ResourceReference) {
+    const clean = reference.id.replace(/^evidence-/, '');
+    const docs = snapshot?.spec.documents ?? [];
+    const doc = docs.find(item => [item.id, item.title, item.source, item.source.split('/').at(-1)].some(value => value?.toLowerCase() === clean.toLowerCase()));
+    if (doc) { setResource({ title: doc.title, content: doc.text, section: reference.section }); return; }
+    if (reference.source === 'note' || reference.source === 'auto') {
+      try {
+        const notes = await api<Note[]>('/api/notes');
+        const note = notes.find(item => item.id === reference.id || item.title.toLowerCase() === clean.toLowerCase());
+        if (note) { setResource({ title: note.title, content: note.content, section: reference.section }); return; }
+      } catch (reason) { setError(String(reason)); return; }
+    }
+    setResource({ title: 'Referência não encontrada', content: 'O item **' + reference.id.replace(/[<>\[\]*]/g, '') + '** não está no corpus deste experimento nem no caderno local.\n\nAs referências são preservadas no Markdown original.' });
+  }
+  const resourceValue = { open: (reference: ResourceReference) => { void openResource(reference); } };
+  const current = snapshot?.experiment_id === selected ? snapshot : null;
+  const verified = current && current.integrity?.valid !== false && current.spec.participants?.length;
+  const currentItem = selectedItem ?? (verified ? { experiment_id: selected, exposure: current.spec.condition.exposure, source_experiment_id: current.spec.condition.prior_experiment, synthetic: current.spec.mode === 'demo', task: current.spec.task.objective, status: current.status } : null);
+  return <ResourceReferenceContext.Provider value={resourceValue}>
+    <div className="app-shell">
+      <aside className="app-sidebar"><a href="/" className="brand"><span className="brand-mark"><FlaskConical size={22} /></span><span>NORVALD <small>LAB</small></span></a>
+        <nav aria-label="Navegação principal">{([
+          ['observe', 'Bancada', FlaskConical], ['experiments', 'Experimentos', Layers], ['records', 'Registros', List],
+        ] as const).map(([id, label, Icon]) => <button key={id} className={'nav-button ' + ((view === id || id === 'observe' && ['prepare', 'compare'].includes(view)) ? 'active' : '')} onClick={() => setView(id)}><Icon size={18} />{label}</button>)}<button className="nav-button" onClick={() => setNotebook({})}><NotebookPen size={18} />Minhas notas</button></nav>
+        <div className="sidebar-divider" /><div className="sidebar-label">NA BANCADA<button className="icon-button" aria-label="Novo experimento" onClick={() => { setInitialSpec(undefined); setView('prepare'); }}><Plus size={14} /></button></div>
+        <div className="sidebar-experiments">{items.slice(-5).reverse().map(item => <button key={item.experiment_id} className={'sidebar-experiment ' + (item.experiment_id === selected ? 'active' : '')} onClick={() => choose(item.experiment_id)}><span className="condition-dot" /><div><strong>{conditions[item.exposure].title}</strong><small>{item.experiment_id}</small></div></button>)}</div>
+        <div className="sidebar-bottom"><div className="local-label"><span />Ambiente local</div><button className="nav-button" onClick={() => setSettings(true)}><Settings2 size={18} />Configurações</button></div>
+      </aside>
+      <main className="app-main">
+        <header className="app-header"><div><div className="title-line"><h1>{view === 'experiments' ? 'Seus experimentos' : view === 'records' ? 'Registros do experimento' : 'Bancada de observação'}</h1><span className="badge">{verified && current.spec.mode === 'live' ? 'Modelos reais' : 'Demonstração · dados sintéticos'}</span></div><p>{selected || 'Prepare, acompanhe e compare.'}{current ? ' · ' + statusLabel(current.status) : ''}</p></div><div className="header-actions"><button className="icon-button" aria-label="Atualizar registros" onClick={() => { setRefresh(value => value + 1); void refreshList(); }}><RefreshCw size={17} /></button><button className="button secondary" onClick={() => { setInitialSpec(undefined); setView('prepare'); }}><Plus size={15} />Novo experimento</button></div></header>
+        {error ? <div role="alert" className="error-banner">{error}<button className="icon-button" onClick={() => setError('')} aria-label="Dispensar aviso"><X size={15} /></button></div> : null}
+        {['prepare', 'observe', 'compare'].includes(view) ? <nav className="stage-nav" aria-label="Etapas do experimento">{([['prepare', 'Preparar'], ['observe', 'Acompanhar'], ['compare', 'Comparar']] as const).map(([id, label], index) => <button key={id} className={view === id ? 'active' : ''} onClick={() => setView(id)}><span>{index + 1}</span>{label}</button>)}</nav> : null}
+        {view === 'prepare' ? <Prepare liveEnabled={health?.live_enabled ?? false} initialSpec={initialSpec} onStarted={started} onDemo={() => { void demo(); }} /> :
+          view === 'experiments' ? <section className="experiments-view"><div className="row-heading"><h2>Histórico</h2><input className="experiment-search" aria-label="Buscar experimentos" placeholder="Buscar pergunta ou registro…" value={search} onChange={event => setSearch(event.target.value)} /></div>{items.filter(item => (item.task + item.experiment_id).toLowerCase().includes(search.toLowerCase())).reverse().map(item => <button className="experiment-row" key={item.experiment_id} onClick={() => choose(item.experiment_id)}><span className="condition-dot" /><div><strong>{conditions[item.exposure].title}</strong><p>{item.task}</p><small>{item.experiment_id}</small></div><span className="badge">{statusLabel(item.status)}</span><ChevronRight size={18} /></button>)}{!items.length ? <Empty onDemo={demo} busy={busy} /> : null}</section> :
+          !selected ? <Empty onDemo={demo} busy={busy} /> :
+          !current ? <div className="empty-state">{observationFailed ? <p>Não foi possível abrir esta coleta. Confira o aviso acima.</p> : <><span className="activity-dot" /><p>Carregando os registros…</p></>}</div> :
+          !verified ? <div role="alert" className="error-banner">O experimento contém registros ausentes ou alterados. A leitura foi bloqueada para preservar a análise.<ul>{current.integrity?.issues.map(issue => <li key={issue}>{issue}</li>)}</ul></div> :
+          view === 'records' ? <Records snapshot={current} onContext={setContext} /> :
+          view === 'compare' && currentItem ? <><div className="compare-intro"><span className="eyebrow">Comparação entre condições</span><h2>Observe as respostas na mesma base</h2><label>Repetição<select value={repetition} onChange={event => setRepetition(Number(event.target.value))}>{Array.from({ length: current.spec.repetitions }, (_, i) => <option key={i} value={i + 1}>{i + 1}</option>)}</select></label></div><Compare selected={currentItem} items={items} repetition={repetition} /></> :
+          <><Observe snapshot={current} repetition={repetition} onRepetition={setRepetition} onContext={setContext} onDocuments={() => setDocuments(true)} onPin={anchor => { void pin(anchor); }} onDerive={exposure => { void derive(exposure); }} replay={replay} onReplay={setReplay} />{currentItem ? <Compare selected={currentItem} items={items} repetition={repetition} /> : null}</>}
+      </main>
+      <aside className="inspector"><div className="inspector-heading"><Pin size={16} /><h3>Seu olhar</h3></div>{pinned ? <><span className="eyebrow">{pinned.anchor?.excerpt ? 'Trecho fixado' : 'Momento marcado'}</span>{pinned.anchor?.excerpt ? <blockquote>{pinned.anchor.excerpt}</blockquote> : null}<small>{pinned.anchor?.experiment_id}</small><h3>Minha observação</h3><button className="note-open-card" onClick={() => setNotebook({ id: pinned.id })}><NotebookPen size={17} />Abrir esta nota<ArrowUpRight size={14} /></button><span className="hypothesis-badge">Hipótese para investigar</span>{pinned.anchor ? <button className="button secondary" onClick={() => origin(pinned)}>Conferir origem</button> : null}</> : <><p>Selecione um trecho de uma resposta e clique em <strong>Fixar trecho</strong>.</p><div className="inspector-empty"><Pin size={24} /><span>Uma particularidade pode virar uma pergunta para investigar.</span></div><button className="button secondary" onClick={() => setNotebook({})}><NotebookPen size={15} />Abrir caderno</button></>}<div className="inspector-footnote"><FileText size={14} />Suas notas ficam separadas dos registros originais.</div></aside>
+    </div>
+    {notebook ? <Notebook initialId={notebook.id} onClose={() => setNotebook(null)} onOrigin={origin} onSaved={note => setPinned(current => current?.id === note.id ? note : current)} /> : null}
+    {context ? <Modal title="Contexto preparado para o participante" onClose={() => setContext(null)}><div className="modal-scroll"><ContextView request={context} /></div></Modal> : null}
+    {documents && current ? <Modal title="Corpus congelado do experimento" onClose={() => setDocuments(false)}><div className="modal-scroll">{current.spec.documents.map(doc => <button className="document-row" key={doc.id} onClick={() => { setDocuments(false); setResource({ title: doc.title, content: doc.text }); }}><BookOpen size={20} /><div><strong>{doc.title}</strong><small>{doc.source || doc.id}</small></div><ChevronRight size={17} /></button>)}{!current.spec.documents.length ? <p className="muted">Este experimento não possui documentos.</p> : null}</div></Modal> : null}
+    {resource ? <ResourceModal resource={resource} onClose={() => setResource(null)} /> : null}
+    {settings ? <Modal title="Configurações do laboratório" onClose={() => setSettings(false)}><div className="modal-scroll"><h3>Identidade visual do Studio</h3><p>Cobre fosco nos destaques, superfícies neutras e detalhes em azul petróleo.</p><h3>Execução</h3><p>{health?.live_enabled ? 'Chamadas reais habilitadas neste servidor.' : 'Modo demonstração. Para usar modelos reais, inicie o laboratório com --live.'}</p><h3>Seu caderno</h3><p>As notas são salvas no computador pelo backend do Lab. Elas não entram no dataset nem nos contextos enviados aos participantes.</p><h3>Renderer e Markdown</h3><p>Componentes importados do Studio: Markdown, callouts, wikilinks, referências, tabelas, fórmulas KaTeX e diagramas Mermaid.</p></div></Modal> : null}
+  </ResourceReferenceContext.Provider>;
+}
+
+function Empty({ onDemo, busy }: { onDemo(): void; busy: boolean }) {
+  return <section className="welcome"><span className="welcome-symbol"><FlaskConical size={38} /></span><span className="eyebrow">Norvald Lab</span><h2>Uma bancada para observar<br />o que muda entre participantes.</h2><p>Comece com três participantes sintéticos. A demonstração cria as condições independente, reconsideração individual e exposição aos colegas.</p><button className="button" onClick={onDemo} disabled={busy}><FlaskConical size={17} />{busy ? 'Preparando…' : 'Abrir demonstração'}</button><small>Sem LLM, sem chamadas de API, sem valor empírico para a tese.</small></section>;
+}
+function ResourceModal({ resource, onClose }: { resource: Resource; onClose(): void }) {
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!resource.section) return;
+    const section = resource.section.toLowerCase().replace(/^#/, '');
+    const heading = [...(root.current?.querySelectorAll<HTMLElement>('h1,h2,h3,h4,h5,h6') ?? [])].find(item => item.textContent?.toLowerCase().includes(section));
+    heading?.scrollIntoView({ block: 'start' });
+  }, [resource]);
+  return <Modal title={resource.title} onClose={onClose}><div className="resource-toolbar"><MarkdownToolbar markdown={resource.content} filename={resource.title} showSyntaxHelp /></div><div ref={root} className="modal-scroll resource-view"><NorvaldMarkdown content={resource.content} /></div></Modal>;
+}
+function Records({ snapshot, onContext }: { snapshot: Snapshot; onContext(request: PreparedRequest): void }) {
+  return <section className="records-view"><div className="row-heading"><div><h2>Registro original</h2><p>{snapshot.records.length} observações · {snapshot.provisional ? 'Coleta ainda sem fechamento verificável' : 'Integridade conferida'}</p></div></div>{snapshot.records.map(record => <article className="raw-card" key={record.observation_id}><div className="row-heading"><div><h3>{record.participant_name} · {record.run_id}</h3><small>{record.observation_id}</small></div><button className="button secondary" onClick={() => onContext(snapshot.requests.find(request => request.context.metadata.execution_id === record.logical_execution_id)!)}>Abrir contexto</button></div><div className="raw-meta"><span>{record.requested_model}</span><time>{new Date(record.captured_at).toLocaleString('pt-BR')}</time><span>{record.result?.tokens ?? '—'} tokens</span></div>{record.result ? <><NorvaldMarkdown content={record.result.content} /><MarkdownToolbar markdown={record.result.content} filename={record.observation_id} /></> : <p className="danger">{record.error?.message}</p>}<details><summary>RAW completo · JSON</summary><pre>{JSON.stringify(record, null, 2)}</pre></details></article>)}<details><summary>Eventos gravados</summary><pre>{JSON.stringify(snapshot.events, null, 2)}</pre></details></section>;
+}

@@ -2,9 +2,38 @@
 
 Laboratório independente para observar deliberação entre LLMs. Extraído do AROF do Norvald Studio e integrado ao **Norvald-Execution**. Funciona com o Studio desligado, com configurações e dados próprios.
 
-Esta primeira entrega é o backend. A interface visual será feita depois.
+Inclui uma **bancada visual de observação**, com a identidade fosca do Studio, destaque em cobre e seu renderer de Markdown.
 
 ## Comece observando
+
+Para abrir a interface, dentro da pasta do projeto:
+
+```bash
+./scripts/start.sh
+```
+
+O comando prepara Python e a interface, inicia o laboratório e abre o navegador em `http://127.0.0.1:8766`. Na primeira vez requer internet, Python 3.10+ e Node.js 22.12+. Clique em **Abrir demonstração**: ela produz três condições, com três participantes sintéticos e sem chamadas às APIs.
+
+- **Preparar:** escreva a pergunta, configure participantes e documentos e confira o contrato que será enviado antes de iniciar.
+- **Acompanhar:** veja os participantes lado a lado, escolha a repetição, abra o contexto e reveja eventos reais na linha do tempo.
+- **Comparar:** veja o mesmo participante e a mesma repetição nas condições ligadas à mesma base independente, com alterações literais destacadas.
+- **Minhas notas:** abra o caderno em overlay, com lista à esquerda, título e toolbar no topo, edição/preview, tags e contagem de palavras. O salvamento é automático; copiar e baixar preservam o Markdown.
+
+Selecione um trecho e use **Fixar trecho**, ou **Marcar momento** na linha do tempo. A nota mantém uma referência à observação original. As notas ficam em `observer/notes/`, fora dos experimentos e dos contextos das LLMs. Alterá-las não modifica o dataset.
+
+O replay navega pelos registros gravados; não pausa a coleta. A resposta e o reasoning aparecem quando são capturados, sem simular chegada de tokens. Os destaques comparam texto, sem avaliar qualidade ou atribuir causalidade. Registros ainda sem fechamento são identificados como provisórios; registros fechados alterados têm sua leitura bloqueada.
+
+Para habilitar modelos reais, com as variáveis de credencial já definidas no computador:
+
+```bash
+./scripts/start.sh --live
+```
+
+Você informa **o nome** da variável da credencial na interface, nunca sua chave. A execução real começa apenas no botão **Iniciar experimento**, após a conferência. Configurações JSON existentes também podem ser importadas.
+
+Use `NORVALD_LAB_DATA_DIR` para escolher a pasta de dados da bancada. Quem já compilou a interface pode iniciar apenas o servidor com `./scripts/lab.sh serve --open`.
+
+### Demonstração no terminal
 
 No terminal, dentro desta pasta, execute:
 
@@ -83,7 +112,7 @@ A origem precisa ter respostas estruturadas de todos os participantes. O laborat
 
 O perfil de ferramentas é explícito: `off` ou `corpus` (consulta somente aos documentos congelados). O mecanismo vem do Execution. O catálogo externo de Library, Repository, Web e MCP do Studio não está conectado nesta versão.
 
-## Backend para a futura interface
+## Servidor local e API
 
 ```bash
 ./scripts/lab.sh serve
@@ -91,7 +120,7 @@ O perfil de ferramentas é explícito: `off` ou `corpus` (consulta somente aos d
 
 Escuta apenas em `http://127.0.0.1:8766`; documentação da API em `/docs`. O servidor aceita demonstrações por padrão; `serve --live` habilita configurações reais. Não há autenticação de serviço público nesta entrega.
 
-Endpoints: `GET /health`, `GET/POST /api/experiments`, `GET /api/experiments/{id}` e suas leituras `/manifest`, `/raw`, `/verify`. O POST devolve 202 e a coleta roda em segundo plano. CLI e API usam o mesmo executor.
+Endpoints: `GET /health`, `GET/POST /api/experiments`, `GET /api/experiments/{id}` e suas leituras `/manifest`, `/raw`, `/verify`, `/observe`. `POST /api/prepare` confere sem executar; `POST /api/derive` prepara outra condição; `POST /api/demo` inicia a demonstração. O caderno usa `/api/notes`. A coleta roda em segundo plano. CLI e API usam o mesmo executor.
 
 ## Limites científicos e da migração
 

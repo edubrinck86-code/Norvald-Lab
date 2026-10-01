@@ -1,0 +1,1102 @@
+/* ==========================================================================
+   NORVALD STUDIO — Markdown Reading System
+   Visual layer only: typography, rhythm, controls and document chrome.
+   Base identity: petroleum blue / Studio surfaces.
+   ========================================================================== */
+
+.note-markdown {
+  --md-accent: hsl(var(--primary));
+  --md-accent-soft: hsl(var(--primary) / 0.12);
+  --md-green: #56c58e;
+  --md-green-soft: rgb(86 197 142 / 0.12);
+  --md-warning: #d9b45f;
+  --md-warning-soft: rgb(217 180 95 / 0.12);
+  --md-danger: #d87979;
+  --md-danger-soft: rgb(216 121 121 / 0.12);
+  --md-info: #6ca9d8;
+  --md-info-soft: rgb(108 169 216 / 0.12);
+  --md-heading: hsl(var(--foreground));
+  --md-body: hsl(var(--text-normal));
+  --md-muted: hsl(var(--muted-foreground));
+  --md-line: hsl(var(--border) / 0.72);
+  --md-surface: hsl(var(--surface-3) / 0.56);
+  --md-code: hsl(var(--surface-4) / 0.78);
+  max-width: 82ch;
+  margin-inline: auto;
+  font-size: 0.95rem;
+  line-height: 1.78;
+  color: var(--md-body);
+  text-wrap: pretty;
+}
+
+/* --------------------------------------------------------------------------
+   Headings — intentionally distinct in size, weight, rhythm and treatment.
+   -------------------------------------------------------------------------- */
+.note-markdown h1,
+.note-markdown h2,
+.note-markdown h3,
+.note-markdown h4,
+.note-markdown h5,
+.note-markdown h6 {
+  color: var(--md-heading);
+  text-wrap: balance;
+  scroll-margin-top: 5rem;
+}
+
+.note-markdown h1 {
+  margin: 2.2em 0 0.75em;
+  padding-bottom: 0.45em;
+  border-bottom: 1px solid hsl(var(--primary) / 0.28);
+  font-size: clamp(1.75rem, 3vw, 2.15rem);
+  line-height: 1.16;
+  font-weight: 720;
+  letter-spacing: -0.025em;
+}
+
+.note-markdown h2 {
+  position: relative;
+  margin: 2em 0 0.65em;
+  padding-left: 0.7em;
+  font-size: 1.45rem;
+  line-height: 1.28;
+  font-weight: 680;
+  letter-spacing: -0.018em;
+}
+
+.note-markdown h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.18em;
+  bottom: 0.18em;
+  width: 2px;
+  border-radius: 999px;
+  background: hsl(var(--primary));
+  opacity: 0.8;
+}
+
+.note-markdown h3 {
+  margin: 1.65em 0 0.45em;
+  font-size: 1.16rem;
+  line-height: 1.35;
+  font-weight: 640;
+}
+
+.note-markdown h4 {
+  margin: 1.35em 0 0.35em;
+  font-size: 1rem;
+  line-height: 1.4;
+  font-weight: 640;
+  color: hsl(var(--text-normal));
+}
+
+.note-markdown h5 {
+  margin: 1.15em 0 0.3em;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  font-weight: 650;
+  color: hsl(var(--muted-foreground));
+}
+
+.note-markdown h6 {
+  margin: 1em 0 0.25em;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  font-weight: 650;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  color: hsl(var(--subtle));
+}
+
+.note-markdown > h1:first-child,
+.note-markdown > h2:first-child,
+.note-markdown > h3:first-child,
+.note-markdown > h4:first-child,
+.note-markdown > h5:first-child,
+.note-markdown > h6:first-child {
+  margin-top: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Reading rhythm
+   -------------------------------------------------------------------------- */
+.note-markdown p {
+  margin: 0.72em 0;
+}
+
+.note-markdown p + p {
+  margin-top: 0.95em;
+}
+
+.note-markdown strong {
+  color: hsl(var(--foreground));
+  font-weight: 680;
+}
+
+.note-markdown em {
+  color: hsl(var(--text-normal));
+}
+
+.note-markdown del {
+  color: hsl(var(--muted-foreground));
+  text-decoration-color: hsl(var(--muted-foreground) / 0.7);
+}
+
+.note-markdown mark {
+  padding: 0.05em 0.25em;
+  border-radius: 4px;
+  background: hsl(var(--primary) / 0.18);
+  color: hsl(var(--foreground));
+}
+
+/* --------------------------------------------------------------------------
+   Lists
+   -------------------------------------------------------------------------- */
+.note-markdown ul,
+.note-markdown ol {
+  margin: 0.8em 0;
+  padding-left: 1.65em;
+  /* O preflight do Tailwind zera `list-style` em ul/ol, então as listas
+     saíam sem marcador nenhum. A regra `li::marker` logo abaixo colore
+     um marcador que nunca chegava a ser desenhado — restaurar o estilo
+     é o que faz aquela cor aparecer. */
+  list-style-position: outside;
+}
+
+.note-markdown ul {
+  list-style-type: disc;
+}
+
+.note-markdown ol {
+  list-style-type: decimal;
+}
+
+.note-markdown ul ul {
+  list-style-type: circle;
+}
+
+.note-markdown li {
+  margin: 0.3em 0;
+  padding-left: 0.12em;
+}
+
+.note-markdown li::marker {
+  color: hsl(var(--primary) / 0.82);
+}
+
+.note-markdown ul ul,
+.note-markdown ol ol,
+.note-markdown ul ol,
+.note-markdown ol ul {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+/* --------------------------------------------------------------------------
+   Green task checkbox — custom, compact, keyboard accessible.
+   -------------------------------------------------------------------------- */
+.note-markdown li.task-list-item {
+  list-style: none;
+  margin-left: -1.65em;
+  padding-left: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55em;
+}
+
+.note-markdown input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  margin: 0.34em 0 0;
+  border: 1px solid hsl(var(--border-hover));
+  border-radius: 5px;
+  background: hsl(var(--surface-4) / 0.35);
+  display: inline-grid;
+  place-content: center;
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 100ms ease;
+}
+
+.note-markdown input[type="checkbox"]::before {
+  content: "";
+  width: 8px;
+  height: 4.5px;
+  border-left: 1.8px solid #0d241a;
+  border-bottom: 1.8px solid #0d241a;
+  transform: translateY(-1px) rotate(-45deg) scale(0);
+  opacity: 0;
+  transition: transform 130ms ease, opacity 130ms ease;
+}
+
+.note-markdown input[type="checkbox"]:hover {
+  border-color: rgb(86 197 142 / 0.7);
+  box-shadow: 0 0 0 3px rgb(86 197 142 / 0.08);
+}
+
+.note-markdown input[type="checkbox"]:focus-visible {
+  outline: none;
+  border-color: rgb(86 197 142 / 0.9);
+  box-shadow: 0 0 0 3px rgb(86 197 142 / 0.14);
+}
+
+.note-markdown input[type="checkbox"]:active {
+  transform: scale(0.94);
+}
+
+.note-markdown input[type="checkbox"]:checked {
+  border-color: rgb(112 214 163 / 0.9);
+  background: var(--md-green);
+}
+
+.note-markdown input[type="checkbox"]:checked::before {
+  transform: translateY(-1px) rotate(-45deg) scale(1);
+  opacity: 1;
+}
+
+.note-markdown li.task-list-item:has(input[type="checkbox"]:checked) {
+  color: hsl(var(--muted-foreground));
+}
+
+/* --------------------------------------------------------------------------
+   Links / references
+   -------------------------------------------------------------------------- */
+.note-markdown a {
+  color: hsl(var(--primary-button-hover));
+  text-decoration: underline;
+  text-decoration-color: hsl(var(--primary) / 0.45);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 140ms ease, text-decoration-color 140ms ease;
+}
+
+.note-markdown a:hover {
+  color: hsl(var(--foreground));
+  text-decoration-color: hsl(var(--primary));
+}
+
+.note-markdown a:focus-visible {
+  outline: 2px solid hsl(var(--primary) / 0.55);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Inline code / code blocks
+   -------------------------------------------------------------------------- */
+.note-markdown :not(pre) > code {
+  padding: 0.16em 0.42em;
+  border: 1px solid hsl(var(--border) / 0.72);
+  border-radius: 5px;
+  background: hsl(var(--surface-4) / 0.62);
+  color: #d9c49b;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  font-size: 0.86em;
+}
+
+.note-markdown pre {
+  position: relative;
+  margin: 1.15em 0;
+  padding: 1.05em 1.15em;
+  overflow-x: auto;
+  border: 1px solid hsl(var(--border) / 0.82);
+  border-radius: 12px;
+  background: linear-gradient(180deg, hsl(var(--surface-4) / 0.78), hsl(var(--surface-3) / 0.72));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.025), 0 8px 22px rgb(0 0 0 / 0.12);
+}
+
+.note-markdown pre code {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: hsl(var(--text-normal));
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  font-size: 0.86rem;
+  line-height: 1.65;
+  white-space: pre;
+}
+
+/* --------------------------------------------------------------------------
+   Blockquotes / callouts
+   -------------------------------------------------------------------------- */
+.note-markdown blockquote {
+  margin: 1.1em 0;
+  padding: 0.82em 1.05em;
+  border-left: 2px solid hsl(var(--primary) / 0.72);
+  border-radius: 0 10px 10px 0;
+  background: hsl(var(--primary) / 0.055);
+  color: hsl(var(--text-normal));
+}
+
+.note-markdown blockquote p {
+  margin: 0.2em 0;
+}
+
+.note-markdown .callout {
+  margin: 1.1em 0;
+  padding: 0.88em 1em;
+  border: 1px solid color-mix(in srgb, var(--callout-color) 20%, transparent);
+  border-left: 3px solid var(--callout-color);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--callout-color) 8%, transparent);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.06);
+}
+
+.note-markdown .callout-title {
+  gap: 0.5em;
+  margin-bottom: 0.38em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.note-markdown .callout-body {
+  color: hsl(var(--text-normal));
+  font-size: 0.95em;
+}
+
+.note-markdown .callout-body > p:first-child { margin-top: 0; }
+.note-markdown .callout-body > p:last-child { margin-bottom: 0; }
+
+.note-markdown .callout-note { --callout-color: var(--md-info); }
+.note-markdown .callout-tip { --callout-color: var(--md-green); }
+.note-markdown .callout-info { --callout-color: #8da1c9; }
+.note-markdown .callout-success { --callout-color: var(--md-green); }
+.note-markdown .callout-warning { --callout-color: var(--md-warning); }
+.note-markdown .callout-caution,
+.note-markdown .callout-important { --callout-color: #c9a56b; }
+.note-markdown .callout-danger,
+.note-markdown .callout-failure { --callout-color: var(--md-danger); }
+
+/* --------------------------------------------------------------------------
+   Tables
+   -------------------------------------------------------------------------- */
+.note-markdown table {
+  width: 100%;
+  margin: 1.2em 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border) / 0.82);
+  border-radius: 11px;
+  background: hsl(var(--surface-3) / 0.28);
+  font-size: 0.9rem;
+}
+
+.note-markdown thead {
+  background: hsl(var(--surface-4) / 0.62);
+}
+
+.note-markdown th {
+  padding: 0.72em 0.85em;
+  border-bottom: 1px solid hsl(var(--border) / 0.9);
+  color: hsl(var(--foreground));
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.note-markdown td {
+  padding: 0.68em 0.85em;
+  border-bottom: 1px solid hsl(var(--border) / 0.48);
+  color: hsl(var(--text-normal));
+  vertical-align: top;
+}
+
+.note-markdown tbody tr:last-child td { border-bottom: 0; }
+
+.note-markdown tbody tr { transition: background-color 120ms ease; }
+.note-markdown tbody tr:hover { background: hsl(var(--primary) / 0.045); }
+
+/* --------------------------------------------------------------------------
+   Details / disclosure
+   -------------------------------------------------------------------------- */
+.note-markdown details {
+  margin: 1em 0;
+  border: 1px solid hsl(var(--border) / 0.82);
+  border-radius: 10px;
+  background: hsl(var(--surface-3) / 0.3);
+  overflow: hidden;
+}
+
+.note-markdown summary {
+  position: relative;
+  padding: 0.72em 0.9em 0.72em 2.25em;
+  color: hsl(var(--foreground));
+  font-weight: 620;
+  cursor: pointer;
+  list-style: none;
+  transition: background-color 120ms ease;
+}
+
+.note-markdown summary::-webkit-details-marker { display: none; }
+
+.note-markdown summary::before {
+  content: "";
+  position: absolute;
+  left: 0.95em;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid hsl(var(--muted-foreground));
+  border-bottom: 1.5px solid hsl(var(--muted-foreground));
+  transform: translateY(-65%) rotate(-45deg);
+  transition: transform 140ms ease;
+}
+
+.note-markdown details[open] > summary {
+  background: hsl(var(--primary) / 0.055);
+  border-bottom: 1px solid hsl(var(--border) / 0.72);
+}
+
+.note-markdown details[open] > summary::before {
+  transform: translateY(-35%) rotate(45deg);
+}
+
+.note-markdown summary:hover { background: hsl(var(--primary) / 0.07); }
+
+.note-markdown details > :not(summary) {
+  margin-left: 0.95em;
+  margin-right: 0.95em;
+}
+
+.note-markdown details > :last-child { margin-bottom: 0.95em; }
+
+/* --------------------------------------------------------------------------
+   Images / media
+   -------------------------------------------------------------------------- */
+.note-markdown img {
+  max-width: 100%;
+  height: auto;
+  margin: 1.15em auto;
+  border: 1px solid hsl(var(--border) / 0.82);
+  border-radius: 12px;
+  background: hsl(var(--surface-3) / 0.35);
+  box-shadow: 0 10px 28px rgb(0 0 0 / 0.12);
+}
+
+.note-markdown img + em,
+.note-markdown figure figcaption {
+  display: block;
+  margin-top: -0.7em;
+  margin-bottom: 1.1em;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   Separators / footnotes / misc inline elements
+   -------------------------------------------------------------------------- */
+.note-markdown hr {
+  height: 1px;
+  margin: 2em 0;
+  border: 0;
+  background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.3), hsl(var(--border) / 0.8), transparent);
+}
+
+.note-markdown sup,
+.note-markdown sub {
+  color: hsl(var(--primary-button-hover));
+  font-size: 0.72em;
+  line-height: 0;
+}
+
+.note-markdown kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0.12em 0.4em;
+  border: 1px solid hsl(var(--border-hover));
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: hsl(var(--surface-4) / 0.6);
+  color: hsl(var(--text-normal));
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.78em;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.note-markdown .footnotes {
+  margin-top: 2.2em;
+  padding-top: 1em;
+  border-top: 1px solid hsl(var(--border) / 0.7);
+  color: hsl(var(--subtle));
+  font-size: 0.82rem;
+}
+
+/* --------------------------------------------------------------------------
+   React-owned Mermaid renderer
+   -------------------------------------------------------------------------- */
+.note-markdown .md-mermaid {
+  margin: 1.35em 0;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border) / 0.78);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, hsl(var(--surface-3) / 0.46), hsl(var(--surface-2) / 0.28));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.025),
+    0 10px 28px rgb(0 0 0 / 0.12);
+}
+
+.note-markdown .md-mermaid-toolbar {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.65rem 0.5rem 0.85rem;
+  border-bottom: 1px solid hsl(var(--border) / 0.58);
+  background: hsl(var(--surface-4) / 0.34);
+}
+
+.note-markdown .md-mermaid-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: hsl(var(--muted-foreground));
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.note-markdown .md-mermaid-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: hsl(var(--primary));
+  box-shadow: 0 0 8px hsl(var(--primary) / 0.45);
+}
+
+.note-markdown .md-mermaid-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.note-markdown .md-mermaid-actions button {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.note-markdown .md-mermaid-actions button:hover:not(:disabled) {
+  background: hsl(var(--surface-4) / 0.72);
+  color: hsl(var(--foreground));
+}
+
+.note-markdown .md-mermaid-actions button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.note-markdown .md-mermaid-zoom {
+  min-width: 3.1em;
+  color: hsl(var(--subtle));
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.66rem;
+  text-align: center;
+}
+
+.note-markdown .md-mermaid-separator {
+  width: 1px;
+  height: 18px;
+  margin: 0 0.25rem;
+  background: hsl(var(--border) / 0.7);
+}
+
+.note-markdown .md-mermaid-viewport {
+  position: relative;
+  min-height: 150px;
+  overflow: auto;
+  padding: 1.35rem;
+}
+
+.note-markdown .md-mermaid-canvas {
+  width: 100%;
+  transform-origin: top center;
+  transition: transform 140ms ease;
+}
+
+.note-markdown .md-mermaid-canvas svg {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.note-markdown .md-mermaid-loading,
+.note-markdown .md-mermaid-building {
+  display: flex;
+  min-height: 84px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.78rem;
+}
+
+.note-markdown .md-mermaid-building {
+  margin: 1em 0;
+  border: 1px dashed hsl(var(--border) / 0.72);
+  border-radius: 12px;
+  background: hsl(var(--surface-3) / 0.24);
+}
+
+.note-markdown .md-mermaid-loading-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: hsl(var(--primary));
+  animation: norvald-md-pulse 1.2s ease-in-out infinite;
+}
+
+.note-markdown .md-mermaid-error {
+  padding: 0.5rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.note-markdown .md-mermaid-error-title {
+  color: var(--md-danger);
+  font-weight: 650;
+}
+
+.note-markdown .md-mermaid-error details {
+  margin-top: 0.8rem;
+}
+
+.note-markdown .md-mermaid-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.5rem 0;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid hsl(var(--border) / 0.62);
+  border-radius: 8px;
+  background: hsl(var(--surface-4) / 0.32);
+  color: hsl(var(--muted-foreground));
+  font-size: 0.72rem;
+}
+
+.note-markdown .md-mermaid-compact-icon {
+  color: hsl(var(--primary));
+}
+
+@keyframes norvald-md-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* Responsive reading width / tables */
+@media (max-width: 700px) {
+  .note-markdown {
+    max-width: none;
+    font-size: 0.92rem;
+  }
+
+  .note-markdown h1 { font-size: 1.65rem; }
+  .note-markdown h2 { font-size: 1.3rem; }
+  .note-markdown h3 { font-size: 1.08rem; }
+
+  .note-markdown table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note-markdown * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Referência documental no meio do texto (ADR-008 §3.1)
+   O span existia sem nenhuma regra: o link era criado, respondia ao
+   clique e não tinha aparência de link — texto comum, sem cor nem
+   cursor. Ninguém descobriria que dava pra clicar.
+   -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   Referência a evidência: Library e Repository em cores distintas.
+   A referência é a costura entre o texto e o acervo — precisa saltar da
+   prosa e dizer, sem clique, de qual ambiente veio. Só a cor e o
+   marcador: caixa e borda competiam com o texto ao redor. Cores diferentes
+   porque são origens diferentes: a Library é acervo consolidado do
+   projeto, o Repository é material do Espaço.
+   -------------------------------------------------------------------------- */
+.note-markdown .workspace-reference {
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+  padding: 0;
+  background: none;
+  border: 0;
+  transition: color 0.12s ease;
+}
+
+.note-markdown .workspace-reference[data-reference-source="library"] {
+  color: #e0a458;
+}
+
+.note-markdown .workspace-reference[data-reference-source="library"]::before {
+  content: "📖";
+  margin-right: 0.3em;
+  font-size: 0.78em;
+  opacity: 0.8;
+}
+
+.note-markdown .workspace-reference[data-reference-source="library"]:hover {
+  color: #f0bd7a;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.note-markdown .workspace-reference[data-reference-source="repository"] {
+  color: #4db6a5;
+}
+
+.note-markdown .workspace-reference[data-reference-source="repository"]::before {
+  content: "📁";
+  margin-right: 0.3em;
+  font-size: 0.78em;
+  opacity: 0.8;
+}
+
+.note-markdown .workspace-reference[data-reference-source="repository"]:hover {
+  color: #6fd0bf;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.note-markdown .wiki-link {
+  color: hsl(var(--primary-button-hover));
+  border-bottom: 1px solid hsl(var(--primary) / 0.42);
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.12s ease, background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.note-markdown .wiki-link::before {
+  content: "🔗";
+  margin-right: 0.25em;
+  font-size: 0.78em;
+  opacity: 0.58;
+}
+
+.note-markdown .wiki-link:hover {
+  color: hsl(var(--foreground));
+  background: hsl(var(--primary) / 0.10);
+  border-bottom-color: hsl(var(--primary));
+}
+
+/* --------------------------------------------------------------------------
+   Bloco ```markdown renderizado
+   O template é lido como documento, mas continua emoldurado: ele cita
+   uma estrutura, não é a prosa do especialista. O front matter fica em
+   monoespaçado porque é especificação de campos, não texto corrido.
+   -------------------------------------------------------------------------- */
+.note-markdown .md-preview {
+  position: relative;
+  margin: 1.15em 0;
+  padding: 1.6em 1.15em 1.05em;
+  border: 1px solid hsl(var(--border) / 0.82);
+  border-radius: 12px;
+  background: hsl(var(--surface-3) / 0.45);
+}
+
+.note-markdown .md-preview-label {
+  position: absolute;
+  top: 0.55em;
+  left: 1.15em;
+  font-size: 0.68em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.note-markdown .md-preview-front {
+  margin: 0 0 1em;
+  padding: 0.7em 0.9em;
+  font-size: 0.82em;
+  border: 1px dashed hsl(var(--border) / 0.7);
+  border-radius: 8px;
+  background: hsl(var(--surface-4) / 0.5);
+  box-shadow: none;
+}
+
+.note-markdown .md-preview-body > :first-child { margin-top: 0; }
+.note-markdown .md-preview-body > :last-child { margin-bottom: 0; }
+
+
+/* ==========================================================================
+   NMP 1.2 — unified renderer upgrades
+   ========================================================================== */
+
+.note-markdown .md-static-chunk:first-child > :first-child {
+  margin-top: 0;
+}
+
+.note-markdown .md-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28em;
+  padding: 0.08em 0.42em;
+  border: 1px solid hsl(var(--primary) / 0.20);
+  border-radius: 6px;
+  background: hsl(var(--primary) / 0.09);
+  color: hsl(var(--primary-button-hover));
+  font-size: 0.82em;
+  font-weight: 560;
+  white-space: nowrap;
+}
+
+.note-markdown a[target="_blank"]::after {
+  content: "↗";
+  margin-left: 0.25em;
+  font-size: 0.72em;
+  opacity: 0.62;
+  text-decoration: none;
+}
+
+/* Callouts: Obsidian-compatible aliases collapse into semantic tones. */
+.note-markdown .callout-title {
+  display: flex;
+  align-items: center;
+}
+
+.note-markdown .callout-icon {
+  display: inline-grid;
+  width: 1.45em;
+  height: 1.45em;
+  place-items: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--callout-color) 14%, transparent);
+  color: var(--callout-color);
+  font-size: 0.86em;
+  line-height: 1;
+}
+
+.note-markdown .callout-note { --callout-color: #7aa7cf; }
+.note-markdown .callout-info { --callout-color: #8da1c9; }
+.note-markdown .callout-success { --callout-color: var(--md-green); }
+.note-markdown .callout-warning { --callout-color: var(--md-warning); }
+.note-markdown .callout-danger { --callout-color: var(--md-danger); }
+.note-markdown .callout-example { --callout-color: #b591d8; }
+.note-markdown .callout-quote { --callout-color: #9aa3ad; }
+
+.note-markdown details.callout.callout-collapsible {
+  padding: 0;
+  overflow: hidden;
+}
+
+.note-markdown details.callout.callout-collapsible > summary.callout-title {
+  margin: 0;
+  padding: 0.82em 0.95em;
+  border: 0;
+  background: color-mix(in srgb, var(--callout-color) 7%, transparent);
+}
+
+.note-markdown details.callout.callout-collapsible > summary.callout-title::before {
+  display: none;
+}
+
+.note-markdown details.callout.callout-collapsible > .callout-body {
+  margin: 0;
+  padding: 0.2em 0.95em 0.9em;
+}
+
+/* Code blocks are documents too: language, size and copy live in chrome,
+   never inside the source. */
+.note-markdown .md-code-block {
+  margin: 1.15em 0;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border) / 0.82);
+  border-radius: 12px;
+  background: hsl(var(--surface-3) / 0.48);
+  box-shadow: 0 8px 22px rgb(0 0 0 / 0.12);
+}
+
+.note-markdown .md-code-header {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.55rem 0.35rem 0.8rem;
+  border-bottom: 1px solid hsl(var(--border) / 0.56);
+  background: hsl(var(--surface-4) / 0.42);
+}
+
+.note-markdown .md-code-language {
+  color: hsl(var(--foreground));
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.note-markdown .md-code-lines {
+  color: hsl(var(--subtle));
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.64rem;
+}
+
+.note-markdown .md-code-copy {
+  margin-left: auto;
+  padding: 0.28rem 0.52rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.66rem;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.note-markdown .md-code-copy:hover {
+  background: hsl(var(--surface-4) / 0.76);
+  color: hsl(var(--foreground));
+}
+
+.note-markdown .md-code-block > pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(180deg, hsl(var(--surface-4) / 0.66), hsl(var(--surface-3) / 0.58));
+  box-shadow: none;
+}
+
+/* Compact mode is intentionally information-dense. Heavy dynamic content
+   becomes a semantic preview instead of running inside a card. */
+.note-markdown-compact {
+  max-width: none;
+  margin-inline: 0;
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.note-markdown-compact h1 {
+  display: none;
+}
+
+.note-markdown-compact h2,
+.note-markdown-compact h3,
+.note-markdown-compact h4,
+.note-markdown-compact h5,
+.note-markdown-compact h6 {
+  margin: 0.55em 0 0.25em;
+  padding: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.note-markdown-compact h2::before {
+  display: none;
+}
+
+.note-markdown-compact p,
+.note-markdown-compact ul,
+.note-markdown-compact ol,
+.note-markdown-compact blockquote {
+  margin-top: 0.35em;
+  margin-bottom: 0.35em;
+}
+
+.note-markdown-compact .md-code-header,
+.note-markdown-compact .md-code-copy,
+.note-markdown-compact .md-code-lines {
+  display: none;
+}
+
+.note-markdown-compact .md-code-block {
+  max-height: 5.8rem;
+  overflow: hidden;
+}
+
+.note-markdown-compact table {
+  font-size: 0.7rem;
+}
+
+.note-markdown-streaming .md-code-copy {
+  visibility: hidden;
+}
+
+/* Reasoning is part of the conversation flow, not a nested card. It keeps
+   full Markdown semantics while using a quieter typographic hierarchy than
+   the final contribution. */
+.reasoning-markdown {
+  max-width: none;
+  margin: 0;
+  color: hsl(var(--muted-foreground) / 0.82);
+  font-size: 0.75rem;
+  line-height: 1.65;
+}
+
+.reasoning-markdown .md-static-chunk > :first-child {
+  margin-top: 0;
+}
+
+.reasoning-markdown .md-static-chunk > :last-child {
+  margin-bottom: 0;
+}
+
+.reasoning-markdown p,
+.reasoning-markdown ul,
+.reasoning-markdown ol,
+.reasoning-markdown blockquote,
+.reasoning-markdown pre,
+.reasoning-markdown table {
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+}
+
+.reasoning-markdown h1,
+.reasoning-markdown h2,
+.reasoning-markdown h3,
+.reasoning-markdown h4,
+.reasoning-markdown h5,
+.reasoning-markdown h6 {
+  margin: 0.55em 0 0.2em;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: hsl(var(--foreground) / 0.78);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.reasoning-markdown h1::before,
+.reasoning-markdown h2::before,
+.reasoning-markdown h3::before,
+.reasoning-markdown h4::before,
+.reasoning-markdown h5::before,
+.reasoning-markdown h6::before {
+  display: none;
+}
+
+.reasoning-markdown strong {
+  color: hsl(var(--foreground) / 0.88);
+}
