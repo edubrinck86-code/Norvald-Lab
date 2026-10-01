@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, ChevronLeft, ChevronRight, FileText, Pause, Pin, Play, RotateCcw, Wrench } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, FileText, Pause, Pin, Play, RotateCcw } from 'lucide-react';
 import { conditions, statusLabel, type Snapshot, type PreparedRequest, type RawRecord, type Anchor } from '../api';
 import { elapsed, eventLabel, eventParticipant, eventRun, responseProjection } from '../lib/observation';
 import { AdjustResponse } from './AdjustResponse';
-import { Drawer } from './Drawer';
+import { Modal } from './Modal';
 import { NorvaldMarkdown } from '../ui/markdown/NorvaldMarkdown';
 import { MarkdownToolbar } from '../ui/MarkdownToolbar';
 
@@ -55,37 +55,29 @@ export function Observe({ snapshot, repetition, onRepetition, onContext, onDocum
       {snapshot.spec.participants.filter(p => visibleIds.includes(p.id)).map(p => {
         const index = snapshot.spec.participants.findIndex(item => item.id === p.id);
         const row = candidates.find(record => record.participant_id === p.id);
-        const request = snapshot.requests.find(r => r.agent_id === p.id && r.context.metadata.repetition_index === repetition)!;
         const ownEvents = events.filter(event => eventParticipant(event, snapshot) === p.id && eventRun(event, snapshot) === run);
         const started = ownEvents.some(event => event.event === 'execution.started');
-        const projection = responseProjection(row?.result?.content ?? '');
-        return <article className={'participant-card tone-' + index % 4} key={p.id}>
-          <header><span className="participant-avatar">{p.name.slice(0, 1).toUpperCase()}</span><div><h3><button className="participant-title" onClick={() => setOpened(p.id)}>{p.name}</button></h3><p>{p.model} · reasoning {p.reasoning_effort}</p></div><span className="participant-status">{row ? row.error ? 'Falhou' : 'Concluído' : started ? 'Em execução' : 'Aguardando'}</span></header>
-          <button className="context-button" onClick={() => onContext(request)}><FileText size={15} />Contexto preparado<ChevronRight size={14} /></button>
-          <div className="participant-events">{ownEvents.map(event => <div className={'recorded-event ' + (event.event.startsWith('tool.') ? 'tool-event' : '')} key={event.index}><span>{event.event.startsWith('tool.') ? <Wrench size={13} /> : <FileText size={13} />}</span><time title={event.at}>{elapsed(event.at, origin)}</time><span>{eventLabel(event)}</span></div>)}</div>
-          <div className="participant-response" id={'response-' + p.id}>
-            {row?.error ? <p className="danger">{row.error.message}</p> : row?.result ? <>
-              <NorvaldMarkdown content={projection.markdown} />
-              {row.result.reasoning ? <details><summary>Reasoning disponibilizado · {row.reasoning_exposure_mode}</summary><NorvaldMarkdown content={row.result.reasoning} /></details> : <p className="trace-note">O provedor não disponibilizou reasoning neste registro.</p>}
-              {projection.structured ? <details><summary>Contribuição estruturada original</summary><pre>{projection.structured}</pre></details> : null}
-              <details><summary>Resposta original em Markdown</summary><pre>{row.result.content}</pre></details>
-            </> : <div className="waiting"><span className={started ? 'activity-dot' : 'waiting-dot'} /><p>{started ? 'Aguardando a resposta do provedor.' : 'Aguardando início desta execução.'}</p></div>}
-          </div>
-          <footer><button className="text-button drawer-open" onClick={() => setOpened(p.id)}>Abrir na bancada<ChevronRight size={14} /></button>{row?.result ? <><button className="text-button" onClick={() => { const element = document.getElementById('response-' + p.id); if (element) pin(row, element); }}><Pin size={14} />Fixar trecho</button><MarkdownToolbar markdown={row.result.content} filename={p.name + '-' + snapshot.experiment_id} /></> : <span className="muted">Os eventos aparecem quando registrados.</span>}</footer>
-        </article>;
+        const check = snapshot.contribution_checks?.find(item => item.observation_id === row?.observation_id);
+        const status = row ? row.error ? 'Falhou' : 'Concluído' : started ? 'Em execução' : 'Aguardando';
+        return <button className={'participant-card participant-horizontal tone-' + index % 4} key={p.id} aria-label={'Abrir participante · ' + p.name} onClick={() => setOpened(p.id)}>
+          <span className="participant-avatar">{p.name.slice(0, 1).toUpperCase()}</span>
+          <span className="participant-identity"><strong>{p.name}</strong><small>{p.provider} · {p.model}</small></span>
+          <span className="participant-activity"><span>{ownEvents.length ? eventLabel(ownEvents.at(-1)!) : 'Sem eventos nesta repetição'}</span><small>{ownEvents.length} eventos{row?.result ? ' · ' + row.result.tokens + ' tokens' : ''}</small></span>
+          <span className="participant-card-status"><span className={'badge ' + (started && !row ? 'participant-running' : '')}>{status}</span>{check?.usable === false ? <small>Contribuição indisponível</small> : null}</span><ChevronRight size={18} />
+        </button>;
       })}
       {!visibleIds.length ? <div className="empty-state">Selecione um participante para observar.</div> : null}
     </div>
-    {openedParticipant ? <Drawer title={openedParticipant.name + ' · Bancada'} onClose={() => setOpened(null)}>
-      <div className="drawer-navigation"><label>Participante<select aria-label="Participante na bancada" value={openedParticipant.id} onChange={event => setOpened(event.target.value)}>{snapshot.spec.participants.map(p => <option value={p.id} key={p.id}>{p.name}</option>)}</select></label><span className="badge">Repetição {repetition} · {replay === null ? 'Registros disponíveis' : 'Revisão de eventos'}</span></div>
-      <div className="drawer-content"><div className="drawer-meta"><span className="eyebrow">{openedParticipant.provider}</span><h3>{openedParticipant.model}</h3><p>Solicitação de reasoning: {openedParticipant.reasoning_effort === 'off' ? 'padrão / sem solicitação' : openedParticipant.reasoning_effort}</p></div>
+    {openedParticipant ? <Modal className="observation-modal" title={openedParticipant.name + ' · Bancada'} onClose={() => setOpened(null)}>
+      <div className="observation-navigation"><label>Participante<select aria-label="Participante na bancada" value={openedParticipant.id} onChange={event => setOpened(event.target.value)}>{snapshot.spec.participants.map(p => <option value={p.id} key={p.id}>{p.name}</option>)}</select></label><span className="badge">Repetição {repetition} · {replay === null ? 'Registros disponíveis' : 'Revisão de eventos'}</span></div>
+      <div className="observation-content"><div className="observation-meta"><span className="eyebrow">{openedParticipant.provider}</span><h3>{openedParticipant.model}</h3><p>Solicitação de reasoning: {openedParticipant.reasoning_effort === 'off' ? 'padrão / sem solicitação' : openedParticipant.reasoning_effort}</p></div>
         {openedRequest ? <button className="context-button" onClick={() => onContext(openedRequest)}><FileText size={15} />Contexto preparado<ChevronRight size={14} /></button> : null}
         {openedCheck ? <section className={'contribution-diagnostic ' + (openedCheck.usable ? '' : 'unusable')}><h3>Diagnóstico da contribuição</h3><p>{openedCheck.message}</p><small>{openedCheck.declared_items} unidades declaradas · {openedCheck.accepted_items} unidades aceitas pelo validador</small>{openedCheck.rejected.length ? <details><summary>Partes recusadas</summary><ul>{openedCheck.rejected.map((part, index) => <li key={index}>{part.kind} · {part.identifier || 'Sem identificador'}: {part.reason}</li>)}</ul></details> : null}<p className="muted">A resposta original está abaixo. Você pode pedir um ajuste separado à LLM, preservando este registro.</p></section> : null}
-        <section className="drawer-response" id="drawer-response"><span className="eyebrow">Resposta registrada</span>{openedRecord?.error ? <p className="danger">{openedRecord.error.message}</p> : openedRecord?.result ? <><NorvaldMarkdown content={responseProjection(openedRecord.result.content).markdown} />{openedRecord.result.reasoning ? <details><summary>Reasoning disponibilizado · {openedRecord.reasoning_exposure_mode}</summary><NorvaldMarkdown content={openedRecord.result.reasoning} /></details> : <p className="trace-note">O provedor não disponibilizou reasoning neste registro.</p>}<details open={openedCheck?.usable === false}><summary>Resposta original em Markdown</summary><pre>{openedRecord.result.content}</pre></details>{responseProjection(openedRecord.result.content).structured ? <details><summary>Contribuição estruturada original</summary><pre>{responseProjection(openedRecord.result.content).structured}</pre></details> : null}</> : <p className="muted">A resposta aparecerá quando for registrada pelo motor.</p>}</section>
+        <section className="observation-response" id="observation-response"><span className="eyebrow">Resposta registrada</span>{openedRecord?.error ? <p className="danger">{openedRecord.error.message}</p> : openedRecord?.result ? <><NorvaldMarkdown content={responseProjection(openedRecord.result.content).markdown} />{openedRecord.result.reasoning ? <details><summary>Reasoning disponibilizado · {openedRecord.reasoning_exposure_mode}</summary><NorvaldMarkdown content={openedRecord.result.reasoning} /></details> : <p className="trace-note">O provedor não disponibilizou reasoning neste registro.</p>}<details open={openedCheck?.usable === false}><summary>Resposta original em Markdown</summary><pre>{openedRecord.result.content}</pre></details>{responseProjection(openedRecord.result.content).structured ? <details><summary>Contribuição estruturada original</summary><pre>{responseProjection(openedRecord.result.content).structured}</pre></details> : null}</> : <p className="muted">A resposta aparecerá quando for registrada pelo motor.</p>}</section>
         {openedRecord && !snapshot.provisional && snapshot.integrity?.valid && snapshot.spec.mode === 'live' ? <AdjustResponse key={openedRecord.observation_id} experimentId={snapshot.experiment_id} record={openedRecord} invalid={openedCheck?.usable === false} maxTokens={openedParticipant.sampling.max_tokens} /> : null}
-        <section className="drawer-events"><h3>Eventos registrados</h3>{openedEvents.map(event => <div className="recorded-event" key={event.index}><time title={event.at}>{elapsed(event.at, origin)}</time><span>{eventLabel(event)}</span></div>)}{!openedEvents.length ? <p className="muted">Aguardando eventos desta execução.</p> : null}</section>
-      </div><footer className="modal-footer">{openedRecord?.result ? <><button className="text-button" onClick={() => { const element = document.getElementById('drawer-response'); if (element) pin(openedRecord, element); }}><Pin size={14} />Fixar trecho</button><MarkdownToolbar markdown={openedRecord.result.content} filename={openedParticipant.name + '-' + snapshot.experiment_id} /></> : <span className="muted">A coleta continua ao fechar a bancada.</span>}</footer>
-    </Drawer> : null}
+        <section className="observation-events"><h3>Eventos registrados</h3>{openedEvents.map(event => <div className="recorded-event" key={event.index}><time title={event.at}>{elapsed(event.at, origin)}</time><span>{eventLabel(event)}</span></div>)}{!openedEvents.length ? <p className="muted">Aguardando eventos desta execução.</p> : null}</section>
+      </div><footer className="modal-footer">{openedRecord?.result ? <><button className="text-button" onClick={() => { const element = document.getElementById('observation-response'); if (element) pin(openedRecord, element); }}><Pin size={14} />Fixar trecho</button><MarkdownToolbar markdown={openedRecord.result.content} filename={openedParticipant.name + '-' + snapshot.experiment_id} /></> : <span className="muted">A coleta continua ao fechar a bancada.</span>}</footer>
+    </Modal> : null}
     <p className="reading-caption">A resposta e o reasoning aparecem quando são registrados pelo motor. O reasoning disponível não representa acesso completo ao processo interno do modelo.</p>
     <section className="timeline-panel">
       <div className="row-heading"><div><h3>Rever registros</h3><p>{replay === null ? 'Acompanhando os registros disponíveis' : 'Revisão de eventos gravados · execução continua independente'}</p></div>
