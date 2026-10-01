@@ -22,7 +22,7 @@ export function ModelPicker({ provider, onSelect, onClose }: { provider: Spec['p
   const [tools, setTools] = useState('all');
   const [reasoning, setReasoning] = useState('all');
   useEffect(() => {
-    const controller = new AbortController(); setLoading(true); setError('');
+    const controller = new AbortController(); setLoading(true); setError(''); setCatalog(null);
     api<Catalog>('/api/models', { method: 'POST', signal: controller.signal, body: JSON.stringify(provider) }).then(setCatalog).catch(reason => { if (!controller.signal.aborted) setError(String(reason)); }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [provider.kind, provider.credential_env, provider.base_url, refresh]);

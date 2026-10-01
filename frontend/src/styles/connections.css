@@ -28,6 +28,16 @@
 .model-option code { display: block; font-size: 11px; color: hsl(var(--muted-foreground)); overflow-wrap: anywhere; margin-top: 5px; }
 .model-capabilities { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px 18px; color: hsl(var(--muted-foreground)); font-size: 11px; }
 .participant-model { min-width: 0; }
+.field-label { display: block; color: hsl(var(--muted-foreground)); font-size: 12px; margin-bottom: 7px; }
+.participant-form { grid-template-columns: 33px minmax(100px,1fr) minmax(120px,1fr) minmax(180px,1.5fr) minmax(130px,1fr) 27px; align-items: start; }
+.participant-form .participant-avatar, .participant-form > .icon-button { margin-top: 24px; }
+.model-select.button { width: 100%; justify-content: space-between; text-align: left; padding: 9px 11px; min-height: 38px; white-space: normal; border-color: hsl(var(--primary) / .35); }
+.model-select span { overflow-wrap: anywhere; min-width: 0; }
+.model-select svg { flex-shrink: 0; color: hsl(var(--primary-button-hover)); }
+.participant-model small { margin-top: 7px; }
+.manual-model { margin: 6px 0 0; }
+.manual-model summary { font-size: 10px; padding: 4px 0; }
+.provider-advanced > summary { font-size: 13px; color: hsl(var(--text-normal)); }
 .participant-model .text-button { color: hsl(var(--primary-button-hover)); }
 .participant-model small { display: block; font-size: 10px; }
 .participant-title { background: transparent; color: inherit; font: inherit; text-align: left; }
@@ -55,7 +65,23 @@
 .drawer-content .recorded-event { padding: 8px 0; }
 .observation-drawer .modal-footer { flex-shrink: 0; }
 @media (max-width: 1000px) { .connection-list { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) {
+  .participant-form { grid-template-columns: 30px minmax(0,1fr) minmax(0,1fr) 28px; }
+  .participant-form > label:first-of-type { grid-column: 2; grid-row: 1; }
+  .participant-form .participant-provider { grid-column: 3; grid-row: 1; }
+  .participant-form .participant-model { grid-column: 2; grid-row: 2; }
+  .participant-form > label:last-of-type { grid-column: 3; grid-row: 2; }
+  .participant-form > .icon-button { grid-column: 4; grid-row: 1; }
+}
 @media (max-width: 600px) {
+  .stage-nav { gap: 10px; }
+  .participant-form { grid-template-columns: 30px minmax(0,1fr) 28px; }
+  .participant-form .participant-provider { grid-column: 2 / -1; grid-row: 2; }
+  .participant-form .participant-model { grid-column: 2 / -1; grid-row: 3; }
+  .participant-form > label:last-of-type { grid-column: 2 / -1; grid-row: 4; }
+  .participant-form > .icon-button { grid-column: 3; }
+  .participant-form .participant-options { grid-row: 5; }
+  .prepare-footer .button { max-width: 100%; white-space: normal; }
   .settings-view { padding: 18px 12px; }
   .execution-setting { flex-direction: column; align-items: flex-start; }
   .model-filters { padding: 14px; }
@@ -64,5 +90,4 @@
   .model-option { grid-template-columns: 1fr; }
   .drawer-content { padding: 18px; }
   .drawer-navigation { padding: 12px 18px; }
-  .participant-form .participant-model { grid-column: 3; }
 }
