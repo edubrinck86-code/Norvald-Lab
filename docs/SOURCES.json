@@ -555,9 +555,9 @@
     "source": "backend/application/arof/outcome_extract.py",
     "destination": "norvald_lab/application/arof/outcome_extract.py",
     "source_sha256": "1237544183d1d140f55364a620fcb207939cf237e97092cd823f682309fcc275",
-    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "migration": "namespace rewrite; Lab divergence 2026-10-04, see \"Divergências intencionais do Studio\" in docs/MIGRACAO.md",
     "source_git_blob_sha": "1f93c4b03eef3b4693954cf732e7eb6eeaca8275",
-    "destination_sha256": "426d82dd61dddd88467822fec5ad3f4992e7efad54813acb0497ecfbb6f98468"
+    "destination_sha256": "85f92171ef60483625582e12a2a9b1f4795f471cdf67198088bdb1103c5d90ab"
   },
   {
     "repository": "Norvald-teste-codex",
@@ -705,9 +705,9 @@
     "source": "backend/domain/deliberation/contribution.py",
     "destination": "norvald_lab/domain/deliberation/contribution.py",
     "source_sha256": "483d0c8ac26165c7b082f991785dc0b1892ccf4523d95a0ca34a4aa8b683a359",
-    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "migration": "namespace rewrite; Lab divergence 2026-10-04, see \"Divergências intencionais do Studio\" in docs/MIGRACAO.md",
     "source_git_blob_sha": "9bfc81fc49b6b330c5b7af5b9e0868367ea43826",
-    "destination_sha256": "483d0c8ac26165c7b082f991785dc0b1892ccf4523d95a0ca34a4aa8b683a359"
+    "destination_sha256": "6141f956284e7f84b7d4a275515e730766a496106d731cf3d9dbcd419fb1f513"
   },
   {
     "repository": "Norvald-teste-codex",
@@ -755,9 +755,9 @@
     "source": "backend/domain/deliberation/contribution_validation.py",
     "destination": "norvald_lab/domain/deliberation/contribution_validation.py",
     "source_sha256": "79e8046d280fa403a4a520d933e24b44fe3567e0690c5c8629c48d2222a4d6b0",
-    "migration": "namespace rewrite; see docs/MIGRACAO.md for adaptations",
+    "migration": "namespace rewrite; Lab divergence 2026-10-04, see \"Divergências intencionais do Studio\" in docs/MIGRACAO.md",
     "source_git_blob_sha": "1d55c6bd5086e6d36d3c90b864de7963c8c7396d",
-    "destination_sha256": "538a926b6610519057f5b8a696320ca039bd8ecaad0963fe99e009f505a704d7"
+    "destination_sha256": "628489d3691ec9ffc4b85f3695c61f169aabc4074d4abc88f3302b4504be8aef"
   },
   {
     "repository": "Norvald-teste-codex",

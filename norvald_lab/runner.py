@@ -35,7 +35,11 @@ from norvald_lab.vendor.norvald_execution.contracts.sampling import ResolvedSamp
 from norvald_lab.vendor.norvald_execution.orchestration.agent_orchestrator import AgentOrchestrator
 from norvald_lab.vendor.norvald_execution.tools import tool_loop
 
-RUNNER_VERSION = "norvald.lab.runner.v1"
+# v2 (2026-10-04): parser com recusa por parte e colunas do validador em
+# outcomes.csv — divergências intencionais do Studio, docs/MIGRACAO.md.
+# O valor entra no manifesto e no fingerprint da condição: coleta v1 e
+# coleta v2 ficam distinguíveis pelo registro, não pela memória.
+RUNNER_VERSION = "norvald.lab.runner.v2"
 PROMPT_PROFILE = "lab-controlled-structured-v1"
 EXECUTION_REVISION = "c903aa42af8a959c7868c6d8be3b744c9677ac16"
 STUDIO_REVISION = "f0d640779324bdde8c1f76e83b1a1869602af089"

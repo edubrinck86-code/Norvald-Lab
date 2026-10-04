@@ -65,7 +65,7 @@ Cada experimento tem uma pasta em `experiments/<id>/`:
 | `raw/r0001/observations.jsonl` | As entradas, respostas, reasoning disponibilizado, erros e consumo |
 | `seed_audits.json` | Quais contribuições anteriores chegaram à condição seguinte e efeitos da inserção no grafo |
 | `events.jsonl` | A sequência operacional da execução |
-| `outcomes.csv` | Uma linha por execução lógica: posição declarada, confiança e relações |
+| `outcomes.csv` | Uma linha por execução lógica: posição declarada, confiança e relações; ao lado, o que o validador aceitou e o motivo de cada parte recusada |
 | `capacity.json` | Medidas operacionais da máquina |
 | `completion.json` | Fechamento e contagens da coleta |
 | `result.json` | Resumo operacional, sem substituir os registros brutos |
@@ -124,6 +124,8 @@ Endpoints: `GET /health`, `GET/POST /api/experiments`, `GET /api/experiments/{id
 
 - O reasoning registrado é somente o disponibilizado pelo provider. Ausência permanece ausência; não é reconstruído a partir da resposta final.
 - `outcomes.csv` conserva o extrator do AROF. `new_evidence_cited` sinaliza uma relação de fundamento declarada; **não prova novidade factual, validade da fonte ou independência**. Os IDs dos alvos ficam disponíveis para análise posterior.
+- `outcomes.csv` traz duas leituras da mesma resposta. `option_selected`, `new_evidence_cited`, `grounding_targets` e `relations_out` leem o bloco **declarado**, sem validar. `validation_code`, `items_*`, `relations_*`, `option_accepted`, `grounding_targets_accepted` e `rejected_reasons` leem o que o **validador aceitou** contra o contexto daquela execução — que é o que chega aos pares em B3 e E. As duas podem divergir; o Lab não escolhe qual delas é a medida. Coluna do validador vazia significa que o RAW não trazia o contexto, não zero.
+- Dentro de um bloco CONTRIBUTION legível, uma unidade ou relação que o parser não consegue ler é recusada com motivo e as demais seguem; nada é preenchido ou inferido. Bloco sem fechamento, JSON inválido ou estrutura que não seja lista continuam descartando o bloco inteiro. Este comportamento difere do Studio: ver "Divergências intencionais do Studio" em [docs/MIGRACAO.md](docs/MIGRACAO.md).
 - Esta versão não calcula automaticamente efeito manada, qualidade, causalidade, correlação ou tamanho efetivo de amostra.
 - O perfil `lab-controlled-structured-v1` usa o formato CONTRIBUTION e o parser do Studio, mas entrega corpus integral em todas as condições e não faz replanejamento automático. Não é uma reprodução integral do perfil nativo do Studio.
 - Repetir a leitura do RAW é possível sem API. Repetir a chamada à LLM não garante a mesma resposta; aliases de modelos e detalhes dos providers podem mudar.

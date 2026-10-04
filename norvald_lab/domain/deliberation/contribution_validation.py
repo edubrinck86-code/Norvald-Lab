@@ -28,9 +28,24 @@ class ValidatedContribution:
     # Proveniência operacional do turno. Não faz parte do conteúdo cognitivo
     # da Contribution; acompanha a contribuição para auditoria e citações.
     provenance: List[Dict[str, Any]] = field(default_factory=list)
+    # `local_id` declarado -> id atribuído ao item aceito. O id é um UUID
+    # sorteado a cada validação; sem este mapa não há como dizer, depois,
+    # a qual unidade declarada uma relação aceita se refere. Não é gravado
+    # no item nem entra no Working Context. Acréscimo do Lab
+    # (docs/MIGRACAO.md, 2026-10-04).
+    local_ids: Dict[str, str] = field(default_factory=dict)
 
 def validate_and_convert(contribution: Contribution, context: WorkingContext, *, dimension_registry: DimensionRegistry | None = None) -> ValidatedContribution:
-    rejected: List[RejectedContributionPart] = []
+    # O que o parser não conseguiu ler entra como recusa, com a posição
+    # da parte no bloco quando não há `local_id` que a identifique.
+    rejected: List[RejectedContributionPart] = [
+        RejectedContributionPart(
+            part.kind,
+            part.identifier or f"{'knowledge' if part.kind == 'knowledge' else 'relations'}[{part.index}]",
+            part.reason,
+        )
+        for part in contribution.malformed
+    ]
     items: List[ContextItem] = []
     local_to_id: Dict[str, str] = {}
     for knowledge in contribution.knowledge:
@@ -73,5 +88,5 @@ def validate_and_convert(contribution: Contribution, context: WorkingContext, *,
         if not WorkingContextGraph.relation_is_allowed(item_types[source_id], relation.relation_type, item_types[target_id]):
             rejected.append(RejectedContributionPart("relation", relation.id, f"relação incompatível: {item_types[source_id]} -{relation.relation_type}-> {item_types[target_id]}")); continue
         validated_relations.append({"source_id": source_id, "relation_type": relation.relation_type, "target_id": target_id, "author_id": contribution.author_id, "round_number": contribution.round_number})
-    return ValidatedContribution(items=items, relations=validated_relations, rejected=rejected)
+    return ValidatedContribution(items=items, relations=validated_relations, rejected=rejected, local_ids=dict(local_to_id))
 

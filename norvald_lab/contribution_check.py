@@ -12,9 +12,12 @@ from norvald_lab.domain.deliberation.working_context import WorkingContext
 def check_contribution(content, author_id, context):
     contribution = Contribution.parse(content, author_id=author_id, round_number=1)
     validated = validate_and_convert(contribution, context)
+    # Parte que o parser não leu também foi declarada: conta em "declared".
+    malformed_items = sum(part.kind == "knowledge" for part in contribution.malformed)
+    malformed_relations = sum(part.kind == "relation" for part in contribution.malformed)
     result = {"usable": bool(validated.items), "fully_valid": bool(validated.items) and not validated.rejected,
-              "declared_items": len(contribution.knowledge), "accepted_items": len(validated.items),
-              "declared_relations": len(contribution.relations), "accepted_relations": len(validated.relations),
+              "declared_items": len(contribution.knowledge) + malformed_items, "accepted_items": len(validated.items),
+              "declared_relations": len(contribution.relations) + malformed_relations, "accepted_relations": len(validated.relations),
               "rejected": [asdict(p) for p in validated.rejected]}
     if not content.strip():
         return result | {"code": "empty_response", "message": "Nenhum conteúdo de resposta foi disponibilizado."}

@@ -19,6 +19,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
+from norvald_lab.application.arof.outcome_validation import validation_from_payload
 from norvald_lab.domain.deliberation.contribution import Contribution
 
 # Relações que declaram fundamento novo. Não inclui `selects`, que é a
@@ -51,6 +52,19 @@ class OutcomeRow:
     relations_out: str
     attempt_index: int
     captured_at: str
+    # Leitura do validador, ao lado da leitura do bloco declarado acima.
+    # Acréscimo do Lab (docs/MIGRACAO.md, 2026-10-04); as colunas
+    # anteriores não mudam de definição. Vazio é ausência de leitura — o
+    # RAW não trazia o contexto da execução —, nunca zero. Ver
+    # `outcome_validation.OutcomeValidation`.
+    validation_code: str = ""
+    items_declared: str = ""
+    items_accepted: str = ""
+    relations_declared: str = ""
+    relations_accepted: str = ""
+    option_accepted: str = ""
+    grounding_targets_accepted: str = ""
+    rejected_reasons: str = ""
 
 
 def _texto_da_resposta(payload: Mapping[str, Any]) -> str:
@@ -146,6 +160,10 @@ def row_from_payload(payload: Mapping[str, Any], *, condition: str = "") -> Outc
     else:
         status = STATUS_OK
 
+    validacao = validation_from_payload(
+        payload, response=resposta, grounding_relations=RELACOES_DE_FUNDAMENTO
+    )
+
     return OutcomeRow(
         # A pergunta é a tarefa do experimento: uma task_label por
         # pergunta é o que torna a tabela pareável entre condições.
@@ -167,6 +185,7 @@ def row_from_payload(payload: Mapping[str, Any], *, condition: str = "") -> Outc
         ),
         attempt_index=int(payload.get("attempt_index") or 0),
         captured_at=str(payload.get("captured_at") or ""),
+        **asdict(validacao),
     )
 
 
