@@ -25,7 +25,7 @@ from norvald_lab.adjustments import AdjustmentStore
 from uuid import uuid4
 
 
-def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=False) -> FastAPI:
+def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=False, oauth_port=8766) -> FastAPI:
     root = Path(root).expanduser() if root is not None else arof_data_root()
     runner = ExperimentRunner(root)
     local_settings = LocalSettings(root)
@@ -49,15 +49,19 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     app = FastAPI(title="Norvald Lab", version="0.2.0", lifespan=lifespan)
     app.state.jobs = jobs
     app.state.adjustment_jobs = adjustments.jobs
+    from norvald_lab.google_account import GoogleAccount, account_router
+    account = GoogleAccount(root, port=oauth_port)
+    app.include_router(account_router(account))
+    app.state.google_account = account
 
     @app.middleware("http")
     async def settings_origin(request: Request, call_next):
-        if request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments")):
+        if request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments", "/api/account/google")) and not request.url.path.endswith('/callback'):
             origin = request.headers.get("origin")
-            if origin and origin.rstrip("/") != str(request.base_url).rstrip("/"):
+            if (origin and origin.rstrip("/") != str(request.base_url).rstrip("/")) or request.headers.get('sec-fetch-site') == 'cross-site':
                 return JSONResponse({"detail": "Configurações só aceitam pedidos da própria interface local."}, status_code=403)
         response = await call_next(request)
-        if request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments")):
+        if request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments", "/api/account/google")):
             response.headers["Cache-Control"] = "no-store"
         return response
 

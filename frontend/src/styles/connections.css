@@ -191,3 +191,9 @@
   .observation-navigation { padding: 12px 18px; }
   .participant-card-status small { max-width: 90px; text-align: right; }
 }
+.google-account-card { margin-bottom: 22px; }
+.google-account-card header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.google-account-card p { line-height: 1.65; margin: 12px 0; }
+.google-account-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 14px 0; }
+.google-account-card label { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; font-size: 13px; }
+.google-account-confirm { border: 1px solid rgba(170,125,92,.3); border-radius: 10px; padding: 14px; margin-top: 12px; }

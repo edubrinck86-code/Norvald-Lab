@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { KeyRound, Save, Unplug, Radio, ShieldCheck } from 'lucide-react';
 import { api, type Connection, type LabSettings } from '../api';
+import { GoogleAccount } from './GoogleAccount';
 
 export function Settings({ onChanged }: { onChanged(value: LabSettings): void }) {
   const [settings, setSettings] = useState<LabSettings | null>(null);
@@ -16,6 +17,7 @@ export function Settings({ onChanged }: { onChanged(value: LabSettings): void })
   return <section className="settings-view">
     <div className="section-heading"><div><span className="eyebrow">Seu laboratório</span><h2>Conexões e execução</h2><p>Cadastre suas chaves aqui. Depois escolha os modelos no Preparar.</p></div><KeyRound size={28} /></div>
     {error ? <div role="alert" className="error-banner">{error}</div> : null}
+    <GoogleAccount />
     <div className="form-card execution-setting"><div><h3>Chamadas reais</h3><p>Ao habilitar, você poderá iniciar experimentos que usam suas APIs. A conferência do contexto continua antes de cada coleta.</p></div><label className="filter-chip"><input type="checkbox" aria-label="Habilitar chamadas reais" disabled={busy || !settings} checked={settings?.live_enabled ?? false} onChange={event => { void execution(event.target.checked); }} />{settings?.live_enabled ? 'Habilitadas' : 'Desabilitadas'}</label></div>
     <p className="settings-privacy"><ShieldCheck size={17} />As chaves ficam em um arquivo local protegido por permissões no computador que executa o Lab. Não entram nos experimentos, no navegador após salvar ou no GitHub. O campo fica vazio para substituir a chave; vazio ao salvar mantém a existente.</p>
     <div className="connection-list">{settings?.connections.map(connection => <ConnectionCard key={connection.kind} connection={connection} onChanged={update} />)}</div>

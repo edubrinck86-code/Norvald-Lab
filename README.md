@@ -118,6 +118,16 @@ O perfil de ferramentas é explícito: `off` ou `corpus` (consulta somente aos d
 
 Escuta apenas em `http://127.0.0.1:8766`; documentação da API em `/docs`. O servidor inicia com chamadas reais desabilitadas se ainda não houver preferência salva. Habilite chamadas reais em Configurações; essa preferência persiste entre reinicializações. `serve --live` continua disponível como alternativa. Não há autenticação de serviço público nesta entrega.
 
+## Conta Google e pasta do ecossistema
+
+Configurações → Conta Google reconhece a mesma identidade usada no Studio e no Desk, com sessão e consentimento próprios. O Lab continua local e utilizável sem login; Experimentos, Notes, Notebook e chaves LLM não são enviados ao Drive nesta etapa.
+
+No primeiro acesso, importe o JSON **Desktop** (`installed`) do cliente OAuth compatível já usado no Desk. O JSON Web do Studio não serve ao callback loopback. Alternativa: `NORVALD_LAB_GOOGLE_CLIENT_ID` e `NORVALD_LAB_GOOGLE_CLIENT_SECRET` no ambiente privado. Credenciais/tokens ficam em `<lab-data>/private/google-account.json`, com permissões restritas; nunca os inclua no Git ou compartilhe a pasta `private`.
+
+Clique Entrar com Google e conclua no navegador. Para associar a raiz, autorize consulta ao Drive e confirme o link/ID. A sugestão registrada é [a pasta existente](https://drive.google.com/drive/folders/1oNz4GPdtpsrqMKwJlRZ-XTG1sDIfkdiK), validada somente quando você clicar Associar pasta. Isso não cria `.lab`, transfere experimentos nem modifica `.studio/.desk`. A identidade é emissor/sub, não o e-mail; outra conta exige remover explicitamente a associação, preservando todos os dados de pesquisa.
+
+O callback acompanha `serve --port`; OAuth usa PKCE, estado de uso único e userinfo Google verificado. APIs de configuração/login/associação recusam origens web externas e não devolvem segredos. Este login associa o proprietário ao Lab local; não transforma o servidor loopback em serviço público autenticado. Testes usam transporte simulado; o consentimento real depende da configuração Google do proprietário.
+
 Endpoints: `GET /health`, `GET/POST /api/experiments`, `GET /api/experiments/{id}` e suas leituras `/manifest`, `/raw`, `/verify`, `/observe`. `POST /api/prepare` confere sem executar; `POST /api/derive` prepara outra condição; `GET /api/experiment-template` oferece uma configuração vazia para modelos reais. `GET /api/experiments/{id}/editable-copy` prepara uma cópia editável; `DELETE /api/experiments/{id}` exclui da lista e `POST /api/experiments/{id}/restore` restaura. `GET/POST /api/adjustments/{id}` lê ou solicita ajustes separados da coleta. As anotações usam `/api/notes`; os cadernos, `GET/POST /api/workbooks`, `GET/PUT /api/workbooks/{id}` e `POST` nas ações `/capture-note` e `/corpus`. Escritas e capturas de caderno exigem a revisão atual. Conexões e execução usam `/api/settings`; `POST /api/models` consulta o catálogo sem gerar respostas. Essas rotas recusam origens web diferentes e retornam `Cache-Control: no-store`. A coleta roda em segundo plano. CLI e API usam o mesmo executor.
 
 ## Limites científicos e da migração

@@ -105,7 +105,7 @@ def main(argv=None):
                 import threading
                 import webbrowser
                 threading.Timer(1, lambda: webbrowser.open(f"http://127.0.0.1:{args.port}")).start()
-            uvicorn.run(create_app(root, allow_live=args.live), host="127.0.0.1", port=args.port)
+            uvicorn.run(create_app(root, allow_live=args.live, oauth_port=args.port), host="127.0.0.1", port=args.port)
         return 0
     except (ValueError, OSError, KeyError, TypeError) as exc:
         print(f"Não foi possível concluir: {exc}", file=sys.stderr)
