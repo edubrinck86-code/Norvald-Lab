@@ -136,3 +136,74 @@ async def test_assistant_refuses_spend_when_disabled_or_untrusted(tmp_path):
         assert client.get('/api/assistant/settings', headers={'Origin': 'https://elsewhere.invalid'}).status_code == 403
         assert client.get(base + '/conversation', headers={'Origin': 'https://elsewhere.invalid'}).status_code == 403
         assert not (tmp_path / 'observer' / 'lab_assistant.sqlite3').exists()
+
+
+@pytest.mark.asyncio
+async def test_assistant_can_read_catalogue_without_mutating_experiment(tmp_path, monkeypatch):
+    from norvald_lab.vendor.norvald_execution.contracts.tool_contract import ToolCall
+
+    await source(tmp_path)
+    originals = {str(p): p.read_bytes() for p in (tmp_path / 'experiments').rglob('*') if p.is_file()}
+
+    class ToolProvider(StubProvider):
+        async def execute(self, request, model):
+            self.requests.append((request, model))
+            if not request.tool_exchanges:
+                return ExecutionResult(content='', tokens=3, duration_seconds=0,
+                                       provider='openrouter', model=model,
+                                       tool_calls=[ToolCall(call_id='t1',
+                                           name='list_operations', arguments={})])
+            exchange = request.tool_exchanges[0]
+            assert exchange.results[0].is_error is False
+            assert 'lab.experiments.list' in exchange.results[0].content
+            assert 'lab.experiment.start' not in exchange.results[0].content
+            return ExecutionResult(content='As consultas disponíveis estão listadas.',
+                                   tokens=5, duration_seconds=0,
+                                   provider='openrouter', model=model)
+
+    operator = ToolProvider('unused')
+    monkeypatch.setattr('norvald_lab.lab_assistant.build_registry',
+                        lambda spec, **kw: registry(spec, operator, name='operator'))
+    with TestClient(create_app(tmp_path, allow_live=True)) as client:
+        client.post('/api/experiments/assistant-origin/criteria/reconcile')
+        issue = client.get('/api/criteria/incidents').json()[0]
+        assert client.put('/api/assistant/settings', json={
+            'kind': 'openrouter', 'model': 'operator-chosen'}).status_code == 200
+        response = client.post('/api/assistant/incidents/' + issue['id'] + '/message',
+                               json={'text': 'Quais consultas você tem?'})
+        assert response.status_code == 200, response.text
+        assert len(operator.requests) == 2
+        assert operator.requests[0][0].allow_tools
+        assert len(operator.requests[1][0].tool_exchanges) == 1
+        assert len(client.get('/api/assistant/incidents/' + issue['id'] + '/conversation').json()['messages']) == 2
+    assert originals == {str(p): p.read_bytes() for p in (tmp_path / 'experiments').rglob('*') if p.is_file()}
+
+
+@pytest.mark.asyncio
+async def test_repeated_model_tools_trigger_emergency_without_quota(tmp_path, monkeypatch):
+    from norvald_lab.vendor.norvald_execution.contracts.tool_contract import ToolCall
+
+    await source(tmp_path)
+
+    class RepeatingProvider(StubProvider):
+        async def execute(self, request, model):
+            self.requests.append((request, model))
+            return ExecutionResult(content='', tokens=2, duration_seconds=0,
+                                   provider='openrouter', model=model,
+                                   tool_calls=[ToolCall(call_id='t' + str(len(self.requests)),
+                                       name='list_operations', arguments={})])
+
+    operator = RepeatingProvider('unused')
+    monkeypatch.setattr('norvald_lab.lab_assistant.build_registry',
+                        lambda spec, **kw: registry(spec, operator, name='operator'))
+    with TestClient(create_app(tmp_path, allow_live=True)) as client:
+        client.post('/api/experiments/assistant-origin/criteria/reconcile')
+        issue = client.get('/api/criteria/incidents').json()[0]
+        client.put('/api/assistant/settings', json={
+            'kind': 'openrouter', 'model': 'operator-chosen'})
+        response = client.post('/api/assistant/incidents/' + issue['id'] + '/message',
+                               json={'text': 'Verifique o catálogo.'})
+        assert response.status_code in {423, 502}
+        assert client.get('/api/assistant/emergency').json()['stopped'] is True
+        assert len(operator.requests) == 4
+        assert client.post('/api/assistant/emergency/resume', json={}).json()['stopped'] is False
