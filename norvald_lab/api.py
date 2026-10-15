@@ -412,7 +412,9 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
             raise HTTPException(422, "Informe somente text.")
         detail = incident_detail(incident_id)
         try:
-            return await assistant.reply(detail, payload["text"], live_enabled=execution_live)
+            return await assistant.reply(
+                detail, payload["text"], live_enabled=execution_live,
+                catalogue=app.state.lab_operations, emergency=assistant_plans)
         except PermissionError as exc:
             raise HTTPException(403, str(exc)) from exc
         except (ValueError, KeyError, TypeError) as exc:
@@ -518,7 +520,8 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     # before an authenticated, authorized Assistant interface exists.
     app.state.lab_operations = build_read_catalogue(
         runner, experiment_template, experiment_criteria,
-        list_incidents=incidents.list, get_incident=incident_detail)
+        list_incidents=incidents.list, get_incident=incident_detail,
+        list_experiments=experiments)
 
     if not enable_demo:
         app.router.routes = [route for route in app.router.routes if getattr(route, "path", "") not in {"/api/demo", "/api/demo-template"}]
