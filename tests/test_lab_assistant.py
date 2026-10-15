@@ -83,7 +83,9 @@ async def test_assistant_chat_planned_once_and_raw_integrity(tmp_path, monkeypat
         assert 'CONTRIBUTION' in spoken.json()['answer']
         assert len(spoken.json()['messages']) == 2
         request, model = operator.requests[0]
-        assert model == 'operator-chosen' and not request.allow_tools
+        assert model == 'operator-chosen' and request.allow_tools
+        assert {tool.name for tool in request.tools} == {
+            'list_operations', 'describe_operation', 'call_operation'}
         assert issue['criterion_id'] in request.context.working_context
         assert operator.requests[0][0].agent_id == 'lab-assistant'
         assert client.get(base + '/conversation').json()['messages'] == spoken.json()['messages']
