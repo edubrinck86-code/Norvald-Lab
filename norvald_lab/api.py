@@ -33,6 +33,7 @@ from norvald_lab.assistant_comparison import compare_experiments
 from norvald_lab.assistant_plans import AssistantPlans, EmergencyStop
 from norvald_lab.assistant_plan_routes import plan_router
 from norvald_lab.assistant_automation import LabAutomation
+from norvald_lab.assistant_destructive import DestructiveRequests
 from norvald_lab.storage import digest
 from uuid import uuid4
 
@@ -53,6 +54,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     assistant = LabAssistant(root, local_settings)
     assistant_plans = AssistantPlans(root)
     automation = LabAutomation(root)
+    destructive = DestructiveRequests(root, management)
     logger = logging.getLogger(__name__)
 
     @asynccontextmanager
@@ -495,7 +497,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
 
     automation_router = plan_router(
         root, runner, adjustments, incidents, local_settings, incident_detail,
-        execute, lambda: execution_live, logger, assistant_plans, automation)
+        execute, lambda: execution_live, logger, assistant_plans, automation, destructive)
     app.state.automation_tick = automation_router.tick
     app.include_router(automation_router)
 
