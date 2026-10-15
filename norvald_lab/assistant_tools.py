@@ -2,7 +2,7 @@
 
 The LLM may discover and invoke only the Lab's whitelisted query or plan-creation catalogue.
 It cannot access arbitrary routes, filesystem paths, credentials, deletion,
-experimental execution or destructive changes through this interface.
+destructive changes or unplanned execution through this interface.
 """
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ def definitions():
                 "name": {"type": "string"}}, "required": ["name"], "additionalProperties": False}),
         ToolDefinition(
             name="call_operation",
-            description="Execute one whitelisted Lab consultation or plan preparation (no execution).",
+            description="Call one whitelisted Lab operation; execution requires a previously displayed plan.",
             parameters={"type": "object", "properties": {
                 "name": {"type": "string"},
                 "input": {"type": "object", "additionalProperties": True}},
@@ -51,3 +51,16 @@ def dispatch(catalogue, name, args):
             raise ValueError("Informe nome e entrada estruturada.")
         return {"operation": args["name"], "result": catalogue.call(args["name"], args["input"])}
     raise ValueError("Ferramenta não autorizada.")
+
+
+async def dispatch_async(catalogue, name, args):
+    """Async dispatch adds plan execution while retaining typed server policy."""
+    if name != "call_operation":
+        return dispatch(catalogue, name, args)
+    if not isinstance(args, dict) or set(args) != {"name", "input"}:
+        raise ValueError("Informe nome e entrada estruturada.")
+    operation = args["name"]
+    if not isinstance(operation, str):
+        raise ValueError("Nome de operação inválido.")
+    return {"operation": operation,
+            "result": await catalogue.call_async(operation, args["input"])}
