@@ -570,7 +570,12 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     app.state.lab_operations = build_read_catalogue(
         runner, experiment_template, experiment_criteria,
         list_incidents=incidents.list, get_incident=incident_detail,
-        list_experiments=experiments, get_experiment_status=experiment)
+        list_experiments=experiments, get_experiment_status=experiment,
+        plan_experiment=lambda spec: automation_router.plan_experiment({"spec": spec}),
+        plan_adjustment=lambda incident_id: automation_router.plan_adjustment(incident_id, {}),
+        derive=lambda source_id, new_id, exposure: derive_spec(
+            root, source_id, new_id, exposure),
+        compare=lambda left, right: compare_experiments(root, left, right))
 
     if not enable_demo:
         app.router.routes = [route for route in app.router.routes if getattr(route, "path", "") not in {"/api/demo", "/api/demo-template"}]
