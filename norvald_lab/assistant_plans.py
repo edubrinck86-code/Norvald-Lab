@@ -72,6 +72,10 @@ class AssistantPlans:
                 plan_id TEXT NOT NULL,
                 at TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS presented_plans (
+                plan_id TEXT PRIMARY KEY,
+                shown_at TEXT NOT NULL
+            );
         """)
         if os.name == "posix":
             os.chmod(self.path, 0o600)
@@ -154,6 +158,26 @@ class AssistantPlans:
                 params = (status,)
             query += " ORDER BY created_at DESC, id"
             return [self._read(row) for row in db.execute(query, params)]
+
+    def mark_presented(self, ids):
+        """A response showing the plan was requested by the local UI."""
+        with closing(self._db()) as db:
+            with db:
+                for plan_id in ids:
+                    identifier(plan_id, "plan_id")
+                    db.execute("""
+                        INSERT OR IGNORE INTO presented_plans(plan_id,shown_at)
+                        SELECT id,? FROM plans WHERE id=?
+                    """, (_now(), plan_id))
+
+    def was_presented(self, plan_id):
+        identifier(plan_id, "plan_id")
+        if not self.path.exists():
+            return False
+        with closing(self._db()) as db:
+            return db.execute(
+                "SELECT 1 FROM presented_plans WHERE plan_id=?", (plan_id,)
+            ).fetchone() is not None
 
     @staticmethod
     def _cycling(last):
