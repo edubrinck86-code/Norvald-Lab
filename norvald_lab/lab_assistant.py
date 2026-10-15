@@ -8,7 +8,10 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import secrets
+import hashlib
 import sqlite3
+from datetime import timedelta
 from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
@@ -60,6 +63,15 @@ class AssistantConversation:
             );
             CREATE INDEX IF NOT EXISTS assistant_thread_idx
                 ON assistant_messages(incident_id, seq);
+            CREATE TABLE IF NOT EXISTS assistant_adjustment_previews (
+                token_hash TEXT PRIMARY KEY,
+                incident_id TEXT NOT NULL,
+                experiment_id TEXT NOT NULL,
+                payload TEXT NOT NULL,
+                source_seal_sha256 TEXT NOT NULL,
+                expires_at TEXT NOT NULL,
+                consumed_at TEXT
+            );
         """)
         if os.name == "posix":
             os.chmod(self.path, 0o600)
@@ -76,6 +88,44 @@ class AssistantConversation:
                 ORDER BY seq DESC LIMIT ?
             """, (incident_id, limit)).fetchall()
             return [dict(row) for row in reversed(rows)]
+
+    def issue_preview(self, incident_id, experiment_id, payload, source_seal_sha256):
+        """One-time, short-lived explicit owner approval, not LLM authority."""
+        identifier(incident_id, "incident_id")
+        identifier(experiment_id, "experiment_id")
+        token = secrets.token_urlsafe(32)
+        token_hash = hashlib.sha256(token.encode("ascii")).hexdigest()
+        expires = (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat()
+        with closing(self._connect()) as db:
+            with db:
+                db.execute("""
+                    INSERT INTO assistant_adjustment_previews
+                    (token_hash,incident_id,experiment_id,payload,source_seal_sha256,expires_at)
+                    VALUES (?,?,?,?,?,?)
+                """, (token_hash, incident_id, experiment_id,
+                      json.dumps(payload, ensure_ascii=False),
+                      source_seal_sha256, expires))
+        return {"approval_token": token, "expires_at": expires}
+
+    def consume_preview(self, incident_id, token, source_seal_sha256):
+        identifier(incident_id, "incident_id")
+        if not isinstance(token, str) or len(token) > 128 or len(token) < 24:
+            raise ValueError("Token de autorização inválido.")
+        token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
+        with closing(self._connect()) as db:
+            with db:
+                db.execute("BEGIN IMMEDIATE")
+                row = db.execute("""
+                    SELECT * FROM assistant_adjustment_previews
+                    WHERE token_hash=? AND incident_id=?
+                """, (token_hash, incident_id)).fetchone()
+                if (row is None or row["consumed_at"] is not None
+                        or row["source_seal_sha256"] != source_seal_sha256
+                        or row["expires_at"] <= datetime.now(timezone.utc).isoformat()):
+                    raise ValueError("Prévia vencida, usada ou desvinculada da origem. Revise novamente.")
+                db.execute("UPDATE assistant_adjustment_previews SET consumed_at=? WHERE token_hash=?",
+                           (datetime.now(timezone.utc).isoformat(), token_hash))
+                return row["experiment_id"], json.loads(row["payload"])
 
     def append_pair(self, incident_id, question, answer, provider, model, tokens):
         identifier(incident_id, "incident_id")
