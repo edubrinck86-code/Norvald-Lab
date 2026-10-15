@@ -300,5 +300,7 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
         return await tick()
 
     router.tick = tick
+    router.plan_experiment = plan_experiment
+    router.plan_adjustment = plan_adjustment
 
     return router
