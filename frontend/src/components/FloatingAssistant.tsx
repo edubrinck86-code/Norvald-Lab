@@ -209,6 +209,7 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
   const [modelCapabilityNotice, setModelCapabilityNotice] = useState('');
   const operatorLoaded = useRef(false);
+  const operatorDraftDirty = useRef(false);
   const [settings, setSettings] = useState<LabSettings | null>(null);
   const [emergency, setEmergency] = useState<{ stopped: boolean; reason: string }>({ stopped: false, reason: '' });
   const input = useRef<HTMLTextAreaElement>(null);
@@ -250,7 +251,7 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
     let active = true;
     void api<OperatorSettings>('/api/assistant/settings').then(value => {
       if (active) {
-        setOperator(value);
+        if (!operatorDraftDirty.current) setOperator(value);
         operatorLoaded.current = true;
       }
     }).catch(reason => { if (active) setError(String(reason)); });
@@ -355,7 +356,8 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
       const value = await api<OperatorSettings>('/api/assistant/settings', {
         method: 'PUT', body: JSON.stringify({ kind: operator.kind, model: operator.model }),
       });
-      setOperator(value); setNotice('Modelo operador salvo.'); setModelCapabilityNotice('');
+      setOperator(value); operatorDraftDirty.current = false;
+      setNotice('Modelo operador salvo.'); setModelCapabilityNotice('');
     } catch (reason) { setError(String(reason)); }
   }
   const selectedConnection = settings?.connections.find(c => c.kind === operator.kind);
@@ -501,6 +503,7 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
                 <select aria-label="Selecionar provider do Assistant" value={operator.kind}
                   onChange={event => {
                     const kind = event.target.value;
+                    operatorDraftDirty.current = true;
                     setOperator(current => ({ ...current, kind, model: '', configured: false }));
                     setModelCapabilityNotice('');
                     setModelPickerOpen(false);
@@ -519,6 +522,7 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
                 <label>Modelo
                   <input aria-label="ID do modelo operador" value={operator.model}
                     onChange={event => {
+                      operatorDraftDirty.current = true;
                       setOperator(current => ({ ...current, model: event.target.value, configured: false }));
                       setModelCapabilityNotice('');
                     }} placeholder="Selecione no catálogo ou informe o ID manualmente" />
@@ -548,6 +552,7 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
         overlayClassName="nca-model-modal"
         onClose={() => setModelPickerOpen(false)}
         onSelect={model => {
+          operatorDraftDirty.current = true;
           setOperator(current => ({ ...current, model: model.id, configured: false }));
           setModelCapabilityNotice(model.tools === false
             ? 'Este modelo declara não oferecer tools. A conversa poderá não executar operações.'
