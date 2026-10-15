@@ -1,7 +1,7 @@
-"""Assistant-facing *internal* catalogue: only explicit read-only operations in slice 1.
+"""Typed Lab Assistant catalogue: queries, reversible plans and reviewed execution.
 
-Inspired by Huginn's Operation / Catalogue / CatalogueTools. No generic HTTP
-execution endpoint is exposed until caller authentication and permissions exist.
+All operations reuse deterministic Lab services. There is no generic endpoint
+for arbitrary HTTP/OS commands or destructive confirmations through the model.
 """
 from __future__ import annotations
 
