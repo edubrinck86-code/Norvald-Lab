@@ -73,6 +73,10 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
                              "fingerprint": prepared.condition_fingerprint},
                 "requires_approval": False}
 
+    @router.get("/plans")
+    def list_plans():
+        return plans.list()
+
     @router.get("/plans/{plan_id}")
     def read_plan(plan_id: str):
         try:
@@ -194,16 +198,80 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
         except (ValueError, TypeError) as exc:
             raise HTTPException(422, str(exc)) from exc
 
+    @router.get("/automation/recovery")
+    def recovery_queue():
+        return {"settings": automation.settings(), "queue": automation.queue()}
+
+    @router.put("/automation/recovery/settings")
+    def recovery_settings(payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"auto_recovery"}:
+            raise HTTPException(422, "Informe auto_recovery.")
+        try:
+            return automation.set_settings(auto_recovery=payload["auto_recovery"])
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
     @router.post("/automation/monitor")
     def monitor_now():
         return automation.monitor(incidents)
 
     async def tick():
-        """One due recurrence at a time, with a durable plan first."""
-        summary = {"monitor": automation.monitor(incidents), "occurrence": None}
+        """Reconcile datasets, stage recovery plans, then run prior scheduled work."""
+        summary = {"monitor": automation.monitor(incidents),
+                   "recovery_planned": [], "recovery_executed": [],
+                   "occurrence": None, "errors": []}
         if plans.control()["stopped"]:
             summary["emergency_stopped"] = True
             return summary
+
+        # Recoveries were prepared on an earlier tick. Never execute a newly
+        # created recovery in the same tick as its plan was first persisted.
+        previous = automation.queue()
+        for item in previous:
+            if item["state"] != "planned" or not automation.settings()["auto_recovery"]:
+                continue
+            try:
+                result = await execute_plan(item["plan_id"], {})
+                state = "accepted" if result["status"] == "accepted" else "blocked"
+                automation.complete_recovery(item["experiment_id"], item["observation_id"],
+                                             state=state)
+                summary["recovery_executed"].append(
+                    {"plan_id": item["plan_id"], "status": state})
+            except Exception as exc:
+                automation.complete_recovery(item["experiment_id"], item["observation_id"],
+                                             state="failed", error=settings.redact(str(exc)))
+                summary["errors"].append({"recovery_plan_id": item["plan_id"],
+                                          "error": settings.redact(str(exc))})
+
+        existing = {(row["experiment_id"], row["observation_id"])
+                    for row in automation.queue()}
+        for issue in incidents.list(status="open", limit=500):
+            if issue["criterion_id"] != "arof.contribution.fully_valid":
+                continue
+            identity = (issue["experiment_id"], issue["observation_id"])
+            if not identity[1] or identity in existing:
+                continue
+            try:
+                detail = incident_detail(issue["id"])
+                policy = detail["recovery"]
+                if (not policy["allowed"] or policy["action"] != "preview_adjustment"
+                        or policy["revalidations"]):
+                    continue
+                proposed = dict(policy["proposed_payload"])
+                saved, _ = adjustments.prepare(identity[0], proposed, persist=False)
+                plan = plans.create(
+                    action="lab.adjustment.request", experiment_id=identity[0],
+                    incident_id=issue["id"], payload=proposed,
+                    evidence_sha256=saved["source_integrity_sha256"])
+                if automation.queue_recovery(
+                        experiment_id=identity[0], observation_id=identity[1],
+                        incident_id=issue["id"], plan_id=plan["id"]):
+                    summary["recovery_planned"].append(plan["id"])
+                    existing.add(identity)
+            except Exception as exc:
+                summary["errors"].append({"incident_id": issue["id"],
+                                          "error": settings.redact(str(exc))})
+
         occurrence = automation.claim_due()
         if occurrence is None:
             return summary
