@@ -98,3 +98,25 @@ def test_http_criteria_and_internal_catalogue(tmp_path):
         catalogue = client.app.state.lab_operations
         assert catalogue.call("lab.spec.evaluate", {"spec": spec})["overall"] == "met"
         assert not (tmp_path / "experiments").exists()
+
+@pytest.mark.asyncio
+async def test_finished_experiment_criteria_cannot_rewrite_raw(tmp_path):
+    runner = ExperimentRunner(tmp_path)
+    await runner.run(runner.prepare(demo_spec("original-criteria")), monitor_capacity=False)
+    originals = {str(path): path.read_bytes()
+                 for path in (tmp_path / "experiments").rglob("*") if path.is_file()}
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
+        result = client.get("/api/experiments/original-criteria/criteria")
+        assert result.status_code == 200
+        report = result.json()
+        assert report["subject"]["experiment_id"] == "original-criteria"
+        assert by_id(report, "lab.dataset.integrity")[0]["status"] == "met"
+        assert by_id(report, "arof.contribution.coverage")[0]["status"] == "met"
+        assert len(by_id(report, "arof.contribution.usable")) == 3
+        assert not by_id(report, "arof.contribution.coverage")[0]["evidence"]["missing"]
+        assert client.get("/api/experiments/original-criteria/criteria",
+                          headers={"Origin": "https://untrusted.example"}).status_code == 403
+        assert client.post("/api/criteria/spec", json=demo_spec("untrusted"),
+                           headers={"Origin": "https://untrusted.example"}).status_code == 403
+    assert originals == {str(path): path.read_bytes()
+                         for path in (tmp_path / "experiments").rglob("*") if path.is_file()}
