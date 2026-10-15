@@ -54,6 +54,19 @@ class ExclusionInput(Input):
     experiment_id: str = Field(min_length=1, max_length=120)
 
 
+class NoteInput(Input):
+    title: str = Field(min_length=1, max_length=300)
+    content: str
+
+
+class WorkbookNameInput(Input):
+    book_id: str = Field(min_length=1)
+
+
+class WorkbookCreateInput(Input):
+    title: str = Field(min_length=1, max_length=300)
+
+
 class NavigationInput(Input):
     view: str = Field(pattern=r"^(observe|prepare|compare|experiments|records|workbook|settings)$")
 
@@ -142,7 +155,8 @@ def build_read_catalogue(runner, template, experiment_criteria, *,
                          set_routine=None, recovery_queue=None, set_recovery=None,
                          emergency_state=None, emergency_stop=None, emergency_resume=None,
                          acknowledge=None, escalate=None, stage_exclusion=None,
-                         navigate=None):
+                         navigate=None, list_notes=None, create_note=None,
+                         list_workbooks=None, read_workbook=None, create_workbook=None):
     """The Lab's own services are authority, not the future Assistant model."""
     operations = [
         Operation("lab.spec.template", "query", "Template for a new experiment.", Empty,
@@ -254,4 +268,24 @@ def build_read_catalogue(runner, template, experiment_criteria, *,
         operations.append(Operation("lab.ui.navigate", "query",
             "Suggest opening a Lab screen in the local interface; no browser action.",
             NavigationInput, lambda item: navigate(item.view)))
+    if list_notes is not None:
+        operations.append(Operation("lab.notes.list", "query",
+            "List local observational notes. Notes never alter RAW.",
+            Empty, lambda _: list_notes()))
+    if create_note is not None:
+        operations.append(Operation("lab.note.create", "organize",
+            "Create a new observation note outside the sealed experiment.",
+            NoteInput, lambda item: create_note(item.title, item.content)))
+    if list_workbooks is not None:
+        operations.append(Operation("lab.workbooks.list", "query",
+            "Read local notebooks and their existing blocks.",
+            Empty, lambda _: list_workbooks()))
+    if read_workbook is not None:
+        operations.append(Operation("lab.workbook.read", "query",
+            "Read an existing notebook without modifying it.",
+            WorkbookNameInput, lambda item: read_workbook(item.book_id)))
+    if create_workbook is not None:
+        operations.append(Operation("lab.workbook.create", "organize",
+            "Create a separate empty notebook without overwriting existing work.",
+            WorkbookCreateInput, lambda item: create_workbook(item.title)))
     return ReadCatalogue(operations)
