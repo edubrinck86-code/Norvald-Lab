@@ -187,6 +187,9 @@ class LabAssistant:
                                            "model": model}]}
         incident_id = detail["id"]
         async with self._thread_locks.setdefault(incident_id, asyncio.Lock()):
+            prior_event_seq = (self.threads.events(incident_id)[-1]["seq"]
+                               if incident_id.startswith("chat-")
+                               and self.threads.events(incident_id) else 0)
             older = self.conversations.history(incident_id, limit=100000000)
             history = "\n".join(row["role"] + ": " + row["content"] for row in older)
             extra = json.dumps(screen_context or {}, ensure_ascii=False)
@@ -245,8 +248,10 @@ class LabAssistant:
                                         metadata["experiment_id"] = plan.get("experiment_id")
                                     if "request" in inner and isinstance(inner["request"], dict):
                                         metadata["destructive_request"] = inner["request"]
+                                    if "id" in inner and str(operation) == "lab.routine.schedule":
+                                        metadata["routine_id"] = inner["id"]
                                     for key in ("experiment_id", "adjustment_id", "status",
-                                                "schema_version", "routine_id"):
+                                                "schema_version", "routine_id", "plan_id", "view"):
                                         if key in inner:
                                             metadata[key] = inner[key]
                             self.threads.add_event(
@@ -267,6 +272,8 @@ class LabAssistant:
                                                kind, model, tokens)
                 if incident_id.startswith("chat-"):
                     self.threads.touch(incident_id, text=question, context=screen_context)
+                    reply_seq = self.conversations.history(incident_id, limit=1)[-1]["seq"]
+                    self.threads.bind_events(incident_id, prior_event_seq, reply_seq)
                 return {"answer": answer, "model": model, "provider": kind,
                         "tokens": tokens,
                         "messages": self.conversations.history(incident_id)}
