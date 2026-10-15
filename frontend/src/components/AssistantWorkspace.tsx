@@ -39,6 +39,7 @@ export function AssistantWorkspace({ canChat, stopped, onStarted }: {
   const [left, setLeft] = useState('');
   const [right, setRight] = useState('');
   const [comparison, setComparison] = useState<Comparison | null>(null);
+  const [report, setReport] = useState<Record<string, unknown> | null>(null);
   const [history, setHistory] = useState<Record<string, unknown>[]>([]);
   const [activeHistory, setActiveHistory] = useState('');
   const [exclusionTarget, setExclusionTarget] = useState('');
@@ -184,6 +185,17 @@ export function AssistantWorkspace({ canChat, stopped, onStarted }: {
     finally { setBusy(''); }
   }
 
+  async function prepareReport() {
+    if (!left) return;
+    setBusy('report'); setError(''); setReport(null);
+    try {
+      const response = await api<Record<string, unknown>>(
+        '/api/assistant/reports/' + encodeURIComponent(left));
+      setReport(response);
+    } catch (reason) { setError(String(reason)); }
+    finally { setBusy(''); }
+  }
+
   async function compare() {
     if (!left || !right) return;
     setBusy('compare'); setError(''); setComparison(null);
@@ -312,6 +324,16 @@ export function AssistantWorkspace({ canChat, stopped, onStarted }: {
         <button className="button secondary" disabled={!!busy || !left || !right || left === right}
           onClick={() => { void compare(); }}>Comparar</button>
       </div>
+      <button className="button secondary" disabled={!!busy || !left}
+        onClick={() => { void prepareReport(); }}>
+        Gerar relatório interno do primeiro experimento
+      </button>
+      {report ? <div className="assistant-preview">
+        <h4>Relatório científico versionado</h4>
+        <p>As métricas são derivadas de registros selados. O RAW original não foi alterado.</p>
+        <details open><summary>Relatório estruturado</summary>
+          <pre>{JSON.stringify(report, null, 2)}</pre></details>
+      </div> : null}
       {comparison ? <div className="assistant-preview">
         <h4>{comparison.comparability.structurally_aligned
           ? 'Pareamento estrutural compatível' : 'Diferenças estruturais encontradas'}</h4>
