@@ -28,7 +28,7 @@ def test_preflight_is_read_only_and_reports_errors(tmp_path):
     assert not (tmp_path / "experiments").exists()
 
     broken = deepcopy(spec)
-    broken["budget"]["max_logical_executions"] = 1
+    broken["repetitions"] = 0
     refused = evaluate_spec(runner, broken)
     assert refused["overall"] == "not_met"
     assert by_id(refused, "lab.spec.structure")[0]["code"] == "invalid_spec"
