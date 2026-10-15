@@ -27,6 +27,8 @@ from norvald_lab.criteria import evaluate_spec, evaluate_snapshot
 from norvald_lab.lab_operations import build_read_catalogue
 from norvald_lab.criterion_incidents import CriterionIncidents
 from norvald_lab.criterion_recovery import recovery_plan
+from norvald_lab.lab_assistant import LabAssistant
+from norvald_lab.storage import digest
 from uuid import uuid4
 
 
@@ -43,6 +45,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     management = ExperimentManagement(root)
     adjustments = AdjustmentStore(root)
     incidents = CriterionIncidents(root)
+    assistant = LabAssistant(root, local_settings)
     logger = logging.getLogger(__name__)
 
     @asynccontextmanager
@@ -57,6 +60,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     app.state.jobs = jobs
     app.state.adjustment_jobs = adjustments.jobs
     app.state.criterion_incidents = incidents
+    app.state.lab_assistant = assistant
     from norvald_lab.google_account import GoogleAccount, account_router
     account = GoogleAccount(root, port=oauth_port)
     app.include_router(account_router(account))
@@ -64,7 +68,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
 
     @app.middleware("http")
     async def settings_origin(request: Request, call_next):
-        protected = request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments", "/api/account/google", "/api/criteria")) or (
+        protected = request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments", "/api/account/google", "/api/criteria", "/api/assistant")) or (
             request.url.path.startswith("/api/experiments/") and (
                 request.url.path.endswith("/criteria") or request.url.path.endswith("/criteria/reconcile")))
         if protected and not request.url.path.endswith('/callback'):
@@ -380,6 +384,96 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     @app.post("/api/criteria/incidents/{incident_id}/escalate")
     def escalate_criterion_incident(incident_id: str, payload: dict):
         return record_owner_decision(incident_id, payload, "escalated")
+
+    @app.get("/api/assistant/settings")
+    def assistant_settings():
+        return assistant.read_settings()
+
+    @app.put("/api/assistant/settings")
+    def save_assistant_settings(payload: dict):
+        try:
+            return assistant.save_settings(payload)
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.get("/api/assistant/incidents/{incident_id}/conversation")
+    def assistant_conversation(incident_id: str):
+        incident_detail(incident_id)  # Existing and accessible?
+        return {"incident_id": incident_id,
+                "messages": assistant.conversations.history(incident_id)}
+
+    @app.post("/api/assistant/incidents/{incident_id}/message")
+    async def assistant_message(incident_id: str, payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"text"}:
+            raise HTTPException(422, "Informe somente text.")
+        detail = incident_detail(incident_id)
+        try:
+            return await assistant.reply(detail, payload["text"], live_enabled=execution_live)
+        except PermissionError as exc:
+            raise HTTPException(403, str(exc)) from exc
+        except (ValueError, KeyError, TypeError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+        except Exception as exc:
+            logger.exception("Não foi possível responder na conversa do Lab Assistant")
+            raise HTTPException(502, "A resposta do modelo operador falhou. A pergunta não foi registrada.") from exc
+
+    @app.post("/api/assistant/incidents/{incident_id}/adjustment/preview")
+    def assistant_adjustment_preview(incident_id: str, payload: dict):
+        if not isinstance(payload, dict) or set(payload) - {"instruction", "max_tokens"}:
+            raise HTTPException(422, "A prévia aceita somente instruction e max_tokens.")
+        if not execution_live:
+            raise HTTPException(403, "Chamadas reais estão desabilitadas.")
+        detail = incident_detail(incident_id)
+        plan = detail["recovery"]
+        if not plan["allowed"] or plan["action"] != "preview_adjustment":
+            raise HTTPException(409, "Esta ocorrência não admite um ajuste assistido.")
+        proposed = dict(plan["proposed_payload"])
+        if "instruction" in payload:
+            proposed["instruction"] = payload["instruction"]
+        if "max_tokens" in payload:
+            proposed["max_tokens"] = payload["max_tokens"]
+        try:
+            saved, _ = adjustments.prepare(detail["experiment_id"], proposed, persist=False)
+            ticket = assistant.conversations.issue_preview(
+                incident_id, detail["experiment_id"], proposed,
+                saved["source_integrity_sha256"])
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+        # The response exposes the real frozen request to the local owner for inspection.
+        return {"incident_id": incident_id, "experiment_id": detail["experiment_id"],
+                "approval": ticket, "preview": saved, "requires_approval": True,
+                "automatic": False, "independent_sample": False}
+
+    @app.post("/api/assistant/incidents/{incident_id}/adjustment/authorize", status_code=202)
+    def assistant_adjustment_authorize(incident_id: str, payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"approval_token", "approved"} or payload["approved"] is not True:
+            raise HTTPException(422, "Revise a prévia e confirme approved=true com seu token.")
+        if not execution_live:
+            raise HTTPException(403, "Chamadas reais estão desabilitadas.")
+        detail = incident_detail(incident_id)
+        plan = detail["recovery"]
+        if not plan["allowed"] or plan["action"] != "preview_adjustment":
+            raise HTTPException(409, "O critério não permite ajuste neste momento.")
+        seal = root / "experiments" / detail["experiment_id"] / "integrity.json"
+        try:
+            expid, approved = assistant.conversations.consume_preview(
+                incident_id, payload["approval_token"], digest(seal))
+            if expid != detail["experiment_id"]:
+                raise ValueError("A prévia não corresponde a este experimento.")
+            if approved.get("observation_id") != detail.get("observation_id"):
+                raise ValueError("A observação original não corresponde à prévia.")
+            saved, spec = adjustments.prepare(expid, approved)
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            raise HTTPException(409, local_settings.redact(str(exc))) from exc
+        adjustments.start(saved, spec)
+        try:
+            incidents.record_action(incident_id, event="assistant.adjustment_requested",
+                                    payload={"adjustment_id": saved["id"]})
+        except Exception:
+            logger.exception("Falha ao auditar ajuste %s do Assistant", saved["id"])
+        return {"incident_id": incident_id, "experiment_id": expid,
+                "adjustment_id": saved["id"], "status": "accepted",
+                "independent_sample": False}
 
     @app.get("/api/notes")
     def notes():
