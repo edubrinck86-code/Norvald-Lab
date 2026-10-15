@@ -119,7 +119,7 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
             raise HTTPException(403, "O Assistant não executa operações destrutivas.")
 
         try:
-            current, fresh = plans.claim(plan_id, evidence_sha256=evidence)
+            current, fresh = plans.claim(plan_id, evidence_sha256=evidence, automatic=True)
         except EmergencyStop as exc:
             raise HTTPException(423, str(exc)) from exc
         except ValueError as exc:
