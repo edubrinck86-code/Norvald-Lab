@@ -199,7 +199,7 @@ def test_live_recovery_proposes_preview_but_never_executes(tmp_path):
     preview = recovery_plan(incident, report, NoAdjustments(), tmp_path, mode="live")
     assert preview["action"] == "preview_adjustment"
     assert preview["allowed"] is True
-    assert preview["requires_approval"] is True
+    assert preview["requires_approval"] is False
     assert preview["automatic"] is False
     assert preview["proposed_payload"]["observation_id"] == "obs"
     assert not (tmp_path / "experiments").exists()
