@@ -1,8 +1,8 @@
-"""Typed, read-only tools for the native Lab Assistant.
+"""Typed query and plan-staging tools for the native Lab Assistant.
 
-The LLM may discover and invoke only the Lab's whitelisted query catalogue.
+The LLM may discover and invoke only the Lab's whitelisted query or plan-creation catalogue.
 It cannot access arbitrary routes, filesystem paths, credentials, deletion,
-writes, experiment execution or adjustments through this interface.
+experimental execution or destructive changes through this interface.
 """
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ def definitions():
     return [
         ToolDefinition(
             name="list_operations",
-            description="List permitted read-only Norvald Lab operations and their purposes.",
+            description="List permitted safe Norvald Lab operations and their purposes.",
             parameters={"type": "object", "properties": {}, "additionalProperties": False}),
         ToolDefinition(
             name="describe_operation",
@@ -22,7 +22,7 @@ def definitions():
                 "name": {"type": "string"}}, "required": ["name"], "additionalProperties": False}),
         ToolDefinition(
             name="call_operation",
-            description="Execute one whitelisted read-only Lab query, never a write.",
+            description="Execute one whitelisted Lab consultation or plan preparation (no execution).",
             parameters={"type": "object", "properties": {
                 "name": {"type": "string"},
                 "input": {"type": "object", "additionalProperties": True}},
