@@ -28,6 +28,8 @@ from norvald_lab.lab_operations import build_read_catalogue
 from norvald_lab.criterion_incidents import CriterionIncidents
 from norvald_lab.criterion_recovery import recovery_plan
 from norvald_lab.lab_assistant import LabAssistant
+from norvald_lab.assistant_design import draft_spec
+from norvald_lab.assistant_comparison import compare_experiments
 from norvald_lab.assistant_plans import AssistantPlans, EmergencyStop
 from norvald_lab.assistant_plan_routes import plan_router
 from norvald_lab.storage import digest
@@ -388,6 +390,33 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     @app.post("/api/criteria/incidents/{incident_id}/escalate")
     def escalate_criterion_incident(incident_id: str, payload: dict):
         return record_owner_decision(incident_id, payload, "escalated")
+
+    @app.post("/api/assistant/spec/draft")
+    async def assistant_draft_spec(payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"goal"}:
+            raise HTTPException(422, "Informe somente goal.")
+        if not execution_live:
+            raise HTTPException(403, "Habilite o modelo operador para propor um Spec.")
+        try:
+            return await draft_spec(assistant=assistant, runner=runner,
+                                    goal=payload["goal"], template=experiment_template(),
+                                    emergency=assistant_plans)
+        except PermissionError as exc:
+            raise HTTPException(423, str(exc)) from exc
+        except (ValueError, TypeError, KeyError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+        except Exception as exc:
+            logger.exception("Falha na proposta de Spec pelo Assistant")
+            raise HTTPException(502, "O modelo operador não conseguiu gerar a proposta.") from exc
+
+    @app.get("/api/assistant/compare")
+    def assistant_compare(left: str, right: str):
+        try:
+            return compare_experiments(root, left, right)
+        except FileNotFoundError as exc:
+            raise HTTPException(404, "Um dos experimentos não está disponível.") from exc
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            raise HTTPException(409, local_settings.redact(str(exc))) from exc
 
     @app.get("/api/assistant/settings")
     def assistant_settings():
