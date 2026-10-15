@@ -2,7 +2,7 @@ import { useEffect, useRef, type ReactNode, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
-export function Modal({ title, onClose, children, className = '', style }: { title: string; onClose(): void; children: ReactNode; className?: string; style?: CSSProperties }) {
+export function Modal({ title, onClose, children, className = '', overlayClassName = '', style }: { title: string; onClose(): void; children: ReactNode; className?: string; overlayClassName?: string; style?: CSSProperties }) {
   const panel = useRef<HTMLDivElement>(null);
   const close = useRef(onClose);
   close.current = onClose;
@@ -28,7 +28,7 @@ export function Modal({ title, onClose, children, className = '', style }: { tit
     document.addEventListener('keydown', key);
     return () => { document.body.style.overflow = oldOverflow; document.removeEventListener('keydown', key); previous?.focus(); };
   }, []);
-  return createPortal(<div className="modal-scrim" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
+  return createPortal(<div className={"modal-scrim " + overlayClassName} onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
     <div ref={panel} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title} style={style} className={'modal-panel ' + className}>
       <header className="modal-header"><h2>{title}</h2><button className="icon-button" onClick={onClose} aria-label="Fechar"><X size={18} /></button></header>
       {children}
