@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -22,6 +23,19 @@ from norvald_lab.models import ModelCatalog
 from norvald_lab.cli import demo_spec, derive_spec
 from norvald_lab.experiment_management import ExperimentManagement, experiment_template
 from norvald_lab.adjustments import AdjustmentStore
+from norvald_lab.criteria import evaluate_spec, evaluate_snapshot
+from norvald_lab.lab_operations import build_read_catalogue
+from norvald_lab.criterion_incidents import CriterionIncidents
+from norvald_lab.criterion_recovery import recovery_plan
+from norvald_lab.lab_assistant import LabAssistant
+from norvald_lab.assistant_design import draft_spec
+from norvald_lab.assistant_comparison import compare_experiments
+from norvald_lab.assistant_reports import experiment_report
+from norvald_lab.assistant_plans import AssistantPlans, EmergencyStop
+from norvald_lab.assistant_plan_routes import plan_router
+from norvald_lab.assistant_automation import LabAutomation
+from norvald_lab.assistant_destructive import DestructiveRequests
+from norvald_lab.storage import digest
 from uuid import uuid4
 
 
@@ -37,10 +51,32 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     workbooks = WorkbookStore(root)
     management = ExperimentManagement(root)
     adjustments = AdjustmentStore(root)
+    incidents = CriterionIncidents(root)
+    assistant = LabAssistant(root, local_settings)
+    assistant_plans = AssistantPlans(root)
+    automation = LabAutomation(root)
+    destructive = DestructiveRequests(root, management)
+    logger = logging.getLogger(__name__)
 
     @asynccontextmanager
     async def lifespan(app):
+        # Ambiguous actions from a prior process must be inspected, never replayed.
+        assistant_plans.recover_interrupted()
+        automation.recover_interrupted()
+        async def observe_loop():
+            # Local-only periodic reconciliation; outages never invalidate RAW.
+            while True:
+                await asyncio.sleep(10)
+                try:
+                    await app.state.automation_tick()
+                except asyncio.CancelledError:
+                    raise
+                except Exception:
+                    logger.exception("Falha no ciclo de observação automática do Lab")
+        watcher = asyncio.create_task(observe_loop())
         yield
+        watcher.cancel()
+        await asyncio.gather(watcher, return_exceptions=True)
         tasks = list(jobs.values()) + list(adjustments.jobs.values())
         for task in tasks:
             task.cancel()
@@ -49,6 +85,10 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     app = FastAPI(title="Norvald Lab", version="0.2.0", lifespan=lifespan)
     app.state.jobs = jobs
     app.state.adjustment_jobs = adjustments.jobs
+    app.state.criterion_incidents = incidents
+    app.state.lab_assistant = assistant
+    app.state.assistant_plans = assistant_plans
+    app.state.assistant_automation = automation
     from norvald_lab.google_account import GoogleAccount, account_router
     account = GoogleAccount(root, port=oauth_port)
     app.include_router(account_router(account))
@@ -56,12 +96,15 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
 
     @app.middleware("http")
     async def settings_origin(request: Request, call_next):
-        if request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments", "/api/account/google")) and not request.url.path.endswith('/callback'):
+        protected = request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments", "/api/account/google", "/api/criteria", "/api/assistant")) or (
+            request.url.path.startswith("/api/experiments/") and (
+                request.url.path.endswith("/criteria") or request.url.path.endswith("/criteria/reconcile")))
+        if protected and not request.url.path.endswith('/callback'):
             origin = request.headers.get("origin")
             if (origin and origin.rstrip("/") != str(request.base_url).rstrip("/")) or request.headers.get('sec-fetch-site') == 'cross-site':
                 return JSONResponse({"detail": "Configurações só aceitam pedidos da própria interface local."}, status_code=403)
         response = await call_next(request)
-        if request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments", "/api/account/google")):
+        if protected:
             response.headers["Cache-Control"] = "no-store"
         return response
 
@@ -104,6 +147,11 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
             return {"spec": prepared.spec, "requests": [json.loads(r) for r in prepared.requests_json], "fingerprint": prepared.condition_fingerprint, "live_enabled": execution_live}
         except (ValueError, KeyError, TypeError, OSError) as exc:
             raise HTTPException(422, str(exc)) from exc
+
+    @app.post("/api/criteria/spec")
+    def inspect_spec_criteria(spec: dict):
+        """Read-only preflight: a rejected criterion is a result, not a write."""
+        return evaluate_spec(runner, spec)
 
     @app.get("/api/experiment-template")
     def empty_template():
@@ -164,7 +212,13 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         authorized_live = execution_live
         async def run():
             try:
-                await runner.run(prepared, allow_live=authorized_live)
+                result = await runner.run(prepared, allow_live=authorized_live)
+                # A failure in the auxiliary observer ledger never changes the
+                # sealed experimental result or the success of the collection.
+                try:
+                    incidents.reconcile(expid, evaluate_snapshot(snapshot(root, expid, result["status"])))
+                except Exception:
+                    logger.exception("Falha ao registrar incidentes da coleta %s", expid)
             except Exception as exc:
                 failures[expid] = local_settings.redact(str(exc))
             finally:
@@ -303,6 +357,163 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         except (ValueError, KeyError) as exc:
             raise HTTPException(409, "Registro inconsistente; confira os arquivos originais.") from exc
 
+    @app.get("/api/experiments/{experiment_id}/criteria")
+    def experiment_criteria(experiment_id: str):
+        """Evaluate stored original observations without altering sealed data."""
+        return evaluate_snapshot(observe(experiment_id))
+
+    @app.post("/api/experiments/{experiment_id}/criteria/reconcile")
+    def reconcile_experiment_criteria(experiment_id: str):
+        """Explicit, idempotent persistence of violations; no LLM or RAW writes."""
+        report = experiment_criteria(experiment_id)
+        return incidents.reconcile(experiment_id, report)
+
+    @app.get("/api/criteria/incidents")
+    def list_criterion_incidents(experiment_id: str | None = None,
+                                 status: str | None = None, limit: int = 100):
+        try:
+            return incidents.list(experiment_id=experiment_id, status=status, limit=limit)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    def incident_detail(incident_id: str):
+        try:
+            incident = incidents.get(incident_id)
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        report = experiment_criteria(incident["experiment_id"])
+        # If the source is not currently verified, a recovery plan is blocked.
+        state = observe(incident["experiment_id"])
+        mode = (state.get("spec") or {}).get("mode") if (
+            (state.get("integrity") or {}).get("valid") and not state.get("provisional")) else None
+        return incident | {"recovery": recovery_plan(incident, report, adjustments, root, mode=mode)}
+
+    @app.get("/api/criteria/incidents/{incident_id}")
+    def get_criterion_incident(incident_id: str):
+        return incident_detail(incident_id)
+
+    def record_owner_decision(incident_id: str, payload: dict, state: str):
+        if not isinstance(payload, dict) or set(payload) != {"note"}:
+            raise HTTPException(422, "Informe somente a justificativa da decisão.")
+        try:
+            incidents.mark(incident_id, status=state, note=payload["note"])
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+        return incident_detail(incident_id)
+
+    @app.post("/api/criteria/incidents/{incident_id}/acknowledge")
+    def acknowledge_criterion_incident(incident_id: str, payload: dict):
+        return record_owner_decision(incident_id, payload, "acknowledged")
+
+    @app.post("/api/criteria/incidents/{incident_id}/escalate")
+    def escalate_criterion_incident(incident_id: str, payload: dict):
+        return record_owner_decision(incident_id, payload, "escalated")
+
+    @app.post("/api/assistant/spec/draft")
+    async def assistant_draft_spec(payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"goal"}:
+            raise HTTPException(422, "Informe somente goal.")
+        if not execution_live:
+            raise HTTPException(403, "Habilite o modelo operador para propor um Spec.")
+        try:
+            return await draft_spec(assistant=assistant, runner=runner,
+                                    goal=payload["goal"], template=experiment_template(),
+                                    emergency=assistant_plans)
+        except PermissionError as exc:
+            raise HTTPException(423, str(exc)) from exc
+        except (ValueError, TypeError, KeyError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+        except Exception as exc:
+            logger.exception("Falha na proposta de Spec pelo Assistant")
+            raise HTTPException(502, "O modelo operador não conseguiu gerar a proposta.") from exc
+
+    @app.get("/api/assistant/reports/{experiment_id}")
+    def assistant_experiment_report(experiment_id: str):
+        try:
+            return experiment_report(root, experiment_id, incidents=incidents)
+        except FileNotFoundError as exc:
+            raise HTTPException(404, "Experimento não encontrado.") from exc
+        except (ValueError, KeyError, OSError, TypeError) as exc:
+            raise HTTPException(409, local_settings.redact(str(exc))) from exc
+
+    @app.get("/api/assistant/compare")
+    def assistant_compare(left: str, right: str):
+        try:
+            return compare_experiments(root, left, right)
+        except FileNotFoundError as exc:
+            raise HTTPException(404, "Um dos experimentos não está disponível.") from exc
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            raise HTTPException(409, local_settings.redact(str(exc))) from exc
+
+    @app.get("/api/assistant/settings")
+    def assistant_settings():
+        return assistant.read_settings()
+
+    @app.put("/api/assistant/settings")
+    def save_assistant_settings(payload: dict):
+        try:
+            return assistant.save_settings(payload)
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.get("/api/assistant/conversation")
+    def assistant_general_conversation():
+        return {"messages": assistant.conversations.history("assistant-general",
+                                                             limit=100000000)}
+
+    @app.post("/api/assistant/chat")
+    async def assistant_general_chat(payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"text"}:
+            raise HTTPException(422, "Informe somente text.")
+        try:
+            return await assistant.general_reply(
+                payload["text"], live_enabled=execution_live,
+                catalogue=app.state.lab_operations, emergency=assistant_plans)
+        except PermissionError as exc:
+            raise HTTPException(403, str(exc)) from exc
+        except EmergencyStop as exc:
+            raise HTTPException(423, str(exc)) from exc
+        except (ValueError, KeyError, TypeError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+        except Exception as exc:
+            logger.exception("Falha na conversa geral do Assistant")
+            raise HTTPException(502, "O modelo operador falhou na conversa geral.") from exc
+
+    @app.get("/api/assistant/incidents/{incident_id}/conversation")
+    def assistant_conversation(incident_id: str):
+        incident_detail(incident_id)  # Existing and accessible?
+        return {"incident_id": incident_id,
+                "messages": assistant.conversations.history(incident_id)}
+
+    @app.post("/api/assistant/incidents/{incident_id}/message")
+    async def assistant_message(incident_id: str, payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"text"}:
+            raise HTTPException(422, "Informe somente text.")
+        detail = incident_detail(incident_id)
+        try:
+            return await assistant.reply(
+                detail, payload["text"], live_enabled=execution_live,
+                catalogue=app.state.lab_operations, emergency=assistant_plans)
+        except PermissionError as exc:
+            raise HTTPException(403, str(exc)) from exc
+        except EmergencyStop as exc:
+            raise HTTPException(423, str(exc)) from exc
+        except (ValueError, KeyError, TypeError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+        except Exception as exc:
+            logger.exception("Não foi possível responder na conversa do Lab Assistant")
+            raise HTTPException(502, "A resposta do modelo operador falhou. A pergunta não foi registrada.") from exc
+
+    automation_router = plan_router(
+        root, runner, adjustments, incidents, local_settings, incident_detail,
+        execute, lambda: execution_live, logger, assistant_plans, automation, destructive)
+    app.state.automation_tick = automation_router.tick
+    app.include_router(automation_router)
+
     @app.get("/api/notes")
     def notes():
         return notebook.list()
@@ -391,6 +602,21 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         if not (web / "index.html").exists():
             raise HTTPException(503, "Inicie ./scripts/start.sh para preparar e abrir a interface.")
         return FileResponse(web / "index.html")
+
+    # Internal tool catalogue. Do not expose generic call_operation over HTTP
+    # before an authenticated, authorized Assistant interface exists.
+    app.state.lab_operations = build_read_catalogue(
+        runner, experiment_template, experiment_criteria,
+        list_incidents=incidents.list, get_incident=incident_detail,
+        list_experiments=experiments, get_experiment_status=experiment,
+        plan_experiment=lambda spec: automation_router.plan_experiment({"spec": spec}),
+        plan_adjustment=lambda incident_id: automation_router.plan_adjustment(incident_id, {}),
+        derive=lambda source_id, new_id, exposure: derive_spec(
+            root, source_id, new_id, exposure),
+        compare=lambda left, right: compare_experiments(root, left, right),
+        execute_plan=lambda plan_id: automation_router.execute_plan(plan_id, {}),
+        presented=assistant_plans.was_presented,
+        report=lambda experiment_id: experiment_report(root, experiment_id, incidents=incidents))
 
     if not enable_demo:
         app.router.routes = [route for route in app.router.routes if getattr(route, "path", "") not in {"/api/demo", "/api/demo-template"}]
