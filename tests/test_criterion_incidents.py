@@ -153,3 +153,56 @@ def test_corrupted_original_blocks_recovery_but_keeps_audit(tmp_path, monkeypatc
         assert len(reconciled["opened"]) == 1
         assert "lab.dataset.integrity" in {
             i["criterion_id"] for i in client.get("/api/criteria/incidents").json()}
+
+def test_incomplete_run_is_not_mislabeled_complete(tmp_path, monkeypatch):
+    original = DemoProvider.execute
+
+    async def sometimes_fails(self, request, model):
+        if request.agent_id == "analista-2":
+            raise RuntimeError("Falha simulada de execução.")
+        return await original(self, request, model)
+
+    monkeypatch.setattr(DemoProvider, "execute", sometimes_fails)
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
+        response = client.post("/api/experiments", json=demo_spec("incident-incomplete"))
+        assert response.status_code == 202
+        settle(client)
+        report = client.get("/api/experiments/incident-incomplete/criteria").json()
+        assert next(c for c in report["evaluations"]
+                    if c["criterion_id"] == "lab.experiment.complete")["status"] == "not_met"
+        issues = client.get("/api/criteria/incidents?experiment_id=incident-incomplete").json()
+        assert any(i["criterion_id"] == "lab.experiment.complete" and
+                   i["validator_code"] == "incomplete" for i in issues)
+        assert verify_experiment(tmp_path, "incident-incomplete")["valid"]
+
+
+def test_live_recovery_proposes_preview_but_never_executes(tmp_path):
+    from norvald_lab.criterion_recovery import recovery_plan
+
+    class NoAdjustments:
+        def list(self, _):
+            return []
+
+    incident = {
+        "id": "ci-test", "status": "open", "experiment_id": "one",
+        "criterion_id": "arof.contribution.fully_valid",
+        "criterion_version": "1", "observation_id": "obs", "participant_id": "a",
+        "run_id": "r0001", "validator_code": "partial",
+    }
+    report = {"evaluations": [
+        {"criterion_id": "lab.dataset.integrity", "status": "met"},
+        {"criterion_id": "lab.experiment.complete", "status": "met"},
+        {"criterion_id": "arof.contribution.fully_valid", "criterion_version": "1",
+         "status": "not_met",
+         "evidence": {"observation_id": "obs", "participant_id": "a", "run_id": "r0001"}},
+    ]}
+    preview = recovery_plan(incident, report, NoAdjustments(), tmp_path, mode="live")
+    assert preview["action"] == "preview_adjustment"
+    assert preview["allowed"] is True
+    assert preview["requires_approval"] is True
+    assert preview["automatic"] is False
+    assert preview["proposed_payload"]["observation_id"] == "obs"
+    assert not (tmp_path / "experiments").exists()
+    refused = recovery_plan(incident, report, NoAdjustments(), tmp_path, mode="demo")
+    assert refused["action"] == "new_collection_review"
+    assert not refused["allowed"]
