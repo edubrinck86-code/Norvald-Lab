@@ -153,3 +153,17 @@
   .nca-composer-foot { font-size:9px; }
 }
 @media(prefers-reduced-motion:reduce) { .nca-pulse { animation:none; } }
+
+/* The provider catalogue is portalled to document.body; it must stack above
+   the floating chat (z-index 1103) and own its own keyboard interactions. */
+.modal-scrim.nca-model-modal { z-index: 1110; }
+.nca-model-selection { display:flex; align-items:end; flex-wrap:wrap; gap:12px; }
+.nca-model-selection > label { flex:1; min-width:min(100%,220px); }
+.nca-model-selection > .button { flex-shrink:0; }
+.nca-model-selection input { width:100%; }
+@media (max-width:600px) {
+  .nca-model-selection { align-items:stretch; }
+  .nca-model-selection > label, .nca-model-selection > .button { width:100%; }
+  .nca-model-modal { padding:10px; }
+  .nca-model-modal .modal-panel { width:100%; height:min(90dvh,900px); }
+}
