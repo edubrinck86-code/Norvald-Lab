@@ -107,12 +107,16 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
 
     @router.get("/plans")
     def list_plans():
-        return plans.list()
+        rows = plans.list()
+        plans.mark_presented([row["id"] for row in rows])
+        return rows
 
     @router.get("/plans/{plan_id}")
     def read_plan(plan_id: str):
         try:
-            return plans.get(plan_id)
+            detail = plans.get(plan_id)
+            plans.mark_presented([detail["id"]])
+            return detail
         except FileNotFoundError as exc:
             raise HTTPException(404, str(exc)) from exc
         except ValueError as exc:
@@ -333,6 +337,7 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
 
     router.tick = tick
     router.plan_experiment = plan_experiment
+    router.execute_plan = execute_plan
     router.plan_adjustment = plan_adjustment
 
     return router
