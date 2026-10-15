@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { AlertCircle, Bot, CheckCircle2, ClipboardCheck, MessageCircle, RefreshCw, Send, ShieldCheck } from 'lucide-react';
+import { AlertCircle, Bot, CheckCircle2, ClipboardCheck, MessageCircle, RefreshCw, Send, ShieldAlert } from 'lucide-react';
 import { api, type LabSettings } from '../api';
 
 type Issue = {
@@ -15,15 +15,15 @@ type Recovery = {
 };
 type Detail = Issue & { history: { seq: number; event: string; at: string; payload: Record<string, unknown> }[]; recovery: Recovery };
 type Message = { seq: number; role: string; content: string; provider: string; model: string; tokens: number | null; at: string };
-type AssistantSettings = { kind: string; model: string; max_output_tokens: number; configured: boolean };
+type AssistantSettings = { kind: string; model: string; configured: boolean };
 type Preview = {
-  incident_id: string; approval: { approval_token: string; expires_at: string };
+  plan: { id: string; status: string; action: string };
   preview: { request: { instructions: string; user_message: string }; diagnostic: { code: string; message: string; details: string[] } };
   requires_approval: boolean;
 };
 
 const explanation: Record<string, string> = {
-  preview_adjustment: 'Um ajuste separado pode ser revisado e autorizado. Não substitui a observação original.',
+  preview_adjustment: 'Um ajuste separado pode ser planejado e executado. Não substitui a observação original.',
   new_collection_review: 'Avalie uma nova coleta independente; não é permitido completar artificialmente o RAW.',
   investigate_integrity: 'A integridade precisa ser investigada; a recuperação está bloqueada.',
   review_manually: 'Não há ajuste automático admissível para esta ocorrência.',
@@ -36,13 +36,13 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment }: {
   const [selected, setSelected] = useState('');
   const [detail, setDetail] = useState<Detail | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [settings, setSettings] = useState<AssistantSettings>({ kind: '', model: '', max_output_tokens: 1500, configured: false });
+  const [settings, setSettings] = useState<AssistantSettings>({ kind: '', model: '', configured: false });
   const [connections, setConnections] = useState<LabSettings | null>(null);
   const [question, setQuestion] = useState('');
   const [instruction, setInstruction] = useState('');
   const [limit, setLimit] = useState('');
   const [preview, setPreview] = useState<Preview | null>(null);
-  const [confirmed, setConfirmed] = useState(false);
+  const [emergency, setEmergency] = useState<{ stopped: boolean; reason: string }>({ stopped: false, reason: '' });
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -54,6 +54,7 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment }: {
       api<LabSettings>('/api/settings'),
     ]);
     setIssues(found); setSettings(conf); setConnections(all);
+    setEmergency(await api<{ stopped: boolean; reason: string }>('/api/assistant/emergency'));
     setSelected(previous => previous && found.some(x => x.id === previous)
       ? previous
       : (found.find(x => x.experiment_id === selectedExperiment)?.id ?? found[0]?.id ?? ''));
@@ -63,7 +64,7 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment }: {
   useEffect(() => {
     if (!selected) { setDetail(null); setMessages([]); return; }
     let active = true;
-    setPreview(null); setConfirmed(false); setError(''); setNotice('');
+    setPreview(null); setError(''); setNotice('');
     Promise.all([
       api<Detail>('/api/criteria/incidents/' + selected),
       api<{ messages: Message[] }>('/api/assistant/incidents/' + selected + '/conversation'),
@@ -92,7 +93,7 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment }: {
     try {
       const chosen = await api<AssistantSettings>('/api/assistant/settings', {
         method: 'PUT',
-        body: JSON.stringify({ kind: settings.kind, model: settings.model, max_output_tokens: settings.max_output_tokens }),
+        body: JSON.stringify({ kind: settings.kind, model: settings.model }),
       });
       setSettings(chosen); setNotice('Modelo operador configurado. Não altera os modelos dos experimentos.');
     } catch (reason) { setError(String(reason)); }
@@ -113,9 +114,9 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment }: {
 
   async function inspectAdjustment() {
     if (!detail) return;
-    setBusy('preview'); setError(''); setNotice(''); setPreview(null); setConfirmed(false);
+    setBusy('preview'); setError(''); setNotice(''); setPreview(null);
     try {
-      const result = await api<Preview>('/api/assistant/incidents/' + detail.id + '/adjustment/preview', {
+      const result = await api<Preview>('/api/assistant/incidents/' + detail.id + '/adjustment/plan', {
         method: 'POST',
         body: JSON.stringify({ instruction, max_tokens: limit === '' ? null : Number(limit) }),
       });
@@ -124,17 +125,31 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment }: {
     finally { setBusy(''); }
   }
 
-  async function authorize() {
-    if (!detail || !preview || !confirmed) return;
-    setBusy('authorize'); setError('');
+  async function executePlan() {
+    if (!detail || !preview || emergency.stopped) return;
+    setBusy('execute'); setError('');
     try {
-      const result = await api<{ adjustment_id: string }>('/api/assistant/incidents/' + detail.id + '/adjustment/authorize', {
-        method: 'POST', body: JSON.stringify({ approved: true, approval_token: preview.approval.approval_token }),
-      });
-      setNotice('Ajuste ' + result.adjustment_id + ' autorizado e iniciado. O RAW original permanece intacto.');
-      setPreview(null); setConfirmed(false);
-      setDetail(await api<Detail>('/api/criteria/incidents/' + detail.id));
-    } catch (reason) { setPreview(null); setConfirmed(false); setError(String(reason)); }
+      const result = await api<{ status: string; result: { adjustment_id: string } | null }>(
+        '/api/assistant/plans/' + preview.plan.id + '/execute', { method: 'POST', body: '{}' });
+      if (result.status === 'accepted' && result.result) {
+        setNotice('Ajuste ' + result.result.adjustment_id + ' iniciado. O RAW original permanece intacto.');
+        setDetail(await api<Detail>('/api/criteria/incidents/' + detail.id));
+      } else {
+        setNotice('Estado do plano: ' + result.status + '.');
+      }
+      setPreview(null);
+    } catch (reason) { setError(String(reason)); }
+    finally { setBusy(''); }
+  }
+
+  async function emergencyAction() {
+    setBusy('emergency'); setError('');
+    try {
+      const next = await api<{ stopped: boolean; reason: string }>(
+        '/api/assistant/emergency/' + (emergency.stopped ? 'resume' : 'stop'),
+        { method: 'POST', body: '{}' });
+      setEmergency(next);
+    } catch (reason) { setError(String(reason)); }
     finally { setBusy(''); }
   }
 
@@ -155,7 +170,7 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment }: {
   return <section className="lab-assistant-view">
     <div className="section-heading"><div><span className="eyebrow">Norvald Lab Assistant</span>
       <h2>Critérios, incidentes e recuperação</h2>
-      <p>Converse sobre uma ocorrência verificada. Ajustes dependem de uma prévia e da sua autorização explícita.</p>
+      <p>Converse sobre uma ocorrência verificada. O planejamento é apresentado antes da execução. Permissões especiais são reservadas a ações destrutivas.</p>
     </div><Bot size={28} /></div>
     {error ? <p role="alert" className="error-banner">{error}</p> : null}
     {notice ? <p role="status" className="assistant-notice"><CheckCircle2 size={16} />{notice}</p> : null}
@@ -166,8 +181,18 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment }: {
         {connections?.connections.map(c => <option key={c.kind} value={c.kind}>{c.kind} {c.has_key || c.kind === 'ollama' ? '' : '(sem chave)'}</option>)}
       </select></label>
       <label>Modelo<input value={settings.model} maxLength={200} placeholder="ID do modelo" onChange={event => setSettings(current => ({ ...current, model: event.target.value }))} /></label>
-      <label>Máx. tokens<input type="number" min={256} max={8000} value={settings.max_output_tokens} onChange={event => setSettings(current => ({ ...current, max_output_tokens: Number(event.target.value) }))} /></label>
+
       <button className="button secondary" disabled={!!busy || !settings.model.trim() || !settings.kind} onClick={() => { void saveModel(); }}>Salvar operador</button>
+    </div>
+    <div className="form-card assistant-emergency">
+      <ShieldAlert size={18} />
+      <div><strong>Parada emergencial</strong><small>{emergency.stopped
+        ? emergency.reason || 'Novas execuções suspensas.'
+        : 'Interrompe novas execuções em caso de looping. Não altera RAW nem trabalhos já fechados.'}</small></div>
+      <button className="button secondary" disabled={!!busy}
+        onClick={() => { void emergencyAction(); }}>
+        {emergency.stopped ? 'Retomar operações' : 'Interromper novas execuções'}
+      </button>
     </div>
     <div className="assistant-columns">
       <aside className="assistant-issues">
@@ -208,17 +233,19 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment }: {
             <p>{detail.recovery.reason}</p>
             {detail.recovery.revalidations.length ? <div className="assistant-attempts">{detail.recovery.revalidations.map(item => <p key={item.adjustment_id}><strong>{item.adjustment_id}</strong> · {item.status} · {item.criterion_status} {item.integrity_verified && item.source_link_verified ? '· íntegro e vinculado' : '· sem confirmação integral'}</p>)}</div> : null}
             {detail.recovery.allowed && detail.recovery.proposed_payload ? <>
-              <label>Orientação para o ajuste<textarea rows={5} maxLength={20000} value={instruction} onChange={event => { setInstruction(event.target.value); setPreview(null); setConfirmed(false); }} /></label>
-              <label>Máximo de tokens (opcional)<input type="number" min={1} max={200000} value={limit} onChange={event => { setLimit(event.target.value); setPreview(null); setConfirmed(false); }} placeholder="Manter limite original" /></label>
-              <button className="button secondary" disabled={!!busy || !instruction.trim()} onClick={() => { void inspectAdjustment(); }}><ClipboardCheck size={15} />Examinar pedido antes de autorizar</button>
+              <label>Orientação para o ajuste<textarea rows={5} maxLength={20000} value={instruction} onChange={event => { setInstruction(event.target.value); setPreview(null); }} /></label>
+              <label>Máximo de tokens (opcional)<input type="number" min={1} max={200000} value={limit} onChange={event => { setLimit(event.target.value); setPreview(null); }} placeholder="Manter limite original" /></label>
+              <button className="button secondary" disabled={!!busy || !instruction.trim()} onClick={() => { void inspectAdjustment(); }}><ClipboardCheck size={15} />Apresentar plano de ajuste</button>
               {preview ? <div className="assistant-preview">
                 <h4>Prévia da chamada real</h4>
                 <p><strong>Diagnóstico:</strong> {preview.preview.diagnostic.code} · {preview.preview.diagnostic.message}</p>
                 <details><summary>Instruções completas que serão enviadas</summary><pre>{preview.preview.request.instructions}</pre></details>
                 <details><summary>Pergunta que será enviada</summary><pre>{preview.preview.request.user_message}</pre></details>
-                <p className="muted">Autorização válida até {new Date(preview.approval.expires_at).toLocaleString('pt-BR')}. Uma chamada adicional poderá consumir tokens.</p>
-                <label className="assistant-confirm"><input type="checkbox" checked={confirmed} onChange={event => setConfirmed(event.target.checked)} />Autorizo esta chamada paga de ajuste independente, preservando o RAW original.</label>
-                <button className="button" disabled={!confirmed || !!busy} onClick={() => { void authorize(); }}><ShieldCheck size={15} />{busy === 'authorize' ? 'Autorizando…' : 'Autorizar e executar ajuste'}</button>
+                <p className="muted">Plano preparado. A execução não exige aprovação individual para ações não destrutivas. Ajustes continuam separados da evidência original.</p>
+                <button className="button" disabled={!!busy || emergency.stopped}
+                  onClick={() => { void executePlan(); }}>
+                  <CheckCircle2 size={15} />{busy === 'execute' ? 'Executando…' : 'Executar plano apresentado'}
+                </button>
               </div> : null}
             </> : <p className="muted">Não há chamada automática disponível para este critério.</p>}
             <details><summary>Histórico de auditoria ({detail.history.length})</summary><pre>{JSON.stringify(detail.history, null, 2)}</pre></details>
