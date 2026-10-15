@@ -22,5 +22,5 @@ jobs:
         run: python -m pip install -e ".[dev]"
       - name: Verify new criteria and existing experimental invariants
         run: |
-          python -m pytest -q tests/test_lab_criteria.py tests/test_criterion_incidents.py tests/test_lab_assistant.py tests/test_assistant_plans.py tests/test_assistant_advanced.py tests/test_assistant_autonomy.py
+          python -m pytest -q tests/test_lab_criteria.py tests/test_criterion_incidents.py tests/test_lab_assistant.py tests/test_assistant_plans.py tests/test_assistant_advanced.py tests/test_assistant_autonomy.py tests/test_assistant_security.py
           python -m pytest -q tests/test_contribution_check.py tests/test_adjustments.py tests/test_lab.py tests/test_observer.py
