@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -24,6 +25,8 @@ from norvald_lab.experiment_management import ExperimentManagement, experiment_t
 from norvald_lab.adjustments import AdjustmentStore
 from norvald_lab.criteria import evaluate_spec, evaluate_snapshot
 from norvald_lab.lab_operations import build_read_catalogue
+from norvald_lab.criterion_incidents import CriterionIncidents
+from norvald_lab.criterion_recovery import recovery_plan
 from uuid import uuid4
 
 
@@ -39,6 +42,8 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     workbooks = WorkbookStore(root)
     management = ExperimentManagement(root)
     adjustments = AdjustmentStore(root)
+    incidents = CriterionIncidents(root)
+    logger = logging.getLogger(__name__)
 
     @asynccontextmanager
     async def lifespan(app):
@@ -51,6 +56,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     app = FastAPI(title="Norvald Lab", version="0.2.0", lifespan=lifespan)
     app.state.jobs = jobs
     app.state.adjustment_jobs = adjustments.jobs
+    app.state.criterion_incidents = incidents
     from norvald_lab.google_account import GoogleAccount, account_router
     account = GoogleAccount(root, port=oauth_port)
     app.include_router(account_router(account))
@@ -59,7 +65,8 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     @app.middleware("http")
     async def settings_origin(request: Request, call_next):
         protected = request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments", "/api/account/google", "/api/criteria")) or (
-            request.url.path.startswith("/api/experiments/") and request.url.path.endswith("/criteria"))
+            request.url.path.startswith("/api/experiments/") and (
+                request.url.path.endswith("/criteria") or request.url.path.endswith("/criteria/reconcile")))
         if protected and not request.url.path.endswith('/callback'):
             origin = request.headers.get("origin")
             if (origin and origin.rstrip("/") != str(request.base_url).rstrip("/")) or request.headers.get('sec-fetch-site') == 'cross-site':
@@ -174,6 +181,12 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         async def run():
             try:
                 await runner.run(prepared, allow_live=authorized_live)
+                # A failure in the auxiliary observer ledger never changes the
+                # sealed experimental result or the success of the collection.
+                try:
+                    incidents.reconcile(expid, evaluate_snapshot(snapshot(root, expid, "complete")))
+                except Exception:
+                    logger.exception("Falha ao registrar incidentes da coleta %s", expid)
             except Exception as exc:
                 failures[expid] = local_settings.redact(str(exc))
             finally:
@@ -317,6 +330,57 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         """Evaluate stored original observations without altering sealed data."""
         return evaluate_snapshot(observe(experiment_id))
 
+    @app.post("/api/experiments/{experiment_id}/criteria/reconcile")
+    def reconcile_experiment_criteria(experiment_id: str):
+        """Explicit, idempotent persistence of violations; no LLM or RAW writes."""
+        report = experiment_criteria(experiment_id)
+        return incidents.reconcile(experiment_id, report)
+
+    @app.get("/api/criteria/incidents")
+    def list_criterion_incidents(experiment_id: str | None = None,
+                                 status: str | None = None, limit: int = 100):
+        try:
+            return incidents.list(experiment_id=experiment_id, status=status, limit=limit)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    def incident_detail(incident_id: str):
+        try:
+            incident = incidents.get(incident_id)
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        report = experiment_criteria(incident["experiment_id"])
+        # If the source is not currently verified, a recovery plan is blocked.
+        state = observe(incident["experiment_id"])
+        mode = (state.get("spec") or {}).get("mode") if (
+            (state.get("integrity") or {}).get("valid") and not state.get("provisional")) else None
+        return incident | {"recovery": recovery_plan(incident, report, adjustments, root, mode=mode)}
+
+    @app.get("/api/criteria/incidents/{incident_id}")
+    def get_criterion_incident(incident_id: str):
+        return incident_detail(incident_id)
+
+    def record_owner_decision(incident_id: str, payload: dict, state: str):
+        if not isinstance(payload, dict) or set(payload) != {"note"}:
+            raise HTTPException(422, "Informe somente a justificativa da decisão.")
+        try:
+            incidents.mark(incident_id, status=state, note=payload["note"])
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+        return incident_detail(incident_id)
+
+    @app.post("/api/criteria/incidents/{incident_id}/acknowledge")
+    def acknowledge_criterion_incident(incident_id: str, payload: dict):
+        return record_owner_decision(incident_id, payload, "acknowledged")
+
+    @app.post("/api/criteria/incidents/{incident_id}/escalate")
+    def escalate_criterion_incident(incident_id: str, payload: dict):
+        return record_owner_decision(incident_id, payload, "escalated")
+
     @app.get("/api/notes")
     def notes():
         return notebook.list()
@@ -409,7 +473,8 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     # Internal tool catalogue. Do not expose generic call_operation over HTTP
     # before an authenticated, authorized Assistant interface exists.
     app.state.lab_operations = build_read_catalogue(
-        runner, experiment_template, experiment_criteria)
+        runner, experiment_template, experiment_criteria,
+        list_incidents=incidents.list, get_incident=incident_detail)
 
     if not enable_demo:
         app.router.routes = [route for route in app.router.routes if getattr(route, "path", "") not in {"/api/demo", "/api/demo-template"}]
