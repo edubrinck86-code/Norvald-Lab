@@ -13,7 +13,7 @@ SCHEMA_VERSION = "norvald.lab.comparison.v1"
 def _verified(root, experiment_id):
     identifier(experiment_id, "experiment_id")
     checked = verify_experiment(root, experiment_id)
-    if not checked.get("valid"):
+    if not checked.get("valid") or checked.get("status") != "complete":
         raise ValueError("A comparação exige experimento íntegro: " + experiment_id)
     state = snapshot(root, experiment_id, "complete")
     if state.get("provisional") or state.get("status") != "complete":
