@@ -42,6 +42,7 @@ function PlanPreview({ id, threadId, onExecuted }: {
   const [error, setError] = useState('');
   const [working, setWorking] = useState(false);
   const [presented, setPresented] = useState(false);
+  const [experimentStatus, setExperimentStatus] = useState('');
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -72,6 +73,21 @@ function PlanPreview({ id, threadId, onExecuted }: {
     return () => { active = false; observer.disconnect(); };
   }, [id, plan, presented]);
 
+  useEffect(() => {
+    if (!plan || plan.action !== 'lab.experiment.start' || plan.status !== 'accepted') return;
+    let active = true;
+    const read = async () => {
+      try {
+        const result = await api<{ status: string }>(
+          '/api/experiments/' + encodeURIComponent(plan.experiment_id));
+        if (active) setExperimentStatus(result.status);
+      } catch { /* A coleta pode ainda estar sendo registrada pelo Runner. */ }
+    };
+    void read();
+    const timer = window.setInterval(() => { void read(); }, 3500);
+    return () => { active = false; window.clearInterval(timer); };
+  }, [plan?.id, plan?.action, plan?.status, plan?.experiment_id]);
+
   async function execute() {
     if (working || !plan || plan.status !== 'planned' || !presented) return;
     setWorking(true); setError('');
@@ -88,6 +104,7 @@ function PlanPreview({ id, threadId, onExecuted }: {
     <div className="nca-plan-heading"><strong>{plan?.action ?? 'Plano operacional'}</strong>
       <span className="badge">{plan?.status ?? 'Lendo…'}</span></div>
     <small>{id}</small>
+    {experimentStatus ? <span className="badge" role="status">Coleta: {experimentStatus}</span> : null}
     {plan ? <>
       <p>{plan.payload.spec?.task.objective ?? 'Ajuste separado da observação ' + (plan.payload.observation_id ?? 'original')}</p>
       {plan.payload.spec ? <p className="nca-plan-meta">
