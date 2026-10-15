@@ -120,3 +120,28 @@ async def test_finished_experiment_criteria_cannot_rewrite_raw(tmp_path):
                            headers={"Origin": "https://untrusted.example"}).status_code == 403
     assert originals == {str(path): path.read_bytes()
                          for path in (tmp_path / "experiments").rglob("*") if path.is_file()}
+
+
+def test_assistant_tools_whitelist_rejects_mutating_operations(tmp_path):
+    from norvald_lab.assistant_tools import definitions, dispatch
+
+    catalogue = build_read_catalogue(ExperimentRunner(tmp_path),
+                                     lambda: demo_spec("tool-template"),
+                                     lambda expid: {"experiment_id": expid},
+                                     list_experiments=lambda: [{"experiment_id": "known",
+                                                                 "status": "complete"}])
+    assert [tool.name for tool in definitions()] == [
+        "list_operations", "describe_operation", "call_operation"]
+    operations = dispatch(catalogue, "list_operations", {})
+    assert "lab.experiments.list" in [row["name"] for row in operations["operations"]]
+    assert "lab.experiment.start" not in [row["name"] for row in operations["operations"]]
+    schema = dispatch(catalogue, "describe_operation", {"name": "lab.experiments.list"})
+    assert schema["kind"] == "query"
+    assert dispatch(catalogue, "call_operation", {
+        "name": "lab.experiments.list", "input": {}})["result"][0]["status"] == "complete"
+    with pytest.raises(ValueError, match="Unknown or unauthorized"):
+        dispatch(catalogue, "call_operation", {
+            "name": "lab.experiment.start", "input": {"spec": demo_spec("forbidden")}})
+    with pytest.raises(ValueError, match="Ferramenta não autorizada"):
+        dispatch(catalogue, "delete_experiment", {"experiment_id": "known"})
+    assert not (tmp_path / "experiments").exists()
