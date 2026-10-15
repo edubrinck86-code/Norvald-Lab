@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { AlertCircle, Bot, CheckCircle2, ClipboardCheck, MessageCircle, RefreshCw, Send, ShieldAlert } from 'lucide-react';
 import { api, type LabSettings } from '../api';
 import { AssistantExperimentPlanner } from './AssistantExperimentPlanner';
+import { AssistantWorkspace } from './AssistantWorkspace';
 
 type Issue = {
   id: string; experiment_id: string; criterion_id: string; criterion_version: string;
@@ -195,6 +196,8 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment, onStarted }
         {emergency.stopped ? 'Retomar operações' : 'Interromper novas execuções'}
       </button>
     </div>
+    <AssistantWorkspace canChat={settings.configured && !!connections?.live_enabled}
+      stopped={emergency.stopped} onStarted={onStarted} />
     <AssistantExperimentPlanner selectedExperiment={selectedExperiment} stopped={emergency.stopped}
       canDraft={settings.configured && !!connections?.live_enabled} onStarted={onStarted} />
     <div className="assistant-columns">
