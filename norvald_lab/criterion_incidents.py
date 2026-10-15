@@ -169,6 +169,26 @@ class CriterionIncidents:
         with closing(self._connect()) as db:
             return [_decode(row) for row in db.execute(query, (*params, limit))]
 
+    def all_matching(self, *, experiment_id=None, status=None):
+        """Internal complete cursor scan; never capped by UI pagination."""
+        if experiment_id is not None:
+            identifier(experiment_id, "experiment_id")
+        if status is not None and status not in {"open", "acknowledged", "escalated"}:
+            raise ValueError("Estado de incidente desconhecido.")
+        if not self.path.exists():
+            return []
+        query = "SELECT * FROM criterion_incidents WHERE 1=1"
+        args = []
+        if experiment_id is not None:
+            query += " AND experiment_id=?"
+            args.append(experiment_id)
+        if status is not None:
+            query += " AND status=?"
+            args.append(status)
+        query += " ORDER BY first_seen DESC,id"
+        with closing(self._connect()) as db:
+            return [_decode(row) for row in db.execute(query, args)]
+
     def get(self, incident_id: str):
         identifier(incident_id, "incident_id")
         if not self.path.exists():
