@@ -28,7 +28,7 @@ from norvald_lab.lab_operations import build_read_catalogue
 from norvald_lab.criterion_incidents import CriterionIncidents
 from norvald_lab.criterion_recovery import recovery_plan
 from norvald_lab.lab_assistant import LabAssistant
-from norvald_lab.assistant_plans import AssistantPlans
+from norvald_lab.assistant_plans import AssistantPlans, EmergencyStop
 from norvald_lab.assistant_plan_routes import plan_router
 from norvald_lab.storage import digest
 from uuid import uuid4
@@ -417,6 +417,8 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
                 catalogue=app.state.lab_operations, emergency=assistant_plans)
         except PermissionError as exc:
             raise HTTPException(403, str(exc)) from exc
+        except EmergencyStop as exc:
+            raise HTTPException(423, str(exc)) from exc
         except (ValueError, KeyError, TypeError) as exc:
             raise HTTPException(422, local_settings.redact(str(exc))) from exc
         except Exception as exc:
