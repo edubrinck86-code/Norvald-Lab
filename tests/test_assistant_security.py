@@ -32,7 +32,7 @@ def test_destructive_exclusion_requires_specific_owner_confirmation(tmp_path):
         assert client.post(endpoint, json={
             "experiment_id": "owner-exclusion", "confirmed": True},
             headers={"Origin": "https://untrusted.invalid"}).status_code == 403
-        assert client.get("/api/experiments") != []
+        assert client.get("/api/experiments").json()
         approved = client.post(endpoint, json={
             "experiment_id": "owner-exclusion", "confirmed": True})
         assert approved.status_code == 200, approved.text
