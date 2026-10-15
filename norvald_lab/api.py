@@ -180,11 +180,11 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         authorized_live = execution_live
         async def run():
             try:
-                await runner.run(prepared, allow_live=authorized_live)
+                result = await runner.run(prepared, allow_live=authorized_live)
                 # A failure in the auxiliary observer ledger never changes the
                 # sealed experimental result or the success of the collection.
                 try:
-                    incidents.reconcile(expid, evaluate_snapshot(snapshot(root, expid, "complete")))
+                    incidents.reconcile(expid, evaluate_snapshot(snapshot(root, expid, result["status"])))
                 except Exception:
                     logger.exception("Falha ao registrar incidentes da coleta %s", expid)
             except Exception as exc:
