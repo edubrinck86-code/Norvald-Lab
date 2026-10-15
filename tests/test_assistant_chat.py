@@ -86,7 +86,7 @@ def test_independent_conversations_context_and_plan_events(tmp_path, monkeypatch
         assert len(second_chat.json()["messages"]) == 2
         assert second_chat.json()["events"] == []
         assert "threaded-experiment" in operator.requests[0].context.working_context
-        assert "experimento" in operator.requests[-1].context.working_context
+        assert "lab.general" in operator.requests[-1].context.working_context
 
         after_restart = client.get("/api/assistant/threads/" + first).json()
         assert len(after_restart["messages"]) == 2
