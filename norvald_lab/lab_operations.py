@@ -29,6 +29,16 @@ class ExperimentInput(Input):
     experiment_id: str = Field(min_length=1, max_length=120)
 
 
+class IncidentInput(Input):
+    incident_id: str = Field(pattern=r"^ci-[0-9a-f]{32}$")
+
+
+class IncidentListInput(Input):
+    experiment_id: str | None = Field(default=None, min_length=1, max_length=120)
+    status: str | None = None
+    limit: int = Field(default=100, ge=1, le=500)
+
+
 @dataclass(frozen=True)
 class Operation:
     name: str
@@ -64,9 +74,10 @@ class ReadCatalogue:
         return operation.handler(validated)
 
 
-def build_read_catalogue(runner, template, experiment_criteria):
+def build_read_catalogue(runner, template, experiment_criteria, *,
+                         list_incidents=None, get_incident=None):
     """The Lab's own services are authority, not the future Assistant model."""
-    return ReadCatalogue([
+    operations = [
         Operation("lab.spec.template", "query", "Template for a new experiment.", Empty,
                   lambda _: template()),
         Operation("lab.spec.evaluate", "query", "Validate and preflight a Spec without LLM calls.", SpecInput,
@@ -74,4 +85,14 @@ def build_read_catalogue(runner, template, experiment_criteria):
         Operation("lab.experiment.criteria", "query",
                   "Evaluate original contribution diagnostics and integrity for a stored experiment.",
                   ExperimentInput, lambda item: experiment_criteria(item.experiment_id)),
-    ])
+    ]
+    if list_incidents is not None:
+        operations.append(Operation(
+            "lab.incidents.list", "query", "List durable unmet framework criteria.",
+            IncidentListInput, lambda item: list_incidents(
+                experiment_id=item.experiment_id, status=item.status, limit=item.limit)))
+    if get_incident is not None:
+        operations.append(Operation(
+            "lab.incident.get", "query", "Read incident, audit history and recovery proposal.",
+            IncidentInput, lambda item: get_incident(item.incident_id)))
+    return ReadCatalogue(operations)
