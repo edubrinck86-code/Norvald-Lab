@@ -128,7 +128,10 @@ async def test_assistant_refuses_spend_when_disabled_or_untrusted(tmp_path):
         issue = client.get('/api/criteria/incidents').json()[0]
         base = '/api/assistant/incidents/' + issue['id']
         assert client.post(base + '/message', json={'text': 'oi'}).status_code == 403
-        assert client.post(base + '/adjustment/plan', json={}).status_code == 422
+        proposal = client.post(base + '/adjustment/plan', json={})
+        assert proposal.status_code == 200  # Planning stays available without live calls.
+        assert client.post('/api/assistant/plans/' + proposal.json()['plan']['id'] + '/execute',
+                           json={}).status_code == 403
         assert client.put('/api/assistant/settings', json={'kind': 'invalid', 'model': 'm'}).status_code == 422
         assert client.get('/api/assistant/settings', headers={'Origin': 'https://elsewhere.invalid'}).status_code == 403
         assert client.get(base + '/conversation', headers={'Origin': 'https://elsewhere.invalid'}).status_code == 403
