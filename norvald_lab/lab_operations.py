@@ -75,7 +75,7 @@ class ReadCatalogue:
 
 
 def build_read_catalogue(runner, template, experiment_criteria, *,
-                         list_incidents=None, get_incident=None):
+                         list_incidents=None, get_incident=None, list_experiments=None):
     """The Lab's own services are authority, not the future Assistant model."""
     operations = [
         Operation("lab.spec.template", "query", "Template for a new experiment.", Empty,
@@ -95,4 +95,8 @@ def build_read_catalogue(runner, template, experiment_criteria, *,
         operations.append(Operation(
             "lab.incident.get", "query", "Read incident, audit history and recovery proposal.",
             IncidentInput, lambda item: get_incident(item.incident_id)))
+    if list_experiments is not None:
+        operations.append(Operation(
+            "lab.experiments.list", "query", "List available experiments and their statuses.",
+            Empty, lambda item: list_experiments()))
     return ReadCatalogue(operations)
