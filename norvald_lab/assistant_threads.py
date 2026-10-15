@@ -45,6 +45,7 @@ class AssistantThreads:
                 operation TEXT NOT NULL,
                 status TEXT NOT NULL,
                 payload TEXT NOT NULL,
+                message_seq INTEGER,
                 at TEXT NOT NULL
             );
             CREATE INDEX IF NOT EXISTS thread_events_idx
@@ -119,11 +120,20 @@ class AssistantThreads:
                 """, (thread_id, tool, operation, status,
                       json.dumps(payload, ensure_ascii=False, default=str), now()))
 
+    def bind_events(self, thread_id, after_seq, message_seq):
+        self.get(thread_id)
+        with closing(self._db()) as db:
+            with db:
+                db.execute("""
+                    UPDATE operation_events SET message_seq=?
+                    WHERE thread_id=? AND seq>? AND message_seq IS NULL
+                """, (message_seq, thread_id, after_seq))
+
     def events(self, thread_id):
         self.get(thread_id)
         with closing(self._db()) as db:
             rows = db.execute("""
-                SELECT seq,tool,operation,status,payload,at
+                SELECT seq,tool,operation,status,payload,message_seq,at
                 FROM operation_events WHERE thread_id=? ORDER BY seq
             """, (thread_id,)).fetchall()
         return [{**dict(row), "payload": json.loads(row["payload"])} for row in rows]
