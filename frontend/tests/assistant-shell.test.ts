@@ -1,37 +1,33 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import React from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
-import { FloatingAssistant } from '../src/components/FloatingAssistant';
+import { readFileSync } from 'node:fs';
 
-const props = {
-  context: { view: 'observe', experiment_id: 'test-study', observation_id: 'obs-1' },
-  onExpand: () => {},
-  onMinimize: () => {},
-  onOpenExperiment: (_id: string) => {},
-  onNavigate: (_view: string) => {},
-  onExperimentStarted: (_id: string) => {},
-};
+const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 
-test('floating Assistant is present throughout the Lab while closed', () => {
-  const html = renderToStaticMarkup(React.createElement(FloatingAssistant, {
-    ...props, fullScreen: false,
-  }));
-  assert.match(html, /Abrir Norvald Assistant/);
-  assert.match(html, /aria-expanded="false"/);
-  assert.doesNotMatch(html, /nca-shell/);
+test('single floating Assistant instance is mounted globally in the Lab', () => {
+  const app = read('../src/App.tsx');
+  assert.match(app, /import \{ FloatingAssistant \} from '\.\/components\/FloatingAssistant'/);
+  assert.match(app, /<FloatingAssistant fullScreen=\{view === 'assistant'\}/);
+  assert.match(app, /context=\{\{ view, experiment_id: selected \|\| undefined/);
+  assert.match(app, /view === 'assistant' \? null/);
+  assert.doesNotMatch(app, /<LabAssistant/);
 });
 
-test('same component renders a full-screen conversational shell with context', () => {
-  const html = renderToStaticMarkup(React.createElement(FloatingAssistant, {
-    ...props, fullScreen: true,
-  }));
-  assert.match(html, /nca-shell nca-full/);
-  assert.match(html, /Norvald Assistant/);
-  assert.match(html, /Conversa/);
-  assert.match(html, /Atividades/);
-  assert.match(html, /Nova conversa/);
-  assert.match(html, /test-study/);
-  assert.match(html, /obs-1/);
-  assert.doesNotMatch(html, /nca-launcher-open/);
+test('same Assistant component supports launcher, full screen, thread navigation and context', () => {
+  const source = read('../src/components/FloatingAssistant.tsx');
+  assert.match(source, /nca-launcher/);
+  assert.match(source, /fullScreen \? 'nca-full' : 'nca-panel'/);
+  assert.match(source, /\/api\/assistant\/threads/);
+  assert.match(source, /\/send'/);
+  assert.match(source, /context\.observation_id/);
+  assert.match(source, /\/present'/);
+  assert.match(source, /<ExclusionPreview/);
+  assert.match(source, /aria-label="Mensagem para o Norvald Assistant"/);
+});
+
+test('floating styling supports full viewport and narrow screens', () => {
+  const style = read('../src/styles/floating-assistant.css');
+  assert.match(style, /\.nca-launcher/);
+  assert.match(style, /\.nca-full \{ inset:0/);
+  assert.match(style, /@media\(max-width:600px\)/);
 });
