@@ -30,6 +30,34 @@ class ExperimentInput(Input):
     experiment_id: str = Field(min_length=1, max_length=120)
 
 
+class RoutineScheduleInput(Input):
+    plan_id: str = Field(pattern=r"^plan-[a-f0-9]{32}$")
+    interval_seconds: int = Field(gt=0)
+    first_at: str = Field(min_length=15)
+
+
+class RoutineStateInput(Input):
+    routine_id: str = Field(pattern=r"^routine-[a-f0-9]{32}$")
+    active: bool
+
+
+class RecoveryStateInput(Input):
+    auto_recovery: bool
+
+
+class OwnerDecisionInput(Input):
+    incident_id: str = Field(pattern=r"^ci-[0-9a-f]{32}$")
+    note: str = Field(min_length=1)
+
+
+class ExclusionInput(Input):
+    experiment_id: str = Field(min_length=1, max_length=120)
+
+
+class NavigationInput(Input):
+    view: str = Field(pattern=r"^(observe|prepare|compare|experiments|records|workbook|settings)$")
+
+
 class PlanInput(Input):
     plan_id: str = Field(pattern=r"^plan-[a-f0-9]{32}$")
 
@@ -110,7 +138,11 @@ def build_read_catalogue(runner, template, experiment_criteria, *,
                          list_experiments=None, get_experiment_status=None,
                          plan_experiment=None, plan_adjustment=None, derive=None,
                          compare=None, execute_plan=None, presented=None,
-                         report=None):
+                         report=None, routines=None, schedule_routine=None,
+                         set_routine=None, recovery_queue=None, set_recovery=None,
+                         emergency_state=None, emergency_stop=None, emergency_resume=None,
+                         acknowledge=None, escalate=None, stage_exclusion=None,
+                         navigate=None):
     """The Lab's own services are authority, not the future Assistant model."""
     operations = [
         Operation("lab.spec.template", "query", "Template for a new experiment.", Empty,
@@ -174,4 +206,52 @@ def build_read_catalogue(runner, template, experiment_criteria, *,
             "lab.plan.execute", "execute",
             "Execute a previously displayed non-destructive plan, with no extra approval.",
             PlanInput, run_presented))
+    if routines is not None:
+        operations.append(Operation("lab.routines.list", "query",
+            "List recurring schedules and next execution times.", Empty, lambda _: routines()))
+    if schedule_routine is not None:
+        operations.append(Operation("lab.routine.schedule", "organize",
+            "Schedule a recurring experiment using an already displayed plan.",
+            RoutineScheduleInput, lambda item: schedule_routine(
+                item.plan_id, item.interval_seconds, item.first_at)))
+    if set_routine is not None:
+        operations.append(Operation("lab.routine.state", "organize",
+            "Pause or resume a recurring non-destructive experiment routine.",
+            RoutineStateInput, lambda item: set_routine(item.routine_id, item.active)))
+    if recovery_queue is not None:
+        operations.append(Operation("lab.recovery.queue", "query",
+            "Read recorded adjustment plans and autonomous recovery setting.",
+            Empty, lambda _: recovery_queue()))
+    if set_recovery is not None:
+        operations.append(Operation("lab.recovery.automatic", "organize",
+            "Enable or disable non-destructive autonomous recovery (may call providers).",
+            RecoveryStateInput, lambda item: set_recovery(item.auto_recovery)))
+    if emergency_state is not None:
+        operations.append(Operation("lab.emergency.status", "query",
+            "Check whether emergency loop protection is stopping new operations.",
+            Empty, lambda _: emergency_state()))
+    if emergency_stop is not None:
+        operations.append(Operation("lab.emergency.stop", "organize",
+            "Immediately stop new Lab Assistant actions without modifying RAW.",
+            Empty, lambda _: emergency_stop()))
+    if emergency_resume is not None:
+        operations.append(Operation("lab.emergency.resume", "organize",
+            "Resume new Assistant actions after owner review.",
+            Empty, lambda _: emergency_resume()))
+    if acknowledge is not None:
+        operations.append(Operation("lab.incident.acknowledge", "organize",
+            "Record non-scientific acknowledgement of an incident with audit note.",
+            OwnerDecisionInput, lambda item: acknowledge(item.incident_id, item.note)))
+    if escalate is not None:
+        operations.append(Operation("lab.incident.escalate", "organize",
+            "Escalate an incident for human review with audit note.",
+            OwnerDecisionInput, lambda item: escalate(item.incident_id, item.note)))
+    if stage_exclusion is not None:
+        operations.append(Operation("lab.destructive.exclusion.plan", "organize",
+            "Stage excluding an experiment from the UI only; requires separate explicit owner confirmation.",
+            ExclusionInput, lambda item: stage_exclusion(item.experiment_id)))
+    if navigate is not None:
+        operations.append(Operation("lab.ui.navigate", "query",
+            "Suggest opening a Lab screen in the local interface; no browser action.",
+            NavigationInput, lambda item: navigate(item.view)))
     return ReadCatalogue(operations)
