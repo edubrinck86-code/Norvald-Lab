@@ -30,6 +30,7 @@ from norvald_lab.criterion_recovery import recovery_plan
 from norvald_lab.lab_assistant import LabAssistant
 from norvald_lab.assistant_design import draft_spec
 from norvald_lab.assistant_comparison import compare_experiments
+from norvald_lab.assistant_reports import experiment_report
 from norvald_lab.assistant_plans import AssistantPlans, EmergencyStop
 from norvald_lab.assistant_plan_routes import plan_router
 from norvald_lab.assistant_automation import LabAutomation
@@ -427,6 +428,15 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
             logger.exception("Falha na proposta de Spec pelo Assistant")
             raise HTTPException(502, "O modelo operador não conseguiu gerar a proposta.") from exc
 
+    @app.get("/api/assistant/reports/{experiment_id}")
+    def assistant_experiment_report(experiment_id: str):
+        try:
+            return experiment_report(root, experiment_id, incidents=incidents)
+        except FileNotFoundError as exc:
+            raise HTTPException(404, "Experimento não encontrado.") from exc
+        except (ValueError, KeyError, OSError, TypeError) as exc:
+            raise HTTPException(409, local_settings.redact(str(exc))) from exc
+
     @app.get("/api/assistant/compare")
     def assistant_compare(left: str, right: str):
         try:
@@ -602,7 +612,8 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
             root, source_id, new_id, exposure),
         compare=lambda left, right: compare_experiments(root, left, right),
         execute_plan=lambda plan_id: automation_router.execute_plan(plan_id, {}),
-        presented=assistant_plans.was_presented)
+        presented=assistant_plans.was_presented,
+        report=lambda experiment_id: experiment_report(root, experiment_id, incidents=incidents))
 
     if not enable_demo:
         app.router.routes = [route for route in app.router.routes if getattr(route, "path", "") not in {"/api/demo", "/api/demo-template"}]
