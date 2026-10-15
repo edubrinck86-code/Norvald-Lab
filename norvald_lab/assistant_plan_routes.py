@@ -6,11 +6,13 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 
 from norvald_lab.assistant_plans import AssistantPlans, EmergencyStop, _sha
+from norvald_lab.assistant_automation import LabAutomation
 from norvald_lab.storage import digest
 
 
 def plan_router(root: Path, runner, adjustments, incidents, settings, incident_detail,
-                start_experiment, live_enabled, logger, plans: AssistantPlans):
+                start_experiment, live_enabled, logger, plans: AssistantPlans,
+                automation: LabAutomation):
     router = APIRouter(prefix="/api/assistant")
 
     @router.get("/emergency")
@@ -151,5 +153,84 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
         except Exception as exc:
             plans.fail(plan_id, settings.redact(str(exc)))
             raise
+
+    @router.get("/routines")
+    def list_routines():
+        return automation.list()
+
+    @router.post("/routines")
+    def schedule_routine(payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {
+                "plan_id", "interval_seconds", "first_at"}:
+            raise HTTPException(422, "Informe plan_id, interval_seconds e first_at.")
+        try:
+            plan = plans.get(payload["plan_id"])
+            if plan["action"] != "lab.experiment.start" or plan["status"] != "planned":
+                raise ValueError("Somente planos de experimento preparados podem ser agendados.")
+            routine = automation.schedule(runner, plan["payload"]["spec"],
+                                          payload["interval_seconds"], payload["first_at"])
+        except FileNotFoundError as exc:
+            raise HTTPException(404, "Plano não encontrado.") from exc
+        except (ValueError, TypeError, KeyError) as exc:
+            raise HTTPException(422, settings.redact(str(exc))) from exc
+        return {"routine": routine, "source_plan_id": plan["id"],
+                "planned_before_execution": True}
+
+    @router.get("/routines/{routine_id}/history")
+    def routine_history(routine_id: str):
+        try:
+            return automation.history(routine_id)
+        except FileNotFoundError as exc:
+            raise HTTPException(404, "Rotina não encontrada.") from exc
+
+    @router.post("/routines/{routine_id}/state")
+    def change_routine(routine_id: str, payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"active"}:
+            raise HTTPException(422, "Informe active.")
+        try:
+            return automation.set_active(routine_id, payload["active"])
+        except FileNotFoundError as exc:
+            raise HTTPException(404, "Rotina não encontrada.") from exc
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @router.post("/automation/monitor")
+    def monitor_now():
+        return automation.monitor(incidents)
+
+    async def tick():
+        """One due recurrence at a time, with a durable plan first."""
+        summary = {"monitor": automation.monitor(incidents), "occurrence": None}
+        if plans.control()["stopped"]:
+            summary["emergency_stopped"] = True
+            return summary
+        occurrence = automation.claim_due()
+        if occurrence is None:
+            return summary
+        plan_id = ""
+        try:
+            prepared = runner.prepare(occurrence["spec"])
+            plan = plans.create(
+                action="lab.experiment.start", experiment_id=prepared.spec["experiment_id"],
+                payload={"spec": prepared.spec}, evidence_sha256=_sha(prepared.spec))
+            plan_id = plan["id"]
+            automation.record(occurrence["id"], plan_id=plan_id, status="planned")
+            result = await execute_plan(plan_id, {})
+            state = "accepted" if result["status"] == "accepted" else "blocked"
+            automation.record(occurrence["id"], plan_id=plan_id, status=state, result=result)
+            summary["occurrence"] = {"id": occurrence["id"], "routine_id": occurrence["routine_id"],
+                                     "plan_id": plan_id, "status": state}
+        except Exception as exc:
+            automation.record(occurrence["id"], plan_id=plan_id, status="failed",
+                              result={"error": settings.redact(str(exc))})
+            logger.exception("Falha na ocorrência agendada %s", occurrence["id"])
+            summary["occurrence"] = {"id": occurrence["id"], "status": "failed"}
+        return summary
+
+    @router.post("/automation/tick")
+    async def tick_now():
+        return await tick()
+
+    router.tick = tick
 
     return router
