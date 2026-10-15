@@ -445,6 +445,29 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         except (ValueError, TypeError) as exc:
             raise HTTPException(422, str(exc)) from exc
 
+    @app.get("/api/assistant/conversation")
+    def assistant_general_conversation():
+        return {"messages": assistant.conversations.history("assistant-general",
+                                                             limit=100000000)}
+
+    @app.post("/api/assistant/chat")
+    async def assistant_general_chat(payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"text"}:
+            raise HTTPException(422, "Informe somente text.")
+        try:
+            return await assistant.general_reply(
+                payload["text"], live_enabled=execution_live,
+                catalogue=app.state.lab_operations, emergency=assistant_plans)
+        except PermissionError as exc:
+            raise HTTPException(403, str(exc)) from exc
+        except EmergencyStop as exc:
+            raise HTTPException(423, str(exc)) from exc
+        except (ValueError, KeyError, TypeError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+        except Exception as exc:
+            logger.exception("Falha na conversa geral do Assistant")
+            raise HTTPException(502, "O modelo operador falhou na conversa geral.") from exc
+
     @app.get("/api/assistant/incidents/{incident_id}/conversation")
     def assistant_conversation(incident_id: str):
         incident_detail(incident_id)  # Existing and accessible?
