@@ -76,6 +76,22 @@ class LabAutomation:
             );
             CREATE INDEX IF NOT EXISTS routine_occ_idx
               ON routine_occurrences(routine_id,scheduled_for);
+            CREATE TABLE IF NOT EXISTS recovery_queue (
+              experiment_id TEXT NOT NULL,
+              observation_id TEXT NOT NULL,
+              incident_id TEXT NOT NULL,
+              plan_id TEXT NOT NULL,
+              state TEXT NOT NULL,
+              last_error TEXT NOT NULL DEFAULT '',
+              created_at TEXT NOT NULL,
+              PRIMARY KEY(experiment_id,observation_id)
+            );
+            CREATE TABLE IF NOT EXISTS automation_options (
+              id INTEGER PRIMARY KEY CHECK(id=1),
+              auto_recovery INTEGER NOT NULL
+            );
+            INSERT OR IGNORE INTO automation_options(id,auto_recovery) VALUES (1,0);
+
         """)
         if os.name == "posix":
             os.chmod(self.path, 0o600)
@@ -115,6 +131,51 @@ class LabAutomation:
             except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
                 failures.append({"experiment_id": expid, "error": str(exc)})
         return {"observed": observed, "skipped": skipped, "errors": failures}
+
+    def settings(self):
+        with closing(self._db()) as db:
+            row = db.execute("SELECT auto_recovery FROM automation_options WHERE id=1").fetchone()
+        return {"auto_recovery": bool(row["auto_recovery"])}
+
+    def set_settings(self, *, auto_recovery):
+        if type(auto_recovery) is not bool:
+            raise ValueError("auto_recovery deve ser booleano.")
+        with closing(self._db()) as db:
+            with db:
+                db.execute("UPDATE automation_options SET auto_recovery=? WHERE id=1",
+                           (int(auto_recovery),))
+        return self.settings()
+
+    def queue(self):
+        if not self.path.exists():
+            return []
+        with closing(self._db()) as db:
+            return [dict(row) for row in db.execute(
+                "SELECT * FROM recovery_queue ORDER BY created_at,incident_id")]
+
+    def queue_recovery(self, *, experiment_id, observation_id, incident_id, plan_id):
+        identifier(experiment_id, "experiment_id")
+        identifier(observation_id, "observation_id")
+        identifier(incident_id, "incident_id")
+        identifier(plan_id, "plan_id")
+        with closing(self._db()) as db:
+            with db:
+                cursor = db.execute("""
+                    INSERT OR IGNORE INTO recovery_queue
+                    (experiment_id,observation_id,incident_id,plan_id,state,created_at)
+                    VALUES(?,?,?,?, 'planned',?)
+                """, (experiment_id, observation_id, incident_id, plan_id, iso(utc())))
+                return cursor.rowcount == 1
+
+    def complete_recovery(self, experiment_id, observation_id, *, state, error=""):
+        if state not in {"accepted", "blocked", "failed"}:
+            raise ValueError("Estado de recuperação inválido.")
+        with closing(self._db()) as db:
+            with db:
+                db.execute("""
+                    UPDATE recovery_queue SET state=?,last_error=?
+                    WHERE experiment_id=? AND observation_id=?
+                """, (state, error, experiment_id, observation_id))
 
     def schedule(self, runner, spec, interval_seconds, first_at):
         if type(interval_seconds) is not int or interval_seconds <= 0:
