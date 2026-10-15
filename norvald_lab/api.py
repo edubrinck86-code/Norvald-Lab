@@ -523,7 +523,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     app.state.lab_operations = build_read_catalogue(
         runner, experiment_template, experiment_criteria,
         list_incidents=incidents.list, get_incident=incident_detail,
-        list_experiments=experiments)
+        list_experiments=experiments, get_experiment_status=experiment)
 
     if not enable_demo:
         app.router.routes = [route for route in app.router.routes if getattr(route, "path", "") not in {"/api/demo", "/api/demo-template"}]
