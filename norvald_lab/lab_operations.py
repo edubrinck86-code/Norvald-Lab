@@ -29,6 +29,17 @@ class ExperimentInput(Input):
     experiment_id: str = Field(min_length=1, max_length=120)
 
 
+class ComparisonInput(Input):
+    left: str = Field(min_length=1)
+    right: str = Field(min_length=1)
+
+
+class DeriveInput(Input):
+    source_id: str = Field(min_length=1)
+    new_id: str = Field(min_length=1)
+    exposure: str = Field(pattern=r"^(self|exposed)$")
+
+
 class IncidentInput(Input):
     incident_id: str = Field(pattern=r"^ci-[0-9a-f]{32}$")
 
@@ -54,8 +65,8 @@ class ReadCatalogue:
     def __init__(self, operations):
         self._operations = {}
         for op in operations:
-            if op.kind != "query":
-                raise ValueError("Only read-only operations are permitted in this catalogue.")
+            if op.kind not in {"query", "organize"}:
+                raise ValueError("Only queries and reversible planning are permitted.")
             if op.name in self._operations:
                 raise ValueError("Duplicate operation: " + op.name)
             self._operations[op.name] = op
@@ -76,7 +87,9 @@ class ReadCatalogue:
 
 def build_read_catalogue(runner, template, experiment_criteria, *,
                          list_incidents=None, get_incident=None,
-                         list_experiments=None, get_experiment_status=None):
+                         list_experiments=None, get_experiment_status=None,
+                         plan_experiment=None, plan_adjustment=None, derive=None,
+                         compare=None):
     """The Lab's own services are authority, not the future Assistant model."""
     operations = [
         Operation("lab.spec.template", "query", "Template for a new experiment.", Empty,
@@ -104,4 +117,25 @@ def build_read_catalogue(runner, template, experiment_criteria, *,
         operations.append(Operation(
             "lab.experiment.status", "query", "Read current status or outcome of an experiment.",
             ExperimentInput, lambda item: get_experiment_status(item.experiment_id)))
+    if plan_experiment is not None:
+        operations.append(Operation(
+            "lab.experiment.plan", "organize",
+            "Prepare and persist a visible experiment plan without executing it.",
+            SpecInput, lambda item: plan_experiment(item.spec)))
+    if plan_adjustment is not None:
+        operations.append(Operation(
+            "lab.adjustment.plan", "organize",
+            "Prepare and persist a separate adjustment plan without invoking a provider.",
+            IncidentInput, lambda item: plan_adjustment(item.incident_id)))
+    if derive is not None:
+        operations.append(Operation(
+            "lab.spec.derive", "query",
+            "Draft a derived condition from an existing complete and verified B1.",
+            DeriveInput, lambda item: derive(
+                item.source_id, item.new_id, item.exposure)))
+    if compare is not None:
+        operations.append(Operation(
+            "lab.experiments.compare", "query",
+            "Descriptive comparison of two sealed experimental datasets.",
+            ComparisonInput, lambda item: compare(item.left, item.right)))
     return ReadCatalogue(operations)
