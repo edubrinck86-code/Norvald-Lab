@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from norvald_lab.config import identifier
+from fastapi import HTTPException
 from norvald_lab.assistant_plans import AssistantPlans, EmergencyStop, _sha
 from norvald_lab.assistant_tools import definitions, dispatch
 from norvald_lab.vendor.norvald_execution.contracts.tool_contract import ToolResult
@@ -221,7 +222,7 @@ class LabAssistant:
                             value = dispatch(catalogue, call.name, call.arguments)
                             result = ToolResult(call_id=call.call_id, name=call.name,
                                                 content=json.dumps(value, ensure_ascii=False, default=str))
-                        except (ValueError, TypeError, KeyError) as exc:
+                        except (ValueError, TypeError, KeyError, FileNotFoundError, HTTPException) as exc:
                             result = ToolResult(call_id=call.call_id, name=call.name,
                                                 content=self.settings.redact(str(exc)), is_error=True)
                         results.append(result)
