@@ -32,6 +32,7 @@ from norvald_lab.assistant_design import draft_spec
 from norvald_lab.assistant_comparison import compare_experiments
 from norvald_lab.assistant_plans import AssistantPlans, EmergencyStop
 from norvald_lab.assistant_plan_routes import plan_router
+from norvald_lab.assistant_automation import LabAutomation
 from norvald_lab.storage import digest
 from uuid import uuid4
 
@@ -51,11 +52,25 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     incidents = CriterionIncidents(root)
     assistant = LabAssistant(root, local_settings)
     assistant_plans = AssistantPlans(root)
+    automation = LabAutomation(root)
     logger = logging.getLogger(__name__)
 
     @asynccontextmanager
     async def lifespan(app):
+        async def observe_loop():
+            # Local-only periodic reconciliation; outages never invalidate RAW.
+            while True:
+                await asyncio.sleep(10)
+                try:
+                    await app.state.automation_tick()
+                except asyncio.CancelledError:
+                    raise
+                except Exception:
+                    logger.exception("Falha no ciclo de observação automática do Lab")
+        watcher = asyncio.create_task(observe_loop())
         yield
+        watcher.cancel()
+        await asyncio.gather(watcher, return_exceptions=True)
         tasks = list(jobs.values()) + list(adjustments.jobs.values())
         for task in tasks:
             task.cancel()
@@ -67,6 +82,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     app.state.criterion_incidents = incidents
     app.state.lab_assistant = assistant
     app.state.assistant_plans = assistant_plans
+    app.state.assistant_automation = automation
     from norvald_lab.google_account import GoogleAccount, account_router
     account = GoogleAccount(root, port=oauth_port)
     app.include_router(account_router(account))
@@ -454,9 +470,11 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
             logger.exception("Não foi possível responder na conversa do Lab Assistant")
             raise HTTPException(502, "A resposta do modelo operador falhou. A pergunta não foi registrada.") from exc
 
-    app.include_router(plan_router(
+    automation_router = plan_router(
         root, runner, adjustments, incidents, local_settings, incident_detail,
-        execute, lambda: execution_live, logger, assistant_plans))
+        execute, lambda: execution_live, logger, assistant_plans, automation)
+    app.state.automation_tick = automation_router.tick
+    app.include_router(automation_router)
 
     @app.get("/api/notes")
     def notes():
