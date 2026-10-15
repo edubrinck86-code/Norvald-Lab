@@ -22,6 +22,8 @@ from norvald_lab.models import ModelCatalog
 from norvald_lab.cli import demo_spec, derive_spec
 from norvald_lab.experiment_management import ExperimentManagement, experiment_template
 from norvald_lab.adjustments import AdjustmentStore
+from norvald_lab.criteria import evaluate_spec, evaluate_snapshot
+from norvald_lab.lab_operations import build_read_catalogue
 from uuid import uuid4
 
 
@@ -56,12 +58,14 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
 
     @app.middleware("http")
     async def settings_origin(request: Request, call_next):
-        if request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments", "/api/account/google")) and not request.url.path.endswith('/callback'):
+        protected = request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments", "/api/account/google", "/api/criteria")) or (
+            request.url.path.startswith("/api/experiments/") and request.url.path.endswith("/criteria"))
+        if protected and not request.url.path.endswith('/callback'):
             origin = request.headers.get("origin")
             if (origin and origin.rstrip("/") != str(request.base_url).rstrip("/")) or request.headers.get('sec-fetch-site') == 'cross-site':
                 return JSONResponse({"detail": "Configurações só aceitam pedidos da própria interface local."}, status_code=403)
         response = await call_next(request)
-        if request.url.path.startswith(("/api/settings", "/api/models", "/api/adjustments", "/api/account/google")):
+        if protected:
             response.headers["Cache-Control"] = "no-store"
         return response
 
@@ -104,6 +108,11 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
             return {"spec": prepared.spec, "requests": [json.loads(r) for r in prepared.requests_json], "fingerprint": prepared.condition_fingerprint, "live_enabled": execution_live}
         except (ValueError, KeyError, TypeError, OSError) as exc:
             raise HTTPException(422, str(exc)) from exc
+
+    @app.post("/api/criteria/spec")
+    def inspect_spec_criteria(spec: dict):
+        """Read-only preflight: a rejected criterion is a result, not a write."""
+        return evaluate_spec(runner, spec)
 
     @app.get("/api/experiment-template")
     def empty_template():
@@ -303,6 +312,11 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         except (ValueError, KeyError) as exc:
             raise HTTPException(409, "Registro inconsistente; confira os arquivos originais.") from exc
 
+    @app.get("/api/experiments/{experiment_id}/criteria")
+    def experiment_criteria(experiment_id: str):
+        """Evaluate stored original observations without altering sealed data."""
+        return evaluate_snapshot(observe(experiment_id))
+
     @app.get("/api/notes")
     def notes():
         return notebook.list()
@@ -391,6 +405,11 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         if not (web / "index.html").exists():
             raise HTTPException(503, "Inicie ./scripts/start.sh para preparar e abrir a interface.")
         return FileResponse(web / "index.html")
+
+    # Internal tool catalogue. Do not expose generic call_operation over HTTP
+    # before an authenticated, authorized Assistant interface exists.
+    app.state.lab_operations = build_read_catalogue(
+        runner, experiment_template, experiment_criteria)
 
     if not enable_demo:
         app.router.routes = [route for route in app.router.routes if getattr(route, "path", "") not in {"/api/demo", "/api/demo-template"}]
