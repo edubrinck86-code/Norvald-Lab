@@ -16,7 +16,7 @@ from pathlib import Path
 from norvald_lab.config import identifier
 from fastapi import HTTPException
 from norvald_lab.assistant_plans import AssistantPlans, EmergencyStop, _sha
-from norvald_lab.assistant_tools import definitions, dispatch
+from norvald_lab.assistant_tools import definitions, dispatch_async
 from norvald_lab.vendor.norvald_execution.contracts.tool_contract import ToolResult
 from norvald_lab.vendor.norvald_execution.contracts.tool_contracts import ToolExchange
 from norvald_lab.runtime import build_registry, close_registry
@@ -219,7 +219,7 @@ class LabAssistant:
                                 emergency.stop(reason="Loop de ferramentas repetitivas detectado no Assistant.")
                             raise EmergencyStop("Loop de ferramentas repetitivas interrompido.")
                         try:
-                            value = dispatch(catalogue, call.name, call.arguments)
+                            value = await dispatch_async(catalogue, call.name, call.arguments)
                             result = ToolResult(call_id=call.call_id, name=call.name,
                                                 content=json.dumps(value, ensure_ascii=False, default=str))
                         except (ValueError, TypeError, KeyError, FileNotFoundError, HTTPException) as exc:
