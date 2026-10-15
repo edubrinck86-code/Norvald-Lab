@@ -1,0 +1,26 @@
+name: Lab criteria and regression tests
+
+on:
+  pull_request:
+    paths:
+      - "norvald_lab/**"
+      - "tests/**"
+      - ".github/workflows/lab-criteria.yml"
+  workflow_dispatch:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install backend and test dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Verify new criteria and existing experimental invariants
+        run: |
+          python -m pytest -q tests/test_lab_criteria.py
+          python -m pytest -q tests/test_contribution_check.py tests/test_adjustments.py tests/test_lab.py tests/test_observer.py
