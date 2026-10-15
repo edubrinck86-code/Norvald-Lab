@@ -110,6 +110,8 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
                 raise HTTPException(409, "Selo original não encontrado.")
             evidence = digest(seal)
         elif plan["action"] == "lab.experiment.start":
+            if plan["payload"]["spec"].get("mode") == "live" and not live_enabled():
+                raise HTTPException(403, "Chamadas reais estão desabilitadas no Lab.")
             try:
                 prepared = runner.prepare(plan["payload"]["spec"])
                 evidence = _sha(prepared.spec)
