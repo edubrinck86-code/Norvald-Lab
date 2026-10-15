@@ -460,6 +460,91 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         except (ValueError, TypeError) as exc:
             raise HTTPException(422, str(exc)) from exc
 
+    def legacy_thread():
+        history = assistant.conversations.history("assistant-general", limit=100000000)
+        if not history:
+            return None
+        return {"id": "assistant-general", "title": "Conversa anterior",
+                "context": {}, "created_at": history[0]["at"],
+                "updated_at": history[-1]["at"]}
+
+    @app.get("/api/assistant/threads")
+    def assistant_threads():
+        records = assistant.threads.list()
+        legacy = legacy_thread()
+        return records + ([legacy] if legacy else [])
+
+    @app.post("/api/assistant/threads", status_code=201)
+    def assistant_create_thread(payload: dict):
+        if not isinstance(payload, dict) or set(payload) - {"title"}:
+            raise HTTPException(422, "Informe somente title, se desejar.")
+        try:
+            return assistant.threads.create(payload.get("title", "Nova conversa"))
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.get("/api/assistant/threads/{thread_id}")
+    def assistant_thread(thread_id: str):
+        try:
+            info = legacy_thread() if thread_id == "assistant-general" else assistant.threads.get(thread_id)
+            if info is None:
+                raise FileNotFoundError("Conversa não encontrada.")
+            return {"thread": info,
+                    "messages": assistant.conversations.history(thread_id, limit=100000000),
+                    "events": [] if thread_id == "assistant-general"
+                              else assistant.threads.events(thread_id)}
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.post("/api/assistant/threads/{thread_id}/send")
+    async def assistant_send_to_thread(thread_id: str, payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"text", "context"}:
+            raise HTTPException(422, "Informe text e context.")
+        context = payload["context"]
+        if (not isinstance(context, dict)
+                or set(context) - {"view", "experiment_id", "observation_id"}
+                or any(not isinstance(v, str) for v in context.values())):
+            raise HTTPException(422, "Contexto da tela inválido.")
+        if context.get("view") not in {
+                None, "observe", "prepare", "compare", "experiments", "records",
+                "workbook", "settings", "assistant"}:
+            raise HTTPException(422, "Tela inválida.")
+        for key in ("experiment_id", "observation_id"):
+            if context.get(key):
+                try:
+                    identifier(context[key], key)
+                except ValueError as exc:
+                    raise HTTPException(422, str(exc)) from exc
+        try:
+            if thread_id == "assistant-general":
+                if legacy_thread() is None:
+                    raise FileNotFoundError("Conversa não encontrada.")
+            else:
+                assistant.threads.get(thread_id)
+            result = await assistant.general_reply(
+                payload["text"], live_enabled=execution_live,
+                catalogue=app.state.lab_operations, emergency=assistant_plans,
+                thread_id=thread_id, screen_context=context)
+            return {"thread": legacy_thread() if thread_id == "assistant-general"
+                                 else assistant.threads.get(thread_id),
+                    "messages": result["messages"],
+                    "events": [] if thread_id == "assistant-general"
+                              else assistant.threads.events(thread_id),
+                    "model": result["model"]}
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except PermissionError as exc:
+            raise HTTPException(403, str(exc)) from exc
+        except EmergencyStop as exc:
+            raise HTTPException(423, str(exc)) from exc
+        except (ValueError, KeyError, TypeError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+        except Exception as exc:
+            logger.exception("Falha na conversa %s", thread_id)
+            raise HTTPException(502, "Falha na consulta ao modelo operador; veja o histórico.") from exc
+
     @app.get("/api/assistant/conversation")
     def assistant_general_conversation():
         return {"messages": assistant.conversations.history("assistant-general",
@@ -513,6 +598,42 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         execute, lambda: execution_live, logger, assistant_plans, automation, destructive)
     app.state.automation_tick = automation_router.tick
     app.include_router(automation_router)
+
+    @app.post("/api/assistant/threads/{thread_id}/plans/{plan_id}/execute", status_code=202)
+    async def assistant_thread_execute(thread_id: str, plan_id: str):
+        try:
+            assistant.threads.get(thread_id)
+            result = await automation_router.execute_plan(plan_id, {})
+            assistant.threads.add_event(
+                thread_id, tool="owner", operation="lab.plan.execute",
+                status="ok", payload={
+                    "plan_id": plan_id, "status": result["status"],
+                    "new_execution": result["new_execution"],
+                    "experiment_id": (result["result"] or {}).get("experiment_id"),
+                    "adjustment_id": (result["result"] or {}).get("adjustment_id")})
+            return result
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+
+    @app.post("/api/assistant/threads/{thread_id}/destructive/{request_id}/confirm")
+    def assistant_thread_confirm_destructive(thread_id: str, request_id: str, payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"experiment_id", "confirmed"}:
+            raise HTTPException(422, "Informe experiment_id e confirmed.")
+        try:
+            assistant.threads.get(thread_id)
+            result = destructive.confirm_exclusion(
+                request_id, experiment_id=payload["experiment_id"],
+                confirmed=payload["confirmed"])
+            assistant.threads.add_event(
+                thread_id, tool="owner", operation="lab.destructive.exclusion.confirm",
+                status="ok", payload={"request_id": request_id,
+                                      "experiment_id": result["experiment_id"],
+                                      "status": result["status"]})
+            return result
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(409, str(exc)) from exc
 
     @app.get("/api/notes")
     def notes():
@@ -616,7 +737,36 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         compare=lambda left, right: compare_experiments(root, left, right),
         execute_plan=lambda plan_id: automation_router.execute_plan(plan_id, {}),
         presented=assistant_plans.was_presented,
-        report=lambda experiment_id: experiment_report(root, experiment_id, incidents=incidents))
+        report=lambda experiment_id: experiment_report(root, experiment_id, incidents=incidents),
+        routines=automation.list,
+        schedule_routine=lambda plan_id, interval, first: (
+            automation.schedule(runner, assistant_plans.get(plan_id)["payload"]["spec"],
+                                interval, first)
+            if assistant_plans.was_presented(plan_id)
+               and assistant_plans.get(plan_id)["action"] == "lab.experiment.start"
+               and assistant_plans.get(plan_id)["status"] == "planned"
+            else (_ for _ in ()).throw(ValueError("Apresente o plano antes de agendar."))),
+        set_routine=lambda routine_id, active: automation.set_active(routine_id, active),
+        recovery_queue=lambda: {"settings": automation.settings(), "queue": automation.queue()},
+        set_recovery=lambda flag: automation.set_settings(auto_recovery=flag),
+        emergency_state=assistant_plans.control,
+        emergency_stop=assistant_plans.stop,
+        emergency_resume=assistant_plans.resume,
+        acknowledge=lambda incident_id, note: record_owner_decision(
+            incident_id, {"note": note}, "acknowledged"),
+        escalate=lambda incident_id, note: record_owner_decision(
+            incident_id, {"note": note}, "escalated"),
+        stage_exclusion=lambda expid: {
+            "request": destructive.stage_exclusion(expid),
+            "requires_owner_confirmation": True,
+            "raw_deleted": False},
+        navigate=lambda view: {"view": view},
+        list_notes=notebook.list,
+        create_note=lambda title, content: notebook.save(
+            {"title": title, "content": content}),
+        list_workbooks=workbooks.list,
+        read_workbook=workbooks.get,
+        create_workbook=lambda title: workbooks.save({"title": title, "blocks": []}))
 
     if not enable_demo:
         app.router.routes = [route for route in app.router.routes if getattr(route, "path", "") not in {"/api/demo", "/api/demo-template"}]

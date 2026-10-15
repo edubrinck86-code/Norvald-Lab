@@ -53,7 +53,10 @@ def test_destructive_actions_unavailable_to_model_tools(tmp_path):
     with TestClient(create_app(tmp_path, enable_demo=True)) as client:
         catalogue = client.app.state.lab_operations
         names = {item["name"] for item in dispatch(catalogue, "list_operations", {})["operations"]}
-        assert not any("exclude" in name or "delete" in name or "destructive" in name
+        # The model may STAGE a request in chat, but cannot confirm or
+        # execute the destructive effect without a separate owner action.
+        assert "lab.destructive.exclusion.plan" in names
+        assert not any(name.endswith(".confirm") or name.endswith(".delete")
                        for name in names)
         assert "lab.experiment.plan" in names
         assert "lab.experiment.start" not in names

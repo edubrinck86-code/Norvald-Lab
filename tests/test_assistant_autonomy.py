@@ -160,7 +160,7 @@ def test_operator_can_execute_only_after_plan_displayed(tmp_path, monkeypatch):
         prepared = client.post("/api/assistant/plans/experiment", json={"spec": spec})
         assert prepared.status_code == 200
         provider.plan_id = prepared.json()["plan"]["id"]
-        # No GET /plans yet: the draft has not been shown through the plan surface.
+        # Fetching a list is NOT proof that a plan was visible to the operator.
         blocked = client.post("/api/assistant/chat", json={
             "text": "Execute o plano apenas se já tiver sido apresentado."})
         assert blocked.status_code == 200
@@ -170,6 +170,12 @@ def test_operator_can_execute_only_after_plan_displayed(tmp_path, monkeypatch):
         shown = client.get("/api/assistant/plans")
         assert shown.status_code == 200
         assert shown.json()[0]["id"] == provider.plan_id
+        still_blocked = client.post("/api/assistant/chat", json={
+            "text": "Só consultar o plano não deve liberá-lo."})
+        assert "Consulte o plano" in still_blocked.json()["answer"]
+        visible = client.post("/api/assistant/plans/" + provider.plan_id + "/present", json={})
+        assert visible.status_code == 200
+        assert visible.json()["presented"] is True
         allowed = client.post("/api/assistant/chat", json={
             "text": "O plano foi apresentado, execute agora."})
         assert allowed.status_code == 200, allowed.text
