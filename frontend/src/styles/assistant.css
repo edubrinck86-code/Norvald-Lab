@@ -33,3 +33,12 @@
 .assistant-attempts p { font-size: 11px; padding: 5px 0; overflow-wrap: anywhere; }
 @media (max-width: 1230px) { .assistant-model { grid-template-columns: 1fr 1fr; } .assistant-model > div { grid-column: 1/-1; } }
 @media (max-width: 900px) { .assistant-columns { grid-template-columns: 1fr; } .assistant-issues { position: static; max-height: 260px; } .assistant-model { grid-template-columns: 1fr; } }
+
+.assistant-emergency { display:flex; align-items:center; gap:14px; }
+.assistant-emergency > svg { flex-shrink:0; color:hsl(var(--primary)); }
+.assistant-emergency > div { display:flex; flex:1; flex-direction:column; gap:5px; }
+.assistant-emergency > div small { line-height:1.6; }
+@media (max-width: 750px) {
+  .assistant-emergency { flex-wrap:wrap; }
+  .assistant-emergency > button { width:100%; }
+}
