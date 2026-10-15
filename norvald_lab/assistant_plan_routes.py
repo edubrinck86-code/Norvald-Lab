@@ -281,7 +281,7 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
 
         existing = {(row["experiment_id"], row["observation_id"])
                     for row in automation.queue()}
-        for issue in incidents.list(status="open", limit=500):
+        for issue in incidents.all_matching(status="open"):
             if issue["criterion_id"] != "arof.contribution.fully_valid":
                 continue
             identity = (issue["experiment_id"], issue["observation_id"])
