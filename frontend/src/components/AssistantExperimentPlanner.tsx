@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ClipboardList, Play, RefreshCw } from 'lucide-react';
+import { ClipboardList, Play, RefreshCw, MessageSquareText } from 'lucide-react';
 import { api, type Spec } from '../api';
 
 type PreparedPlan = {
@@ -12,10 +12,16 @@ type PreparedPlan = {
   requires_approval: boolean;
 };
 
-export function AssistantExperimentPlanner({ selectedExperiment, stopped, onStarted }: {
-  selectedExperiment: string; stopped: boolean; onStarted(experimentId: string): void;
+export function AssistantExperimentPlanner({ selectedExperiment, stopped, canDraft, onStarted }: {
+  selectedExperiment: string; stopped: boolean; canDraft: boolean;
+  onStarted(experimentId: string): void;
 }) {
   const [draft, setDraft] = useState('');
+  const [goal, setGoal] = useState('');
+  const [validation, setValidation] = useState('');
+  const [interval, setInterval] = useState('');
+  const [firstAt, setFirstAt] = useState('');
+  const [routine, setRoutine] = useState('');
   const [plan, setPlan] = useState<PreparedPlan | null>(null);
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
@@ -30,6 +36,42 @@ export function AssistantExperimentPlanner({ selectedExperiment, stopped, onStar
         : '/api/experiment-template';
       const spec = await api<Spec>(path);
       setDraft(JSON.stringify(spec, null, 2));
+    } catch (err) { setError(String(err)); }
+    finally { setBusy(''); }
+  }
+
+  async function propose() {
+    if (!goal.trim() || !canDraft || stopped) return;
+    setBusy('propose'); setError(''); setNotice(''); setValidation('');
+    setPlan(null); setStarted(false);
+    try {
+      const response = await api<{ draft: Spec; ready: boolean;
+        evaluation: { evaluations: { status: string; message: string }[] } }>(
+        '/api/assistant/spec/draft',
+        { method: 'POST', body: JSON.stringify({ goal }) });
+      setDraft(JSON.stringify(response.draft, null, 2));
+      setValidation(response.ready
+        ? 'Proposta validada no preflight do Lab. Revise antes de preparar o plano.'
+        : 'Proposta incompleta: ' + response.evaluation.evaluations
+          .filter(x => x.status !== 'met').map(x => x.message).join(' | '));
+    } catch (err) { setError(String(err)); }
+    finally { setBusy(''); }
+  }
+
+  async function schedule() {
+    if (!plan || !interval || !firstAt || started) return;
+    setBusy('schedule'); setError('');
+    try {
+      const first = new Date(firstAt);
+      if (Number.isNaN(first.getTime())) throw new Error('Data inicial inválida.');
+      const value = await api<{ routine: { id: string } }>('/api/assistant/routines', {
+        method: 'POST', body: JSON.stringify({
+          plan_id: plan.plan.id, interval_seconds: Number(interval),
+          first_at: first.toISOString(),
+        }),
+      });
+      setRoutine(value.routine.id);
+      setNotice('Rotina salva: ' + value.routine.id + '. O plano foi apresentado antes do agendamento.');
     } catch (err) { setError(String(err)); }
     finally { setBusy(''); }
   }
@@ -74,6 +116,17 @@ export function AssistantExperimentPlanner({ selectedExperiment, stopped, onStar
     </div>
     {error ? <p role="alert" className="error-banner">{error}</p> : null}
     {notice ? <p role="status" className="muted">{notice}</p> : null}
+    <label>Descreva o estudo em linguagem natural
+      <textarea rows={3} value={goal}
+        placeholder="Objetivo, condições, participantes e modelos desejados…"
+        onChange={event => setGoal(event.target.value)} />
+    </label>
+    <button className="button secondary" disabled={!!busy || !goal.trim() || !canDraft || stopped}
+      onClick={() => { void propose(); }}>
+      <MessageSquareText size={15} />{busy === 'propose' ? 'Propondo…' : 'Gerar rascunho por conversa'}
+    </button>
+    {!canDraft ? <small>Configure um modelo operador e habilite chamadas reais para usar linguagem natural.</small> : null}
+    {validation ? <p role="status" className="muted">{validation}</p> : null}
     {draft ? <>
       <label>Spec experimental (JSON)<textarea rows={7} spellCheck={false} value={draft}
         onChange={event => { setDraft(event.target.value); setPlan(null); setStarted(false); }} /></label>
@@ -94,6 +147,17 @@ export function AssistantExperimentPlanner({ selectedExperiment, stopped, onStar
       <button className="button" disabled={!!busy || stopped || started} onClick={() => { void execute(); }}>
         <Play size={15}/>{started ? 'Execução solicitada' : busy === 'execute' ? 'Iniciando…' : 'Executar plano apresentado'}
       </button>
+      <details>
+        <summary>Agendar execução recorrente deste plano</summary>
+        <p className="muted">O mesmo desenho será repetido com identificador novo, sem modificar o experimento original.</p>
+        <label>Intervalo em segundos<input type="number" min={1} value={interval}
+          onChange={event => setInterval(event.target.value)} placeholder="86400 = diariamente" /></label>
+        <label>Primeira execução<input type="datetime-local" value={firstAt}
+          onChange={event => setFirstAt(event.target.value)} /></label>
+        <button className="button secondary" disabled={!!busy || !interval || !firstAt || !!routine}
+          onClick={() => { void schedule(); }}>Agendar plano apresentado</button>
+        {routine ? <small>Rotina criada: {routine}</small> : null}
+      </details>
       {stopped ? <small>Parada emergencial ativa: novas execuções bloqueadas.</small> : null}
     </section> : null}
   </article>;
