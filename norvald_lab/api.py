@@ -460,6 +460,72 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         except (ValueError, TypeError) as exc:
             raise HTTPException(422, str(exc)) from exc
 
+    @app.get("/api/assistant/threads")
+    def assistant_threads():
+        return assistant.threads.list()
+
+    @app.post("/api/assistant/threads", status_code=201)
+    def assistant_create_thread(payload: dict):
+        if not isinstance(payload, dict) or set(payload) - {"title"}:
+            raise HTTPException(422, "Informe somente title, se desejar.")
+        try:
+            return assistant.threads.create(payload.get("title", "Nova conversa"))
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.get("/api/assistant/threads/{thread_id}")
+    def assistant_thread(thread_id: str):
+        try:
+            info = assistant.threads.get(thread_id)
+            return {"thread": info,
+                    "messages": assistant.conversations.history(thread_id, limit=100000000),
+                    "events": assistant.threads.events(thread_id)}
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.post("/api/assistant/threads/{thread_id}/send")
+    async def assistant_send_to_thread(thread_id: str, payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"text", "context"}:
+            raise HTTPException(422, "Informe text e context.")
+        context = payload["context"]
+        if (not isinstance(context, dict)
+                or set(context) - {"view", "experiment_id", "observation_id"}
+                or any(not isinstance(v, str) for v in context.values())):
+            raise HTTPException(422, "Contexto da tela inválido.")
+        if context.get("view") not in {
+                None, "observe", "prepare", "compare", "experiments", "records",
+                "workbook", "settings", "assistant"}:
+            raise HTTPException(422, "Tela inválida.")
+        for key in ("experiment_id", "observation_id"):
+            if context.get(key):
+                try:
+                    identifier(context[key], key)
+                except ValueError as exc:
+                    raise HTTPException(422, str(exc)) from exc
+        try:
+            assistant.threads.get(thread_id)
+            result = await assistant.general_reply(
+                payload["text"], live_enabled=execution_live,
+                catalogue=app.state.lab_operations, emergency=assistant_plans,
+                thread_id=thread_id, screen_context=context)
+            return {"thread": assistant.threads.get(thread_id),
+                    "messages": result["messages"],
+                    "events": assistant.threads.events(thread_id),
+                    "model": result["model"]}
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except PermissionError as exc:
+            raise HTTPException(403, str(exc)) from exc
+        except EmergencyStop as exc:
+            raise HTTPException(423, str(exc)) from exc
+        except (ValueError, KeyError, TypeError) as exc:
+            raise HTTPException(422, local_settings.redact(str(exc))) from exc
+        except Exception as exc:
+            logger.exception("Falha na conversa %s", thread_id)
+            raise HTTPException(502, "Falha na consulta ao modelo operador; veja o histórico.") from exc
+
     @app.get("/api/assistant/conversation")
     def assistant_general_conversation():
         return {"messages": assistant.conversations.history("assistant-general",
