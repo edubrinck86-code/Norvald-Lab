@@ -79,9 +79,9 @@ def recovery_plan(incident, evaluation, adjustments, root, *, mode=None):
         "current_evaluation_status": current,
         "action": "review_manually",
         "automatic": False,
-        "requires_approval": True,
+        "requires_approval": False,
         "allowed": False,
-        "reason": "O Lab preserva a falha original; não existe correção automática de evidência.",
+        "reason": "O Lab preserva a falha original. Ajustes separados não exigem permissão adicional.",
         "proposed_payload": None,
         "revalidations": [],
         "original_still_unmet": current == "not_met",
@@ -111,8 +111,8 @@ def recovery_plan(incident, evaluation, adjustments, root, *, mode=None):
                 and mode == "live"):
             plan.update(action="preview_adjustment",
                         allowed=True,
-                        reason=("Um ajuste assistido pode ser conferido antes de enviar. "
-                                "É outra chamada paga e não substitui a observação original."),
+                        reason=("O Lab apresenta primeiro o plano e o request completo do ajuste. "
+                                "A execução não precisa de autorização extra e não substitui o RAW original."),
                         proposed_payload={
                             "observation_id": incident["observation_id"],
                             "instruction": ("Corrija somente o formato e as partes recusadas pelo "
@@ -127,7 +127,7 @@ def recovery_plan(incident, evaluation, adjustments, root, *, mode=None):
                 "Ajustes assistidos exigem uma coleta real íntegra; não executar sobre demonstração."))
         elif incident["validator_code"] == "execution_failed":
             plan.update(action="new_collection_review", reason=(
-                "A execução original falhou. Avaliar nova coleta independente com autorização."))
+                "A execução original falhou. Planejar nova coleta independente, mantendo a evidência."))
     elif incident["criterion_id"] in {"arof.contribution.coverage", "lab.experiment.complete"}:
         plan.update(action="new_collection_review", reason=(
             "Analisar o registro e planejar nova coleta se necessário; "
