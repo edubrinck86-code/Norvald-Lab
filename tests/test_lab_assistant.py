@@ -59,7 +59,7 @@ def settle(client):
 
 
 @pytest.mark.asyncio
-async def test_assistant_chat_approval_one_use_and_raw_integrity(tmp_path, monkeypatch):
+async def test_assistant_chat_planned_once_and_raw_integrity(tmp_path, monkeypatch):
     await source(tmp_path)
     originals = {str(p): p.read_bytes() for p in (tmp_path / 'experiments').rglob('*') if p.is_file()}
     operator = StubProvider('Falta o bloco CONTRIBUTION; conferir prévia antes de corrigir.')
@@ -76,7 +76,7 @@ async def test_assistant_chat_approval_one_use_and_raw_integrity(tmp_path, monke
         assert client.get(base + '/conversation').json()['messages'] == []
         assert client.post(base + '/message', json={'text': 'Por que falhou?'}).status_code == 422
         assert client.put('/api/assistant/settings', json={
-            'kind': 'openrouter', 'model': 'operator-chosen', 'max_output_tokens': 1200}).status_code == 200
+            'kind': 'openrouter', 'model': 'operator-chosen'}).status_code == 200
         assert operator.requests == []
         spoken = client.post(base + '/message', json={'text': 'Por que falhou?'})
         assert spoken.status_code == 200
@@ -88,28 +88,26 @@ async def test_assistant_chat_approval_one_use_and_raw_integrity(tmp_path, monke
         assert operator.requests[0][0].agent_id == 'lab-assistant'
         assert client.get(base + '/conversation').json()['messages'] == spoken.json()['messages']
 
-        denied = client.post(base + '/adjustment/authorize',
-                             json={'approved': True, 'approval_token': 'unknown'})
-        assert denied.status_code == 409
-        view = client.post(base + '/adjustment/preview', json={'instruction': 'Conferir o formato', 'max_tokens': 1500})
-        assert view.status_code == 200, view.text
-        ticket = view.json()['approval']['approval_token']
-        assert 'Conferir o formato' in view.json()['preview']['request']['instructions']
+        planned = client.post(base + '/adjustment/plan',
+                              json={'instruction': 'Conferir o formato', 'max_tokens': 1500})
+        assert planned.status_code == 200, planned.text
+        proposal = planned.json()
+        plan_id = proposal['plan']['id']
+        assert proposal['requires_approval'] is False
+        assert proposal['plan']['status'] == 'planned'
+        assert 'Conferir o formato' in proposal['preview']['request']['instructions']
         assert adjusted.requests == []
-        assert client.post(base + '/adjustment/authorize',
-                           json={'approved': False, 'approval_token': ticket}).status_code == 422
-        assert client.post(base + '/adjustment/authorize',
-                           json={'approved': True, 'approval_token': ticket},
-                           headers={'Origin': 'https://other.invalid'}).status_code == 403
-        assert adjusted.requests == []
-        accepted = client.post(base + '/adjustment/authorize',
-                               json={'approved': True, 'approval_token': ticket})
+        assert client.post('/api/assistant/plans/' + plan_id + '/execute',
+                           json={}, headers={'Origin': 'https://other.invalid'}).status_code == 403
+        accepted = client.post('/api/assistant/plans/' + plan_id + '/execute', json={})
         assert accepted.status_code == 202, accepted.text
-        assert not accepted.json()['independent_sample']
+        assert accepted.json()['new_execution'] is True
+        assert not accepted.json()['result']['independent_sample']
         settle(client)
         assert len(adjusted.requests) == 1
-        assert client.post(base + '/adjustment/authorize',
-                           json={'approved': True, 'approval_token': ticket}).status_code == 409
+        duplicate = client.post('/api/assistant/plans/' + plan_id + '/execute', json={})
+        assert duplicate.status_code == 202
+        assert duplicate.json()['new_execution'] is False
         assert len(adjusted.requests) == 1
         fresh = client.get('/api/criteria/incidents/' + issue['id']).json()
         assert fresh['recovery']['original_still_unmet']
@@ -130,8 +128,8 @@ async def test_assistant_refuses_spend_when_disabled_or_untrusted(tmp_path):
         issue = client.get('/api/criteria/incidents').json()[0]
         base = '/api/assistant/incidents/' + issue['id']
         assert client.post(base + '/message', json={'text': 'oi'}).status_code == 403
-        assert client.post(base + '/adjustment/preview', json={}).status_code == 403
-        assert client.put('/api/assistant/settings', json={'kind': 'invalid', 'model': 'm', 'max_output_tokens': 1000}).status_code == 422
+        assert client.post(base + '/adjustment/plan', json={}).status_code == 422
+        assert client.put('/api/assistant/settings', json={'kind': 'invalid', 'model': 'm'}).status_code == 422
         assert client.get('/api/assistant/settings', headers={'Origin': 'https://elsewhere.invalid'}).status_code == 403
         assert client.get(base + '/conversation', headers={'Origin': 'https://elsewhere.invalid'}).status_code == 403
         assert not (tmp_path / 'observer' / 'lab_assistant.sqlite3').exists()
