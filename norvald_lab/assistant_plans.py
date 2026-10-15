@@ -146,7 +146,7 @@ class AssistantPlans:
             return self._read(row)
 
     def list(self, *, status=None):
-        if status is not None and status not in {"planned", "running", "accepted", "failed"}:
+        if status is not None and status not in {"planned", "running", "accepted", "failed", "interrupted"}:
             raise ValueError("Estado de plano desconhecido.")
         if not self.path.exists():
             return []
@@ -178,6 +178,19 @@ class AssistantPlans:
             return db.execute(
                 "SELECT 1 FROM presented_plans WHERE plan_id=?", (plan_id,)
             ).fetchone() is not None
+
+    def recover_interrupted(self):
+        """Mark ambiguous in-flight actions for review, never replay provider calls."""
+        if not self.path.exists():
+            return 0
+        with closing(self._db()) as db:
+            with db:
+                cursor = db.execute("""
+                    UPDATE plans SET status='interrupted',
+                    result=?,updated_at=? WHERE status='running'
+                """, (_json({"reason": "Processo reiniciado; confira a coleta antes de repetir."}),
+                      _now()))
+                return cursor.rowcount
 
     @staticmethod
     def _cycling(last):
