@@ -682,7 +682,30 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         compare=lambda left, right: compare_experiments(root, left, right),
         execute_plan=lambda plan_id: automation_router.execute_plan(plan_id, {}),
         presented=assistant_plans.was_presented,
-        report=lambda experiment_id: experiment_report(root, experiment_id, incidents=incidents))
+        report=lambda experiment_id: experiment_report(root, experiment_id, incidents=incidents),
+        routines=automation.list,
+        schedule_routine=lambda plan_id, interval, first: (
+            automation.schedule(runner, assistant_plans.get(plan_id)["payload"]["spec"],
+                                interval, first)
+            if assistant_plans.was_presented(plan_id)
+               and assistant_plans.get(plan_id)["action"] == "lab.experiment.start"
+               and assistant_plans.get(plan_id)["status"] == "planned"
+            else (_ for _ in ()).throw(ValueError("Apresente o plano antes de agendar."))),
+        set_routine=lambda routine_id, active: automation.set_active(routine_id, active),
+        recovery_queue=lambda: {"settings": automation.settings(), "queue": automation.queue()},
+        set_recovery=lambda flag: automation.set_settings(auto_recovery=flag),
+        emergency_state=assistant_plans.control,
+        emergency_stop=assistant_plans.stop,
+        emergency_resume=assistant_plans.resume,
+        acknowledge=lambda incident_id, note: record_owner_decision(
+            incident_id, {"note": note}, "acknowledged"),
+        escalate=lambda incident_id, note: record_owner_decision(
+            incident_id, {"note": note}, "escalated"),
+        stage_exclusion=lambda expid: {
+            "request": destructive.stage_exclusion(expid),
+            "requires_owner_confirmation": True,
+            "raw_deleted": False},
+        navigate=lambda view: {"view": view})
 
     if not enable_demo:
         app.router.routes = [route for route in app.router.routes if getattr(route, "path", "") not in {"/api/demo", "/api/demo-template"}]
