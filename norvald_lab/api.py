@@ -60,6 +60,9 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
 
     @asynccontextmanager
     async def lifespan(app):
+        # Ambiguous actions from a prior process must be inspected, never replayed.
+        assistant_plans.recover_interrupted()
+        automation.recover_interrupted()
         async def observe_loop():
             # Local-only periodic reconciliation; outages never invalidate RAW.
             while True:
