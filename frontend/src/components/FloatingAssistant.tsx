@@ -98,7 +98,7 @@ function PlanPreview({ id, threadId, onExecuted }: {
       <details><summary>Inspecionar o plano completo</summary>
         <pre>{JSON.stringify(plan.payload, null, 2)}</pre></details>
       <div className="nca-plan-actions">
-        <button className="button secondary" disabled={!presented || working || plan.status !== 'planned'}
+        <button className="button secondary" disabled={!presented || working || !threadId || plan.status !== 'planned'}
           onClick={() => { void execute(); }}>
           <ArrowUp size={14} />{working ? 'Iniciando…' : plan.status === 'planned' ? 'Executar plano apresentado' : plan.status}
         </button>
@@ -191,6 +191,7 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
   const [settings, setSettings] = useState<LabSettings | null>(null);
   const [emergency, setEmergency] = useState<{ stopped: boolean; reason: string }>({ stopped: false, reason: '' });
   const input = useRef<HTMLTextAreaElement>(null);
+  const shell = useRef<HTMLElement>(null);
   const end = useRef<HTMLDivElement>(null);
   const open = panelOpen || fullScreen;
   const refreshThreads = useCallback(async () => {
@@ -243,6 +244,17 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
       if (event.key === 'Escape') {
         event.preventDefault();
         if (fullScreen) onMinimize(); else setPanelOpen(false);
+      }
+      if (event.key === 'Tab' && shell.current) {
+        const controls = Array.from(shell.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled])'))
+          .filter(node => node.getClientRects().length > 0);
+        const first = controls[0], last = controls[controls.length - 1];
+        if (first && last && event.shiftKey && document.activeElement === first) {
+          event.preventDefault(); last.focus();
+        } else if (first && last && !event.shiftKey && document.activeElement === last) {
+          event.preventDefault(); first.focus();
+        }
       }
     };
     document.addEventListener('keydown', handle);
@@ -322,7 +334,7 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
     {open ? <>
       {!fullScreen ? <button className="nca-scrim" aria-label="Fechar painel do Assistant"
         onClick={() => setPanelOpen(false)}/> : null}
-      <section className={'nca-shell ' + (fullScreen ? 'nca-full' : 'nca-panel')}
+      <section ref={shell} className={'nca-shell ' + (fullScreen ? 'nca-full' : 'nca-panel')}
         aria-label="Norvald Assistant" role={fullScreen ? 'region' : 'dialog'}
         aria-modal={fullScreen ? undefined : true}>
         <header className="nca-topbar">
@@ -414,6 +426,7 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
                 <div className="nca-context"><FileCheck2 size={13}/>
                   {context.experiment_id ? 'Contexto: ' + context.experiment_id : 'Contexto geral do laboratório'}
                   {context.view ? ' · ' + context.view : null}
+                  {context.observation_id ? ' · observação ' + context.observation_id : null}
                 </div>
                 <div className="nca-input-row">
                   <textarea ref={input} rows={2} value={draft} onChange={e => setDraft(e.target.value)}
