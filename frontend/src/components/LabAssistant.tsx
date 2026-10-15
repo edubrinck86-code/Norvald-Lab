@@ -196,7 +196,7 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment, onStarted }
       </button>
     </div>
     <AssistantExperimentPlanner selectedExperiment={selectedExperiment} stopped={emergency.stopped}
-      onStarted={onStarted} />
+      canDraft={settings.configured && !!connections?.live_enabled} onStarted={onStarted} />
     <div className="assistant-columns">
       <aside className="assistant-issues">
         <div className="row-heading"><h3>Critérios não atendidos</h3><button className="icon-button" disabled={!!busy || !selectedExperiment} onClick={() => { void resync(); }} aria-label="Verificar critérios do experimento selecionado"><RefreshCw size={16} /></button></div>
