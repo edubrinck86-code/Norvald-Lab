@@ -580,6 +580,42 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     app.state.automation_tick = automation_router.tick
     app.include_router(automation_router)
 
+    @app.post("/api/assistant/threads/{thread_id}/plans/{plan_id}/execute", status_code=202)
+    async def assistant_thread_execute(thread_id: str, plan_id: str):
+        try:
+            assistant.threads.get(thread_id)
+            result = await automation_router.execute_plan(plan_id, {})
+            assistant.threads.add_event(
+                thread_id, tool="owner", operation="lab.plan.execute",
+                status="ok", payload={
+                    "plan_id": plan_id, "status": result["status"],
+                    "new_execution": result["new_execution"],
+                    "experiment_id": (result["result"] or {}).get("experiment_id"),
+                    "adjustment_id": (result["result"] or {}).get("adjustment_id")})
+            return result
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+
+    @app.post("/api/assistant/threads/{thread_id}/destructive/{request_id}/confirm")
+    def assistant_thread_confirm_destructive(thread_id: str, request_id: str, payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"experiment_id", "confirmed"}:
+            raise HTTPException(422, "Informe experiment_id e confirmed.")
+        try:
+            assistant.threads.get(thread_id)
+            result = destructive.confirm_exclusion(
+                request_id, experiment_id=payload["experiment_id"],
+                confirmed=payload["confirmed"])
+            assistant.threads.add_event(
+                thread_id, tool="owner", operation="lab.destructive.exclusion.confirm",
+                status="ok", payload={"request_id": request_id,
+                                      "experiment_id": result["experiment_id"],
+                                      "status": result["status"]})
+            return result
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(409, str(exc)) from exc
+
     @app.get("/api/notes")
     def notes():
         return notebook.list()
