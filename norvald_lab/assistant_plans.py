@@ -141,6 +141,20 @@ class AssistantPlans:
                 raise FileNotFoundError("Plano não encontrado.")
             return self._read(row)
 
+    def list(self, *, status=None):
+        if status is not None and status not in {"planned", "running", "accepted", "failed"}:
+            raise ValueError("Estado de plano desconhecido.")
+        if not self.path.exists():
+            return []
+        with closing(self._db()) as db:
+            query = "SELECT * FROM plans"
+            params = ()
+            if status is not None:
+                query += " WHERE status=?"
+                params = (status,)
+            query += " ORDER BY created_at DESC, id"
+            return [self._read(row) for row in db.execute(query, params)]
+
     @staticmethod
     def _cycling(last):
         # Never stop simply because the operator executed many different tasks.
