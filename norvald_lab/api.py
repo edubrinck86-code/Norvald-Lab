@@ -28,6 +28,8 @@ from norvald_lab.lab_operations import build_read_catalogue
 from norvald_lab.criterion_incidents import CriterionIncidents
 from norvald_lab.criterion_recovery import recovery_plan
 from norvald_lab.lab_assistant import LabAssistant
+from norvald_lab.assistant_plans import AssistantPlans
+from norvald_lab.assistant_plan_routes import plan_router
 from norvald_lab.storage import digest
 from uuid import uuid4
 
@@ -46,6 +48,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     adjustments = AdjustmentStore(root)
     incidents = CriterionIncidents(root)
     assistant = LabAssistant(root, local_settings)
+    assistant_plans = AssistantPlans(root)
     logger = logging.getLogger(__name__)
 
     @asynccontextmanager
@@ -61,6 +64,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     app.state.adjustment_jobs = adjustments.jobs
     app.state.criterion_incidents = incidents
     app.state.lab_assistant = assistant
+    app.state.assistant_plans = assistant_plans
     from norvald_lab.google_account import GoogleAccount, account_router
     account = GoogleAccount(root, port=oauth_port)
     app.include_router(account_router(account))
@@ -474,6 +478,10 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         return {"incident_id": incident_id, "experiment_id": expid,
                 "adjustment_id": saved["id"], "status": "accepted",
                 "independent_sample": False}
+
+    app.include_router(plan_router(
+        root, runner, adjustments, incidents, local_settings, incident_detail,
+        execute, lambda: execution_live, logger, assistant_plans))
 
     @app.get("/api/notes")
     def notes():
