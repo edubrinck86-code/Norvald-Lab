@@ -56,8 +56,8 @@ class DestructiveRequests:
             with db:
                 db.execute("""
                     INSERT INTO requests(id,action,experiment_id,status,created_at,expires_at)
-                    VALUES (?,'lab.experiment.exclude','?','requested',?,?)
-                """.replace("'?'", "?"), (request_id, experiment_id,
+                    VALUES (?,'lab.experiment.exclude',?,'requested',?,?)
+                """, (request_id, experiment_id,
                                              created.isoformat(),
                                              (created + timedelta(minutes=10)).isoformat()))
         return self.get(request_id)
