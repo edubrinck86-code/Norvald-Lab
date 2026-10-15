@@ -445,7 +445,7 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
                 "automatic": False, "independent_sample": False}
 
     @app.post("/api/assistant/incidents/{incident_id}/adjustment/authorize", status_code=202)
-    def assistant_adjustment_authorize(incident_id: str, payload: dict):
+    async def assistant_adjustment_authorize(incident_id: str, payload: dict):
         if not isinstance(payload, dict) or set(payload) != {"approval_token", "approved"} or payload["approved"] is not True:
             raise HTTPException(422, "Revise a prévia e confirme approved=true com seu token.")
         if not execution_live:
