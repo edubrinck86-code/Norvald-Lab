@@ -157,3 +157,27 @@ def test_chat_catalogue_can_create_notes_and_notebooks_without_raw_mutation(tmp_
         assert catalogue.call("lab.workbook.read", {"book_id": book["id"]})["blocks"] == []
         assert catalogue.call("lab.workbooks.list", {})[0]["id"] == book["id"]
         assert not (tmp_path / "experiments").exists()
+
+
+def test_existing_general_history_is_visible_without_rewriting_it(tmp_path, monkeypatch):
+    operator = Operator(demo_spec("unused-template"))
+    monkeypatch.setattr("norvald_lab.lab_assistant.build_registry",
+                        lambda payload, **kw: registry(payload, operator))
+    with TestClient(create_app(tmp_path, allow_live=True, enable_demo=True)) as client:
+        client.put("/api/assistant/settings", json={
+            "kind": "openrouter", "model": "operator-local"})
+        previous = client.post("/api/assistant/chat", json={"text": "Mensagem de antes"})
+        assert previous.status_code == 200
+        threads = client.get("/api/assistant/threads").json()
+        assert len(threads) == 1 and threads[0]["id"] == "assistant-general"
+        old = client.get("/api/assistant/threads/assistant-general").json()
+        assert old["messages"][0]["content"] == "Mensagem de antes"
+        continued = client.post("/api/assistant/threads/assistant-general/send", json={
+            "text": "Continue a conversa anterior", "context": {"view": "assistant"}})
+        assert continued.status_code == 200
+        assert len(continued.json()["messages"]) == 4
+        assert continued.json()["events"] == []
+        assert client.get("/api/assistant/conversation").json()["messages"] == continued.json()["messages"]
+        new_chat = client.post("/api/assistant/threads", json={})
+        assert new_chat.status_code == 201
+        assert len(client.get("/api/assistant/threads").json()) == 2
