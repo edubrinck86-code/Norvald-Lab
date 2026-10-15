@@ -1,7 +1,7 @@
-"""A narrowly scoped conversational incident assistant, separate from experiment runs.
+"""Native conversational Lab operator, independent of experimental participants.
 
-The assistant explains evidence, separate from sealed RAW. Operational plans
-are handled by trusted Lab services, without model-generated approval.
+The model dispatches typed Lab operations, never arbitrary filesystem/code.
+Chats, operations and plans persist separately from sealed RAW evidence.
 """
 from __future__ import annotations
 
