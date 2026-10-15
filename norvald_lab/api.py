@@ -760,7 +760,13 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
             "request": destructive.stage_exclusion(expid),
             "requires_owner_confirmation": True,
             "raw_deleted": False},
-        navigate=lambda view: {"view": view})
+        navigate=lambda view: {"view": view},
+        list_notes=notebook.list,
+        create_note=lambda title, content: notebook.save(
+            {"title": title, "content": content}),
+        list_workbooks=workbooks.list,
+        read_workbook=workbooks.get,
+        create_workbook=lambda title: workbooks.save({"title": title, "blocks": []}))
 
     if not enable_demo:
         app.router.routes = [route for route in app.router.routes if getattr(route, "path", "") not in {"/api/demo", "/api/demo-template"}]
