@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import {
-  Activity, AlertTriangle, ArrowLeft, ArrowUp, Bot, CheckCircle2, ChevronDown,
-  Clock3, Expand, FileCheck2, History, Maximize2, MessageCircle, Minimize2, PanelLeft,
-  Plus, RotateCcw, Send, Settings2, ShieldAlert, ShieldCheck, X,
+  Activity, AlertTriangle, ArrowUp, Bot, CheckCircle2,
+  FileCheck2, Maximize2, MessageCircle, Minimize2, PanelLeft,
+  Plus, Settings2, ShieldAlert, ShieldCheck, X,
 } from 'lucide-react';
 import { api, type LabSettings, type Spec } from '../api';
 import { NorvaldMarkdown } from '../ui/markdown/NorvaldMarkdown';
