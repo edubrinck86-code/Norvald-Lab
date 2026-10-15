@@ -14,6 +14,8 @@ test('operator provider and model drafts are not overwritten by the background p
   assert.doesNotMatch(refresh, /setOperator\(/);
   assert.doesNotMatch(refresh, /\/api\/assistant\/settings/);
   assert.match(assistant, /operatorLoaded\.current = true/);
+  assert.match(assistant, /if \(!operatorDraftDirty\.current\) setOperator\(value\)/);
+  assert.match(assistant, /operatorDraftDirty\.current = true/);
   assert.match(assistant, /kind, model: '', configured: false/);
 });
 
