@@ -51,6 +51,10 @@ class AssistantThreads:
             CREATE INDEX IF NOT EXISTS thread_events_idx
                 ON operation_events(thread_id,seq);
         """)
+        # Earlier feature-branch SQLite ledgers may predate message linkage.
+        columns = {row["name"] for row in db.execute("PRAGMA table_info(operation_events)")}
+        if "message_seq" not in columns:
+            db.execute("ALTER TABLE operation_events ADD COLUMN message_seq INTEGER")
         if os.name == "posix":
             os.chmod(self.path, 0o600)
         return db
