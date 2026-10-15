@@ -140,3 +140,20 @@ def test_thread_specific_destructive_confirmation(tmp_path):
         events = client.get("/api/assistant/threads/" + thread_id).json()["events"]
         assert events[-1]["operation"] == "lab.destructive.exclusion.confirm"
         assert originals == {str(p): p.read_bytes() for p in (tmp_path / "experiments").rglob("*") if p.is_file()}
+
+
+def test_chat_catalogue_can_create_notes_and_notebooks_without_raw_mutation(tmp_path):
+    with TestClient(create_app(tmp_path, enable_demo=True)) as client:
+        catalogue = client.app.state.lab_operations
+        names = {row["name"] for row in catalogue.describe()}
+        assert {"lab.notes.list", "lab.note.create", "lab.workbooks.list",
+                "lab.workbook.read", "lab.workbook.create"} <= names
+        note = catalogue.call("lab.note.create", {
+            "title": "Hipótese", "content": "Investigar diferença entre B1 e B3."})
+        assert note["anchor"] is None
+        assert catalogue.call("lab.notes.list", {})[0]["id"] == note["id"]
+        book = catalogue.call("lab.workbook.create", {"title": "Caderno de validação"})
+        assert book["revision"] == 1
+        assert catalogue.call("lab.workbook.read", {"book_id": book["id"]})["blocks"] == []
+        assert catalogue.call("lab.workbooks.list", {})[0]["id"] == book["id"]
+        assert not (tmp_path / "experiments").exists()
