@@ -8,7 +8,7 @@ import { Workbook, bookMarkdown } from './components/Workbook';
 import { useWorkbooks } from './hooks/useWorkbooks';
 import { Settings } from './components/Settings';
 import { Observe } from './components/Observe';
-import { LabAssistant } from './components/LabAssistant';
+import { FloatingAssistant } from './components/FloatingAssistant';
 import { Compare } from './components/Compare';
 import { Experiments } from './components/Experiments';
 import { ContextView, Prepare } from './components/Prepare';
@@ -46,6 +46,7 @@ export default function App() {
   const listRequest = useRef<Promise<void> | null>(null);
   const hasSelected = useRef(false);
   const originRequest = useRef<Anchor | null>(null);
+  const assistantReturn = useRef<View>('observe');
 
   const refreshList = useCallback((): Promise<void> => {
     if (listRequest.current) return listRequest.current;
@@ -195,7 +196,7 @@ export default function App() {
       <aside className="app-sidebar"><a href="/" className="brand"><span className="brand-mark"><FlaskConical size={22} /></span><span>NORVALD <small>LAB</small></span></a>
         <nav aria-label="Navegação principal">{([
           ['observe', 'Bancada', FlaskConical], ['experiments', 'Experimentos', Layers], ['records', 'Registros', List], ['assistant', 'Lab Assistant', Bot], ['workbook', 'Notebook', BookOpen],
-        ] as const).map(([id, label, Icon]) => <button key={id} aria-label={label} title={label} className={'nav-button ' + ((view === id || id === 'observe' && ['prepare', 'compare'].includes(view)) ? 'active' : '')} onClick={() => { setView(id); if (id === 'experiments') void refreshList(); }}><Icon size={18} />{label}</button>)}<button className="nav-button" aria-label="Notes" title="Notes" onClick={() => setNotebook({})}><NotebookPen size={18} />Notes</button></nav>
+        ] as const).map(([id, label, Icon]) => <button key={id} aria-label={label} title={label} className={'nav-button ' + ((view === id || id === 'observe' && ['prepare', 'compare'].includes(view)) ? 'active' : '')} onClick={() => { if (id === 'assistant' && view !== 'assistant') assistantReturn.current = view; setView(id); if (id === 'experiments') void refreshList(); }}><Icon size={18} />{label}</button>)}<button className="nav-button" aria-label="Notes" title="Notes" onClick={() => setNotebook({})}><NotebookPen size={18} />Notes</button></nav>
         <div className="sidebar-bottom"><div className="local-label"><span />Ambiente local</div><button className={'nav-button ' + (view === 'settings' ? 'active' : '')} onClick={() => setView('settings')}><Settings2 size={18} />Configurações</button></div>
       </aside>
       <main className="app-main">
@@ -203,7 +204,7 @@ export default function App() {
         {error ? <div role="alert" className="error-banner">{error}<button className="icon-button" onClick={() => setError('')} aria-label="Dispensar aviso"><X size={15} /></button></div> : null}
         {['prepare', 'observe', 'compare'].includes(view) ? <nav className="stage-nav" aria-label="Etapas do experimento">{([['prepare', 'Preparar'], ['observe', 'Acompanhar'], ['compare', 'Comparar']] as const).map(([id, label], index) => <button key={id} className={view === id ? 'active' : ''} onClick={() => setView(id)}><span>{index + 1}</span>{label}</button>)}</nav> : null}
         <Workbook store={workbooks} active={view === 'workbook'} documents={current?.spec.documents ?? []} onResource={setResource} onOrigin={origin} onNotes={id => setNotebook({ id })} onCorpus={capture => { void useCorpus(capture); }} />
-        {view === 'settings' ? <Settings onChanged={setHealth} /> : view === 'assistant' ? <LabAssistant selectedExperiment={selected} onOpenExperiment={id => choose(id)} onStarted={started} /> : view === 'workbook' ? null : view === 'prepare' ? <Prepare onSettings={() => setView('settings')} liveEnabled={health?.live_enabled ?? false} initialSpec={initialSpec} onStarted={started} /> :
+        {view === 'settings' ? <Settings onChanged={setHealth} /> : view === 'assistant' ? null : view === 'workbook' ? null : view === 'prepare' ? <Prepare onSettings={() => setView('settings')} liveEnabled={health?.live_enabled ?? false} initialSpec={initialSpec} onStarted={started} /> :
           view === 'experiments' ? <Experiments items={items} onChoose={choose} onRefresh={refreshList} onEdit={spec => { setInitialSpec(spec); setView('prepare'); }} onDeleted={ids => { if (ids.includes(selected)) { setSelected(''); setSnapshot(null); hasSelected.current = true; } }} onNew={() => { setInitialSpec(undefined); setView('prepare'); }} /> :
           !selected ? <Empty onNew={() => { setInitialSpec(undefined); setView('prepare'); }} /> :
           !current ? <div className="empty-state">{observationFailed ? <p>Não foi possível abrir esta coleta. Confira o aviso acima.</p> : <><span className="activity-dot" /><p>Carregando os registros…</p></>}</div> :
@@ -214,6 +215,16 @@ export default function App() {
       </main>
       {!['workbook', 'settings', 'assistant'].includes(view) ? <aside className="inspector"><div className="inspector-heading"><Pin size={16} /><h3>Seu olhar</h3></div>{pinned ? <><span className="eyebrow">{pinned.anchor?.excerpt ? 'Trecho fixado' : 'Momento marcado'}</span>{pinned.anchor?.excerpt ? <blockquote>{pinned.anchor.excerpt}</blockquote> : null}<small>{pinned.anchor?.experiment_id}</small><h3>Minha observação</h3><button className="note-open-card" onClick={() => setNotebook({ id: pinned.id })}><NotebookPen size={17} />Abrir esta nota<ArrowUpRight size={14} /></button><span className="hypothesis-badge">Hipótese para investigar</span>{pinned.anchor ? <button className="button secondary" onClick={() => origin(pinned)}>Conferir origem</button> : null}</> : <><p>Selecione um trecho de uma resposta e clique em <strong>Fixar trecho</strong>.</p><div className="inspector-empty"><Pin size={24} /><span>Uma particularidade pode virar uma pergunta para investigar.</span></div><button className="button secondary" onClick={() => setNotebook({})}><NotebookPen size={15} />Abrir anotações</button></>}<div className="inspector-footnote"><FileText size={14} />Suas notas ficam separadas dos registros originais.</div></aside> : null}
     </div>
+    <FloatingAssistant fullScreen={view === 'assistant'}
+      context={{ view, experiment_id: selected || undefined }}
+      onExpand={() => { if (view !== 'assistant') assistantReturn.current = view; setView('assistant'); }}
+      onMinimize={() => setView(assistantReturn.current === 'assistant' ? 'observe' : assistantReturn.current)}
+      onOpenExperiment={id => choose(id)}
+      onNavigate={next => { if (['observe', 'prepare', 'compare', 'experiments', 'records', 'workbook', 'settings'].includes(next)) setView(next as View); }}
+      onExperimentStarted={id => {
+        acceptedStarts.current.add(id); setAwaitingStarts(acceptedStarts.current.size);
+        setListPollingFailed(false); void refreshList();
+      }} />
     {notebook ? <Notebook initialId={notebook.id} onClose={() => setNotebook(null)} onOrigin={origin} onSaved={note => setPinned(current => current?.id === note.id ? note : current)} /> : null}
     {context ? <Modal title="Contexto preparado para o participante" onClose={() => setContext(null)}><div className="modal-scroll"><ContextView request={context} /></div></Modal> : null}
     {documents && current ? <Modal title="Corpus congelado do experimento" onClose={() => setDocuments(false)}><div className="modal-scroll">{current.spec.documents.map(doc => <button className="document-row" key={doc.id} onClick={() => { setDocuments(false); setResource({ title: doc.title, content: doc.text }); }}><BookOpen size={20} /><div><strong>{doc.title}</strong><small>{doc.source || doc.id}</small></div><ChevronRight size={17} /></button>)}{!current.spec.documents.length ? <p className="muted">Este experimento não possui documentos.</p> : null}</div></Modal> : null}
