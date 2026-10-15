@@ -600,7 +600,9 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         plan_adjustment=lambda incident_id: automation_router.plan_adjustment(incident_id, {}),
         derive=lambda source_id, new_id, exposure: derive_spec(
             root, source_id, new_id, exposure),
-        compare=lambda left, right: compare_experiments(root, left, right))
+        compare=lambda left, right: compare_experiments(root, left, right),
+        execute_plan=lambda plan_id: automation_router.execute_plan(plan_id, {}),
+        presented=assistant_plans.was_presented)
 
     if not enable_demo:
         app.router.routes = [route for route in app.router.routes if getattr(route, "path", "") not in {"/api/demo", "/api/demo-template"}]
