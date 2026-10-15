@@ -109,7 +109,8 @@ def build_read_catalogue(runner, template, experiment_criteria, *,
                          list_incidents=None, get_incident=None,
                          list_experiments=None, get_experiment_status=None,
                          plan_experiment=None, plan_adjustment=None, derive=None,
-                         compare=None, execute_plan=None, presented=None):
+                         compare=None, execute_plan=None, presented=None,
+                         report=None):
     """The Lab's own services are authority, not the future Assistant model."""
     operations = [
         Operation("lab.spec.template", "query", "Template for a new experiment.", Empty,
@@ -153,6 +154,11 @@ def build_read_catalogue(runner, template, experiment_criteria, *,
             "Draft a derived condition from an existing complete and verified B1.",
             DeriveInput, lambda item: derive(
                 item.source_id, item.new_id, item.exposure)))
+    if report is not None:
+        operations.append(Operation(
+            "lab.experiment.report", "query",
+            "Read versioned integrity-backed report and criteria for one experiment.",
+            ExperimentInput, lambda item: report(item.experiment_id)))
     if compare is not None:
         operations.append(Operation(
             "lab.experiments.compare", "query",
