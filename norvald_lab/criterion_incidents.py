@@ -184,6 +184,23 @@ class CriterionIncidents:
                 {"seq": event["seq"], "event": event["event"], "at": event["at"],
                  "payload": json.loads(event["payload"])} for event in events]}
 
+    def record_action(self, incident_id: str, *, event: str, payload: dict):
+        """Append a confirmed owner action without changing criterion truth."""
+        identifier(incident_id, "incident_id")
+        if event not in {"assistant.adjustment_requested"}:
+            raise ValueError("Evento de auditoria não permitido.")
+        if not isinstance(payload, dict) or set(payload) != {"adjustment_id"}:
+            raise ValueError("Registro deve conter somente o ID do ajuste.")
+        identifier(payload["adjustment_id"], "adjustment_id")
+        with closing(self._connect()) as db:
+            with db:
+                db.execute("BEGIN IMMEDIATE")
+                found = db.execute("SELECT id FROM criterion_incidents WHERE id=?",
+                                   (incident_id,)).fetchone()
+                if found is None:
+                    raise FileNotFoundError("Incidente não encontrado.")
+                self._event(db, incident_id, event, payload | {"actor": "owner"})
+
     def mark(self, incident_id: str, *, status: str, note: str):
         identifier(incident_id, "incident_id")
         if status not in {"acknowledged", "escalated"}:
