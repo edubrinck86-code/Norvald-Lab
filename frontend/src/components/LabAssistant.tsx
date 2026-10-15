@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AlertCircle, Bot, CheckCircle2, ClipboardCheck, MessageCircle, RefreshCw, Send, ShieldAlert } from 'lucide-react';
 import { api, type LabSettings } from '../api';
+import { AssistantExperimentPlanner } from './AssistantExperimentPlanner';
 
 type Issue = {
   id: string; experiment_id: string; criterion_id: string; criterion_version: string;
@@ -29,8 +30,8 @@ const explanation: Record<string, string> = {
   review_manually: 'Não há ajuste automático admissível para esta ocorrência.',
 };
 
-export function LabAssistant({ selectedExperiment, onOpenExperiment }: {
-  selectedExperiment: string; onOpenExperiment(id: string): void;
+export function LabAssistant({ selectedExperiment, onOpenExperiment, onStarted }: {
+  selectedExperiment: string; onOpenExperiment(id: string): void; onStarted(id: string): void;
 }) {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [selected, setSelected] = useState('');
@@ -194,6 +195,8 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment }: {
         {emergency.stopped ? 'Retomar operações' : 'Interromper novas execuções'}
       </button>
     </div>
+    <AssistantExperimentPlanner selectedExperiment={selectedExperiment} stopped={emergency.stopped}
+      onStarted={onStarted} />
     <div className="assistant-columns">
       <aside className="assistant-issues">
         <div className="row-heading"><h3>Critérios não atendidos</h3><button className="icon-button" disabled={!!busy || !selectedExperiment} onClick={() => { void resync(); }} aria-label="Verificar critérios do experimento selecionado"><RefreshCw size={16} /></button></div>
