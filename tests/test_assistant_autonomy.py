@@ -126,3 +126,57 @@ async def test_recovery_is_staged_by_default_then_opt_in_executed_once(tmp_path,
     assert verify_experiment(tmp_path, "recover-live")["valid"]
     assert originals == {str(p): p.read_bytes() for p in (tmp_path / "experiments").rglob("*")
                          if p.is_file()}
+
+
+def test_operator_can_execute_only_after_plan_displayed(tmp_path, monkeypatch):
+    spec = demo_spec("operator-execute-after-review")
+
+    class ExecuteProvider(Stub):
+        def __init__(self):
+            super().__init__("")
+            self.plan_id = ""
+
+        async def execute(self, request, model):
+            self.requests.append(request)
+            if not request.tool_exchanges:
+                return ExecutionResult(content="", tokens=1, duration_seconds=0,
+                                       provider="openrouter", model=model,
+                                       tool_calls=[ToolCall(call_id="execute-tool",
+                                           name="call_operation", arguments={
+                                               "name": "lab.plan.execute",
+                                               "input": {"plan_id": self.plan_id}})])
+            last = request.tool_exchanges[-1].results[0]
+            return ExecutionResult(
+                content="Execução recebida." if not last.is_error
+                        else "Consulte o plano antes de executá-lo.",
+                tokens=1, duration_seconds=0, provider="openrouter", model=model)
+
+    provider = ExecuteProvider()
+    monkeypatch.setattr("norvald_lab.lab_assistant.build_registry",
+                        lambda operator_spec, **kw: registry(operator_spec, provider))
+    with TestClient(create_app(tmp_path, allow_live=True, enable_demo=True)) as client:
+        client.put("/api/assistant/settings", json={
+            "kind": "openrouter", "model": "assistant-operator"})
+        prepared = client.post("/api/assistant/plans/experiment", json={"spec": spec})
+        assert prepared.status_code == 200
+        provider.plan_id = prepared.json()["plan"]["id"]
+        # No GET /plans yet: the draft has not been shown through the plan surface.
+        blocked = client.post("/api/assistant/chat", json={
+            "text": "Execute o plano apenas se já tiver sido apresentado."})
+        assert blocked.status_code == 200
+        assert "Consulte o plano" in blocked.json()["answer"]
+        assert not (tmp_path / "experiments").exists()
+
+        shown = client.get("/api/assistant/plans")
+        assert shown.status_code == 200
+        assert shown.json()[0]["id"] == provider.plan_id
+        allowed = client.post("/api/assistant/chat", json={
+            "text": "O plano foi apresentado, execute agora."})
+        assert allowed.status_code == 200, allowed.text
+        assert "Execução recebida" in allowed.json()["answer"]
+        async def settle():
+            await asyncio.gather(*list(client.app.state.jobs.values()))
+        client.portal.call(settle)
+        assert verify_experiment(tmp_path, spec["experiment_id"])["valid"]
+        assert len([x for x in client.get("/api/assistant/plans").json()
+                    if x["id"] == provider.plan_id and x["status"] == "accepted"]) == 1
