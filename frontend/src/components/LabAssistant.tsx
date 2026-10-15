@@ -227,7 +227,7 @@ export function LabAssistant({ selectedExperiment, onOpenExperiment, onStarted }
                 <small>{m.role === 'assistant' ? 'Lab Assistant · ' + m.model : 'Você'}</small><p>{m.content}</p>
               </div>) : <p className="muted">Pergunte por que o critério não foi atendido, o que o validador aceitou ou quais correções são permitidas.</p>}
             </div>
-            <label htmlFor="assistant-question">Sua pergunta<textarea id="assistant-question" rows={3} maxLength={4000} value={question} placeholder="Por que esta contribuição foi recusada?" onChange={event => setQuestion(event.target.value)} /></label>
+            <label htmlFor="assistant-question">Sua pergunta<textarea id="assistant-question" rows={3} value={question} placeholder="Por que esta contribuição foi recusada?" onChange={event => setQuestion(event.target.value)} /></label>
             <button className="button" disabled={!!busy || !question.trim() || !settings.configured || !connections?.live_enabled} onClick={() => { void sendQuestion(); }}><Send size={15} />{busy === 'chat' ? 'Consultando…' : 'Enviar ao Assistant'}</button>
             {!connections?.live_enabled ? <small>Habilite chamadas reais em Configurações para conversar com um modelo.</small> : !settings.configured ? <small>Configure e salve um modelo operador acima.</small> : null}
           </article>
