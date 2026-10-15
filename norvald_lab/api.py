@@ -460,9 +460,19 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
         except (ValueError, TypeError) as exc:
             raise HTTPException(422, str(exc)) from exc
 
+    def legacy_thread():
+        history = assistant.conversations.history("assistant-general", limit=100000000)
+        if not history:
+            return None
+        return {"id": "assistant-general", "title": "Conversa anterior",
+                "context": {}, "created_at": history[0]["at"],
+                "updated_at": history[-1]["at"]}
+
     @app.get("/api/assistant/threads")
     def assistant_threads():
-        return assistant.threads.list()
+        records = assistant.threads.list()
+        legacy = legacy_thread()
+        return records + ([legacy] if legacy else [])
 
     @app.post("/api/assistant/threads", status_code=201)
     def assistant_create_thread(payload: dict):
@@ -476,10 +486,13 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
     @app.get("/api/assistant/threads/{thread_id}")
     def assistant_thread(thread_id: str):
         try:
-            info = assistant.threads.get(thread_id)
+            info = legacy_thread() if thread_id == "assistant-general" else assistant.threads.get(thread_id)
+            if info is None:
+                raise FileNotFoundError("Conversa não encontrada.")
             return {"thread": info,
                     "messages": assistant.conversations.history(thread_id, limit=100000000),
-                    "events": assistant.threads.events(thread_id)}
+                    "events": [] if thread_id == "assistant-general"
+                              else assistant.threads.events(thread_id)}
         except FileNotFoundError as exc:
             raise HTTPException(404, str(exc)) from exc
         except ValueError as exc:
@@ -505,14 +518,20 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
                 except ValueError as exc:
                     raise HTTPException(422, str(exc)) from exc
         try:
-            assistant.threads.get(thread_id)
+            if thread_id == "assistant-general":
+                if legacy_thread() is None:
+                    raise FileNotFoundError("Conversa não encontrada.")
+            else:
+                assistant.threads.get(thread_id)
             result = await assistant.general_reply(
                 payload["text"], live_enabled=execution_live,
                 catalogue=app.state.lab_operations, emergency=assistant_plans,
                 thread_id=thread_id, screen_context=context)
-            return {"thread": assistant.threads.get(thread_id),
+            return {"thread": legacy_thread() if thread_id == "assistant-general"
+                                 else assistant.threads.get(thread_id),
                     "messages": result["messages"],
-                    "events": assistant.threads.events(thread_id),
+                    "events": [] if thread_id == "assistant-general"
+                              else assistant.threads.events(thread_id),
                     "model": result["model"]}
         except FileNotFoundError as exc:
             raise HTTPException(404, str(exc)) from exc
