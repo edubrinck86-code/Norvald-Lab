@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from norvald_lab.config import identifier
 from norvald_lab.storage import digest
 
 SCHEMA_VERSION = "norvald.lab.criterion_recovery.v1"
@@ -30,7 +31,11 @@ def _attempts(root: Path, adjustments, incident):
     for row in records:
         if row.get("observation_id") != observation_id:
             continue
-        path = adjustments.directory(experiment_id) / row["id"]
+        try:
+            aid = identifier(row["id"], "adjustment_id")
+        except (KeyError, TypeError, ValueError):
+            continue
+        path = adjustments.directory(experiment_id) / aid
         sealed = (path / "integrity.json").exists() and row.get("status") != "altered"
         linked = original_hash is not None and row.get("source_integrity_sha256") == original_hash
         check = row.get("check") if sealed and linked and row.get("status") == "complete" else None
@@ -52,7 +57,7 @@ def _attempts(root: Path, adjustments, incident):
     return selected
 
 
-def recovery_plan(incident, evaluation, adjustments, root):
+def recovery_plan(incident, evaluation, adjustments, root, *, mode=None):
     """Explain safe next steps. Never calls providers or starts adjustments."""
     checks = evaluation.get("evaluations") or []
     integrity = next((c for c in checks if c["criterion_id"] == "lab.dataset.integrity"), {})
@@ -70,7 +75,7 @@ def recovery_plan(incident, evaluation, adjustments, root):
     plan = {
         "schema_version": SCHEMA_VERSION,
         "incident_id": incident["id"],
-        "original_criterion_status": incident["status"],
+        "incident_status": incident["status"],
         "current_evaluation_status": current,
         "action": "review_manually",
         "automatic": False,
@@ -102,7 +107,8 @@ def recovery_plan(incident, evaluation, adjustments, root):
         spec = next((c for c in checks if c["criterion_id"] == "lab.experiment.complete"), {})
         # Get mode from the persisted, verified snapshot's Spec at the caller.
         if (incident.get("validator_code") in FORMAT_ERRORS
-                and spec.get("status") == "met" and incident.get("observation_id")):
+                and spec.get("status") == "met" and incident.get("observation_id")
+                and mode == "live"):
             plan.update(action="preview_adjustment",
                         allowed=True,
                         reason=("Um ajuste assistido pode ser conferido antes de enviar. "
@@ -116,6 +122,9 @@ def recovery_plan(incident, evaluation, adjustments, root):
                             "max_tokens": None,
                             "parent_id": None,
                         })
+        elif incident.get("validator_code") in FORMAT_ERRORS and mode != "live":
+            plan.update(action="new_collection_review", reason=(
+                "Ajustes assistidos exigem uma coleta real íntegra; não executar sobre demonstração."))
         elif incident["validator_code"] == "execution_failed":
             plan.update(action="new_collection_review", reason=(
                 "A execução original falhou. Avaliar nova coleta independente com autorização."))
