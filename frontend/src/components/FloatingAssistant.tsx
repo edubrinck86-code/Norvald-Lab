@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { api, type LabSettings, type Spec } from '../api';
 import { NorvaldMarkdown } from '../ui/markdown/NorvaldMarkdown';
+import { ModelPicker } from './ModelPicker';
 
 type Thread = { id: string; title: string; context: Record<string, string>; created_at: string; updated_at: string };
 type Message = { seq: number; role: 'owner' | 'assistant'; content: string; model: string; at: string };
@@ -205,6 +206,10 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
   const [notice, setNotice] = useState('');
   const [plans, setPlans] = useState<Plan[]>([]);
   const [operator, setOperator] = useState<OperatorSettings>({ kind: '', model: '', configured: false });
+  const [modelPickerOpen, setModelPickerOpen] = useState(false);
+  const [modelCapabilityNotice, setModelCapabilityNotice] = useState('');
+  const operatorLoaded = useRef(false);
+  const operatorDraftDirty = useRef(false);
   const [settings, setSettings] = useState<LabSettings | null>(null);
   const [emergency, setEmergency] = useState<{ stopped: boolean; reason: string }>({ stopped: false, reason: '' });
   const input = useRef<HTMLTextAreaElement>(null);
@@ -222,13 +227,13 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
     setData(result);
   }, []);
   const refreshGlobal = useCallback(async () => {
-    const [all, chosen, connections, control] = await Promise.all([
+    const [all, connections, control] = await Promise.all([
       api<Plan[]>('/api/assistant/plans'),
-      api<OperatorSettings>('/api/assistant/settings'),
       api<LabSettings>('/api/settings'),
       api<{ stopped: boolean; reason: string }>('/api/assistant/emergency'),
     ]);
-    setPlans(all); setOperator(chosen); setSettings(connections); setEmergency(control);
+    // Polling must never overwrite unsaved provider/model selections.
+    setPlans(all); setSettings(connections); setEmergency(control);
   }, []);
   useEffect(() => {
     void refreshThreads().catch(reason => setError(String(reason)));
@@ -241,6 +246,20 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
       .catch(reason => { if (alive) setError(String(reason)); });
     return () => { alive = false; };
   }, [activeId]);
+  useEffect(() => {
+    if (!open || operatorLoaded.current) return;
+    let active = true;
+    void api<OperatorSettings>('/api/assistant/settings').then(value => {
+      if (active) {
+        if (!operatorDraftDirty.current) setOperator(value);
+        operatorLoaded.current = true;
+      }
+    }).catch(reason => { if (active) setError(String(reason)); });
+    return () => { active = false; };
+  }, [open]);
+  useEffect(() => {
+    if (!open) setModelPickerOpen(false);
+  }, [open]);
   useEffect(() => {
     if (!open) return;
     void refreshGlobal().catch(reason => setError(String(reason)));
@@ -258,6 +277,8 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
   useEffect(() => {
     if (!open) return;
     const handle = (event: globalThis.KeyboardEvent) => {
+      // The catalogue modal owns Escape and Tab while it is open.
+      if (modelPickerOpen) return;
       if (event.key === 'Escape') {
         event.preventDefault();
         if (fullScreen) onMinimize(); else setPanelOpen(false);
@@ -276,7 +297,7 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
     };
     document.addEventListener('keydown', handle);
     return () => document.removeEventListener('keydown', handle);
-  }, [open, fullScreen, onMinimize]);
+  }, [open, fullScreen, onMinimize, modelPickerOpen]);
 
   async function newThread() {
     setBusy(true); setError(''); setTab('chat');
@@ -335,9 +356,11 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
       const value = await api<OperatorSettings>('/api/assistant/settings', {
         method: 'PUT', body: JSON.stringify({ kind: operator.kind, model: operator.model }),
       });
-      setOperator(value); setNotice('Modelo operador salvo.');
+      setOperator(value); operatorDraftDirty.current = false;
+      setNotice('Modelo operador salvo.'); setModelCapabilityNotice('');
     } catch (reason) { setError(String(reason)); }
   }
+  const selectedConnection = settings?.connections.find(c => c.kind === operator.kind);
   const visibleEvents = data?.events.filter(event => event.message_seq === null) ?? [];
   const threadName = data?.thread.title ?? 'Nova conversa';
 
@@ -477,13 +500,41 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
               <h3>Modelo operador</h3>
               <p className="muted">Modelo independente dos participantes do experimento. Credenciais permanecem na configuração local do Lab.</p>
               <label>Provider
-                <select value={operator.kind} onChange={event => setOperator(v => ({ ...v, kind: event.target.value }))}>
-                  <option value="">Selecione</option>
-                  {settings?.connections.map(c => <option key={c.kind} value={c.kind}>{c.kind}</option>)}
+                <select aria-label="Selecionar provider do Assistant" value={operator.kind}
+                  onChange={event => {
+                    const kind = event.target.value;
+                    operatorDraftDirty.current = true;
+                    setOperator(current => ({ ...current, kind, model: '', configured: false }));
+                    setModelCapabilityNotice('');
+                    setModelPickerOpen(false);
+                  }}>
+                  <option value="">Selecione o provider</option>
+                  {settings?.connections.map(c => <option key={c.kind} value={c.kind}>
+                    {c.kind}{c.has_key ? ' · conectado' : c.kind === 'ollama' ? ' · local' : ' · sem chave'}
+                  </option>)}
                 </select>
               </label>
-              <label>Modelo<input value={operator.model} onChange={e =>
-                setOperator(v => ({ ...v, model: e.target.value }))} placeholder="ID do modelo"/></label>
+              {selectedConnection && !selectedConnection.has_key
+                && !['ollama', 'openrouter'].includes(selectedConnection.kind) ? <p className="muted">
+                  Configure a chave desse provider nas Configurações do Lab para consultar o catálogo.
+                </p> : null}
+              <div className="nca-model-selection">
+                <label>Modelo
+                  <input aria-label="ID do modelo operador" value={operator.model}
+                    onChange={event => {
+                      operatorDraftDirty.current = true;
+                      setOperator(current => ({ ...current, model: event.target.value, configured: false }));
+                      setModelCapabilityNotice('');
+                    }} placeholder="Selecione no catálogo ou informe o ID manualmente" />
+                </label>
+                <button className="button secondary" type="button" disabled={!operator.kind || !selectedConnection}
+                  onClick={() => setModelPickerOpen(true)}>
+                  Buscar modelos e filtrar
+                </button>
+              </div>
+              {modelCapabilityNotice ? <p className="muted" role="status">{modelCapabilityNotice}</p> : null}
+              <p className="muted">O catálogo permite buscar por nome ou ID e filtrar por preço,
+                ferramentas (tools) e reasoning. O Assistant precisa de ferramentas para operar o Lab por conversa.</p>
               <button className="button secondary" onClick={() => { void saveOperator(); }}
                 disabled={!operator.kind || !operator.model.trim()}>Salvar modelo operador</button>
               {!settings?.live_enabled ? <p className="danger">Chamadas reais estão desabilitadas nas configurações do Lab.</p> : null}
@@ -492,6 +543,25 @@ export function FloatingAssistant({ fullScreen, context, onExpand, onMinimize,
           </div>
         </div>
       </section>
+      {modelPickerOpen && selectedConnection ? <ModelPicker
+        provider={{
+          kind: selectedConnection.kind,
+          credential_env: selectedConnection.credential_env,
+          base_url: selectedConnection.base_url,
+        }}
+        overlayClassName="nca-model-modal"
+        onClose={() => setModelPickerOpen(false)}
+        onSelect={model => {
+          operatorDraftDirty.current = true;
+          setOperator(current => ({ ...current, model: model.id, configured: false }));
+          setModelCapabilityNotice(model.tools === false
+            ? 'Este modelo declara não oferecer tools. A conversa poderá não executar operações.'
+            : model.tools === null
+              ? 'O catálogo não informa se este modelo suporta tools; confirme antes de operar o Lab.'
+              : 'Modelo selecionado no catálogo: ' + model.name);
+          setModelPickerOpen(false);
+        }}
+      /> : null}
     </> : null}
   </>;
 }
