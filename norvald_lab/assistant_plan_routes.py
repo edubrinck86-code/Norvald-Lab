@@ -1,6 +1,7 @@
 """Staged non-destructive Lab Assistant operations, with plans shown first."""
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
@@ -15,6 +16,7 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
                 start_experiment, live_enabled, logger, plans: AssistantPlans,
                 automation: LabAutomation, destructive: DestructiveRequests):
     router = APIRouter(prefix="/api/assistant")
+    tick_lock = asyncio.Lock()
 
     @router.get("/destructive/requests")
     def list_destructive_requests():
@@ -251,7 +253,7 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
     def monitor_now():
         return automation.monitor(incidents)
 
-    async def tick():
+    async def _tick():
         """Reconcile datasets, stage recovery plans, then run prior scheduled work."""
         summary = {"monitor": automation.monitor(incidents),
                    "recovery_planned": [], "recovery_executed": [],
@@ -330,6 +332,11 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
             logger.exception("Falha na ocorrência agendada %s", occurrence["id"])
             summary["occurrence"] = {"id": occurrence["id"], "status": "failed"}
         return summary
+
+    async def tick():
+        # Background watcher and manual refresh share a single reconciliation pass.
+        async with tick_lock:
+            return await _tick()
 
     @router.post("/automation/tick")
     async def tick_now():
