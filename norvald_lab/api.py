@@ -421,64 +421,6 @@ def create_app(root: str | Path | None = None, *, allow_live=False, enable_demo=
             logger.exception("Não foi possível responder na conversa do Lab Assistant")
             raise HTTPException(502, "A resposta do modelo operador falhou. A pergunta não foi registrada.") from exc
 
-    @app.post("/api/assistant/incidents/{incident_id}/adjustment/preview")
-    def assistant_adjustment_preview(incident_id: str, payload: dict):
-        if not isinstance(payload, dict) or set(payload) - {"instruction", "max_tokens"}:
-            raise HTTPException(422, "A prévia aceita somente instruction e max_tokens.")
-        if not execution_live:
-            raise HTTPException(403, "Chamadas reais estão desabilitadas.")
-        detail = incident_detail(incident_id)
-        plan = detail["recovery"]
-        if not plan["allowed"] or plan["action"] != "preview_adjustment":
-            raise HTTPException(409, "Esta ocorrência não admite um ajuste assistido.")
-        proposed = dict(plan["proposed_payload"])
-        if "instruction" in payload:
-            proposed["instruction"] = payload["instruction"]
-        if "max_tokens" in payload:
-            proposed["max_tokens"] = payload["max_tokens"]
-        try:
-            saved, _ = adjustments.prepare(detail["experiment_id"], proposed, persist=False)
-            ticket = assistant.conversations.issue_preview(
-                incident_id, detail["experiment_id"], proposed,
-                saved["source_integrity_sha256"])
-        except (ValueError, KeyError, TypeError, OSError) as exc:
-            raise HTTPException(422, local_settings.redact(str(exc))) from exc
-        # The response exposes the real frozen request to the local owner for inspection.
-        return {"incident_id": incident_id, "experiment_id": detail["experiment_id"],
-                "approval": ticket, "preview": saved, "requires_approval": True,
-                "automatic": False, "independent_sample": False}
-
-    @app.post("/api/assistant/incidents/{incident_id}/adjustment/authorize", status_code=202)
-    async def assistant_adjustment_authorize(incident_id: str, payload: dict):
-        if not isinstance(payload, dict) or set(payload) != {"approval_token", "approved"} or payload["approved"] is not True:
-            raise HTTPException(422, "Revise a prévia e confirme approved=true com seu token.")
-        if not execution_live:
-            raise HTTPException(403, "Chamadas reais estão desabilitadas.")
-        detail = incident_detail(incident_id)
-        plan = detail["recovery"]
-        if not plan["allowed"] or plan["action"] != "preview_adjustment":
-            raise HTTPException(409, "O critério não permite ajuste neste momento.")
-        seal = root / "experiments" / detail["experiment_id"] / "integrity.json"
-        try:
-            expid, approved = assistant.conversations.consume_preview(
-                incident_id, payload["approval_token"], digest(seal))
-            if expid != detail["experiment_id"]:
-                raise ValueError("A prévia não corresponde a este experimento.")
-            if approved.get("observation_id") != detail.get("observation_id"):
-                raise ValueError("A observação original não corresponde à prévia.")
-            saved, spec = adjustments.prepare(expid, approved)
-        except (ValueError, KeyError, TypeError, OSError) as exc:
-            raise HTTPException(409, local_settings.redact(str(exc))) from exc
-        adjustments.start(saved, spec)
-        try:
-            incidents.record_action(incident_id, event="assistant.adjustment_requested",
-                                    payload={"adjustment_id": saved["id"]})
-        except Exception:
-            logger.exception("Falha ao auditar ajuste %s do Assistant", saved["id"])
-        return {"incident_id": incident_id, "experiment_id": expid,
-                "adjustment_id": saved["id"], "status": "accepted",
-                "independent_sample": False}
-
     app.include_router(plan_router(
         root, runner, adjustments, incidents, local_settings, incident_detail,
         execute, lambda: execution_live, logger, assistant_plans))
