@@ -41,6 +41,11 @@ export function AssistantWorkspace({ canChat, stopped, onStarted }: {
   const [comparison, setComparison] = useState<Comparison | null>(null);
   const [history, setHistory] = useState<Record<string, unknown>[]>([]);
   const [activeHistory, setActiveHistory] = useState('');
+  const [exclusionTarget, setExclusionTarget] = useState('');
+  const [destructiveRequest, setDestructiveRequest] = useState<{
+    id: string; experiment_id: string; status: string; expires_at: string;
+  } | null>(null);
+  const [excludeConfirmed, setExcludeConfirmed] = useState(false);
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -147,6 +152,38 @@ export function AssistantWorkspace({ canChat, stopped, onStarted }: {
     finally { setBusy(''); }
   }
 
+  async function stageExclusion() {
+    if (!exclusionTarget) return;
+    setBusy('exclude'); setError('');
+    try {
+      const result = await api<{ request: {
+        id: string; experiment_id: string; status: string; expires_at: string;
+      } }>('/api/assistant/destructive/exclusion/plan', {
+        method: 'POST', body: JSON.stringify({ experiment_id: exclusionTarget }),
+      });
+      setDestructiveRequest(result.request);
+      setExcludeConfirmed(false);
+    } catch (reason) { setError(String(reason)); }
+    finally { setBusy(''); }
+  }
+
+  async function confirmExclusion() {
+    if (!destructiveRequest || !excludeConfirmed) return;
+    setBusy('exclude-confirm'); setError('');
+    try {
+      const result = await api<{ status: string }>(
+        '/api/assistant/destructive/requests/' + destructiveRequest.id + '/confirm',
+        { method: 'POST', body: JSON.stringify({
+          experiment_id: destructiveRequest.experiment_id, confirmed: true,
+        }) });
+      setNotice('Solicitação destrutiva: ' + result.status
+        + '. RAW preservado; exclusão da lista é reversível.');
+      setDestructiveRequest(null); setExcludeConfirmed(false);
+      await refresh();
+    } catch (reason) { setError(String(reason)); }
+    finally { setBusy(''); }
+  }
+
   async function compare() {
     if (!left || !right) return;
     setBusy('compare'); setError(''); setComparison(null);
@@ -230,6 +267,34 @@ export function AssistantWorkspace({ canChat, stopped, onStarted }: {
       </div>) : <p className="muted">Nenhuma rotina agendada.</p>}
       {activeHistory ? <details open><summary>Ocorrências da rotina {activeHistory}</summary>
         <pre>{JSON.stringify(history, null, 2)}</pre></details> : null}
+    </article>
+    <article className="form-card">
+      <div className="row-heading"><div><h3>Permissão exclusiva para ação destrutiva</h3>
+        <small>O modelo não pode excluir dados. Somente você pode confirmar a ocultação de um experimento da lista.</small>
+      </div></div>
+      <label>Experimento a excluir da lista
+        <select value={exclusionTarget} onChange={event => {
+          setExclusionTarget(event.target.value); setDestructiveRequest(null);
+          setExcludeConfirmed(false);
+        }}>
+          <option value="">Selecione</option>{experiments.map(item =>
+            <option key={item.experiment_id} value={item.experiment_id}>{item.experiment_id}</option>)}
+        </select>
+      </label>
+      <button className="button secondary" disabled={!exclusionTarget || !!busy}
+        onClick={() => { void stageExclusion(); }}>Mostrar solicitação destrutiva</button>
+      {destructiveRequest ? <div className="assistant-preview">
+        <strong>Exclusão da lista: {destructiveRequest.experiment_id}</strong>
+        <p>Os arquivos RAW não serão apagados e o experimento poderá ser restaurado.
+          Esta ação requer sua confirmação específica.</p>
+        <small>Solicitação vence em {new Date(destructiveRequest.expires_at).toLocaleString('pt-BR')}</small>
+        <label className="assistant-confirm"><input type="checkbox" checked={excludeConfirmed}
+          onChange={event => setExcludeConfirmed(event.target.checked)} />
+          Confirmo expressamente a exclusão deste experimento da lista.
+        </label>
+        <button className="button" disabled={!excludeConfirmed || !!busy}
+          onClick={() => { void confirmExclusion(); }}>Confirmar ação destrutiva</button>
+      </div> : null}
     </article>
     <article className="form-card">
       <div className="row-heading"><div><h3><BarChart3 size={17} /> Comparação científica estruturada</h3>
