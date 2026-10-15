@@ -7,13 +7,45 @@ from fastapi import APIRouter, HTTPException
 
 from norvald_lab.assistant_plans import AssistantPlans, EmergencyStop, _sha
 from norvald_lab.assistant_automation import LabAutomation
+from norvald_lab.assistant_destructive import DestructiveRequests
 from norvald_lab.storage import digest
 
 
 def plan_router(root: Path, runner, adjustments, incidents, settings, incident_detail,
                 start_experiment, live_enabled, logger, plans: AssistantPlans,
-                automation: LabAutomation):
+                automation: LabAutomation, destructive: DestructiveRequests):
     router = APIRouter(prefix="/api/assistant")
+
+    @router.get("/destructive/requests")
+    def list_destructive_requests():
+        return destructive.list()
+
+    @router.post("/destructive/exclusion/plan")
+    def stage_exclusion(payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"experiment_id"}:
+            raise HTTPException(422, "Informe somente experiment_id.")
+        try:
+            request = destructive.stage_exclusion(payload["experiment_id"])
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+        return {"request": request, "requires_owner_confirmation": True,
+                "raw_deleted": False,
+                "effect": "Somente ocultar o experimento da lista; restauração possível."}
+
+    @router.post("/destructive/requests/{request_id}/confirm")
+    def confirm_exclusion(request_id: str, payload: dict):
+        if not isinstance(payload, dict) or set(payload) != {"experiment_id", "confirmed"}:
+            raise HTTPException(422, "Informe experiment_id e confirmed.")
+        try:
+            return destructive.confirm_exclusion(
+                request_id, experiment_id=payload["experiment_id"],
+                confirmed=payload["confirmed"])
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(409, str(exc)) from exc
 
     @router.get("/emergency")
     def emergency_state():
