@@ -97,6 +97,18 @@ class LabAutomation:
             os.chmod(self.path, 0o600)
         return db
 
+    def recover_interrupted(self):
+        """Conservatively surface interrupted dispatches without duplicating work."""
+        if not self.path.exists():
+            return 0
+        with closing(self._db()) as db:
+            with db:
+                cursor = db.execute("""
+                    UPDATE routine_occurrences SET status='interrupted'
+                    WHERE status IN ('reserved', 'planned')
+                """)
+                return cursor.rowcount
+
     def monitor(self, incidents):
         """Reconcile each newly sealed dataset; never change sealed data."""
         observed, skipped, failures = [], 0, []
