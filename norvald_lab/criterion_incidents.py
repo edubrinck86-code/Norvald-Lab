@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sqlite3
 from contextlib import closing
 from datetime import datetime, timezone
@@ -53,8 +54,10 @@ class CriterionIncidents:
         self.path = Path(root) / "observer" / "criterion_incidents.sqlite3"
 
     def _connect(self):
-        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         db = sqlite3.connect(self.path, timeout=15)
+        if os.name == "posix":
+            os.chmod(self.path, 0o600)
         db.row_factory = sqlite3.Row
         db.execute("PRAGMA busy_timeout=15000")
         db.executescript("""
