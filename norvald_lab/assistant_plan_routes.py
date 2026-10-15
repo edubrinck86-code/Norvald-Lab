@@ -109,20 +109,29 @@ def plan_router(root: Path, runner, adjustments, incidents, settings, incident_d
 
     @router.get("/plans")
     def list_plans():
-        rows = plans.list()
-        plans.mark_presented([row["id"] for row in rows])
-        return rows
+        return plans.list()
 
     @router.get("/plans/{plan_id}")
     def read_plan(plan_id: str):
         try:
-            detail = plans.get(plan_id)
-            plans.mark_presented([detail["id"]])
-            return detail
+            return plans.get(plan_id)
         except FileNotFoundError as exc:
             raise HTTPException(404, str(exc)) from exc
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc
+
+    @router.post("/plans/{plan_id}/present")
+    def present_plan(plan_id: str):
+        """Explicit UI acknowledgement that a reviewed plan card was displayed.
+
+        This is not an approval or an additional permission requirement.
+        """
+        try:
+            detail = plans.get(plan_id)
+            plans.mark_presented([detail["id"]])
+            return {"plan_id": plan_id, "presented": True}
+        except FileNotFoundError as exc:
+            raise HTTPException(404, str(exc)) from exc
 
     @router.post("/plans/{plan_id}/execute", status_code=202)
     async def execute_plan(plan_id: str, payload: dict):
