@@ -19,7 +19,7 @@ def experiment_report(root, experiment_id, *, incidents):
     spec = state["spec"]
     contributions = state.get("contribution_checks") or []
     codes = Counter(row.get("code", "unknown") for row in contributions)
-    selected = incidents.list(experiment_id=experiment_id, limit=500)
+    selected = incidents.all_matching(experiment_id=experiment_id)
     observations = [{
         "observation_id": row.get("observation_id"),
         "participant_id": row.get("participant_id"),
