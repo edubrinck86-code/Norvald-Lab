@@ -2,27 +2,25 @@
  "run_id": "piloto-mmlu-2",
  "inicio_utc": "2026-11-11T18:36:22.392306+00:00",
  "inicio_brasilia": "11/11/2026 15:36:22",
- "fim_utc": "2026-11-11T19:32:50.985589+00:00",
- "fim_brasilia": "11/11/2026 16:32:50",
- "duracao_min": 56.5,
+ "fim_utc": "2026-11-11T19:34:07.394021+00:00",
+ "fim_brasilia": "11/11/2026 16:34:07",
+ "duracao_min": 57.8,
  "experimentos_fechados": {
   "B1": 28,
   "B2": 28,
-  "B3": 27,
-  "E": 27,
-  "EP": 26
+  "B3": 28,
+  "E": 28,
+  "EP": 28
  },
- "experimentos_abertos": [
-  "piloto-mmlu-2-m02069-ep"
- ],
- "chamadas": 705,
- "segundas_tentativas": 21,
+ "experimentos_abertos": [],
+ "chamadas": 722,
+ "segundas_tentativas": 22,
  "falhas_da_1a_tentativa_por_modelo": {
   "nemotron-3-nano-omni-30b-a3b-reasoning:free": 12,
-  "mistral-small-2603": 8,
+  "mistral-small-2603": 9,
   "qwen3.8-27b": 1
  },
- "tokens_de_saida": 700853,
- "custo_usd": 0.7192,
- "registrado_em_utc": "2026-11-11T19:33:07.814636+00:00"
+ "tokens_de_saida": 713003,
+ "custo_usd": 0.7306,
+ "registrado_em_utc": "2026-11-11T19:34:53.563109+00:00"
 }
