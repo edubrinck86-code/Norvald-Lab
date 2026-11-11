@@ -99,6 +99,7 @@ def resolve_sampling(
     reasoning_effort: str = "off",
     supported_parameters: Optional[set[str]] = None,
     temperature_max: Optional[float] = None,
+    keep_sampling_with_reasoning: bool = False,
 ) -> ResolvedSampling:
     """Traduz a intenção do usuário no que o provider aceita.
 
@@ -143,7 +144,11 @@ def resolve_sampling(
 
     # "default" (11/11/2026) = não enviar controle de raciocínio; o provider decide.
     # A amostragem pedida segue normalmente, como em "off".
-    if reasoning_effort and reasoning_effort not in {"off", "default"}:
+    # keep_sampling_with_reasoning (11/11/2026, coleta do Δ_herd): a regra abaixo
+    # vale para Anthropic e OpenAI, mas Gemma, Mistral, Qwen e Nemotron no
+    # OpenRouter aceitam temperatura com raciocínio ligado (conferido em chamada
+    # real). O experimento declara a exceção no spec; nada muda por padrão.
+    if reasoning_effort and reasoning_effort not in {"off", "default"} and not keep_sampling_with_reasoning:
         if temperature is not None or top_p is not None:
             notes.append(
                 "Raciocínio estendido ativo: o provider fixa a amostragem, então temperatura e top_p foram omitidos."

@@ -147,7 +147,7 @@ class ExperimentRunner:
                 if exposure != "blind":
                     instructions += "\nReconsidere a tarefa à luz das contribuições disponíveis no contexto."
                 provider_kind = spec["providers"][participant["provider"]]["kind"]
-                sampling = resolve_sampling(SamplingParams.from_dict(participant["sampling"]), provider_kind=provider_kind, model=participant["model"], reasoning_effort=participant["reasoning_effort"])
+                sampling = resolve_sampling(SamplingParams.from_dict(participant["sampling"]), provider_kind=provider_kind, model=participant["model"], reasoning_effort=participant["reasoning_effort"], keep_sampling_with_reasoning=participant.get("sampling_with_reasoning", False))
                 metadata = {
                     "session_id": "lab:" + spec["experiment_id"], "source_session_id": spec["source"].get("session_id", ""),
                     "execution_id": f"{spec['experiment_id']}:{index}:{participant['id']}",

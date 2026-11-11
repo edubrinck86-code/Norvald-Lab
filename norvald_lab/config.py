@@ -56,7 +56,7 @@ def validate_spec(payload: dict) -> dict:
         raise ValueError("Informe pelo menos um participante.")
     ids = []
     for p in participants:
-        _keys(p, "id name role provider model reasoning_effort sampling", "participante")
+        _keys(p, "id name role provider model reasoning_effort sampling sampling_with_reasoning", "participante")
         ids.append(identifier(p.get("id"), "participant.id"))
         for key in ("provider", "model"):
             _text(p.get(key), f"participant.{key}")
@@ -64,6 +64,8 @@ def validate_spec(payload: dict) -> dict:
         _text(p.setdefault("role", "Analista"), "participant.role")
         if p.setdefault("reasoning_effort", "off") not in {"default", "off", "none", "minimal", "low", "medium", "high", "xhigh", "max"}:
             raise ValueError("reasoning_effort inválido.")
+        if not isinstance(p.get("sampling_with_reasoning", False), bool):
+            raise ValueError("sampling_with_reasoning deve ser true ou false.")
         sampling = p.setdefault("sampling", {})
         _keys(sampling, "temperature top_p max_tokens", "sampling")
         for key, upper in (("temperature", 2), ("top_p", 1)):
