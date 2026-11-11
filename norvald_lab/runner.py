@@ -17,6 +17,7 @@ from norvald_lab.application.arof.corpus import fingerprint_payload
 from norvald_lab.application.arof.dataset import ExperimentManifest
 from norvald_lab.application.arof.exposed_context import seed_peer_contributions
 from norvald_lab.application.arof.outcome_extract import rows_from_raw, write_csv
+from norvald_lab.application.arof.peer_order import PEER_ORDER_METHOD, draw_peer_order, reorder_by_author
 from norvald_lab.application.arof.prior_contribution import PriorContribution
 from norvald_lab.application.arof.raw_observation import build_raw_observation
 from norvald_lab.application.deliberation.round_prompt import render_shared_instructions
@@ -114,6 +115,8 @@ class ExperimentRunner:
         for index in range(1, spec["repetitions"] + 1):
             for participant in spec["participants"]:
                 visible = [prior_by_run[(index, p["id"])] for p in spec["participants"] if exposure == "exposed" or (exposure == "self" and p["id"] == participant["id"])] if exposure != "blind" else []
+                # TESE-002 §4.1: em E, a ordem dos pares é sorteada por execução e gravada (ver peer_order.py).
+                peer_order = draw_peer_order([raw["participant_id"] for raw in visible], experiment_id=spec["experiment_id"], repetition_index=index, participant_id=participant["id"]) if exposure == "exposed" else []
                 wc = WorkingContext.from_dict(base.to_dict())
                 if visible:
                     visibility_key = (index, tuple(raw["observation_id"] for raw in visible))
@@ -125,8 +128,10 @@ class ExperimentRunner:
                             raise ValueError("Exposição incompleta recusada. " + " | ".join(details) + " A coleta original permanece salva. Confira o diagnóstico e a resposta original na bancada.")
                         frozen_contexts[visibility_key] = (seeded.to_dict(), audit)
                     context_snapshot, audit = frozen_contexts[visibility_key]
+                    if peer_order:
+                        context_snapshot = reorder_by_author(context_snapshot, peer_order)
                     wc = WorkingContext.from_dict(context_snapshot)
-                    seed_audits.append({"repetition_index": index, "participant_id": participant["id"], **asdict(audit)})
+                    seed_audits.append({"repetition_index": index, "participant_id": participant["id"], "peer_order": peer_order, **asdict(audit)})
                 # A projeção é integral, sem seleção semântica ou truncamento silencioso.
                 context = _json({"question": wc.question, "items": [item.to_dict() for item in wc.active_items()], "relations": [rel.to_dict() for rel in wc.relations]})
                 round_number = 1 if exposure == "blind" else 2
@@ -147,6 +152,7 @@ class ExperimentRunner:
                     "task_id": spec["task"]["id"], "task_label": spec["task"]["id"],
                     "peer_exposure_mode": "exposed" if exposure == "exposed" else "blind", "lab_exposure_mode": exposure,
                     "source_experiment_id": condition.get("prior_experiment"), "source_observation_ids": [raw["observation_id"] for raw in visible],
+                    "peer_order": peer_order, "peer_order_method": PEER_ORDER_METHOD if exposure == "exposed" else None,
                     "reasoning_exposure_mode": "unknown", "can_modify_deliberation_artifacts": False,
                     "library_corpus_fingerprint": corpus_hash, "library_corpus_item_count": len(spec["documents"]), "library_corpus_algorithm": "sha256-canonical-json-v1",
                     "research_anchor_ids": ["evidence-" + d["id"] for d in spec["documents"]], "attached_evidence_mode": "lab_inline_full", "tool_phase": "lab_frozen_corpus", "tool_limits_explicit": condition.get("max_tool_calls") is not None or condition.get("max_tool_iterations") is not None,
