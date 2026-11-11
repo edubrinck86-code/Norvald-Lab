@@ -68,6 +68,7 @@ def main(argv=None):
     herd.add_argument("--run-id", required=True)
     herd.add_argument("--questions", default="", help="Ids separados por vírgula; vazio = todas as contestáveis e as com gabarito")
     herd.add_argument("--live", action="store_true")
+    herd.add_argument("--pilot", action="store_true", help="Só B1 (pilotos do TESE-002 §5.3 e §5.4)")
     serve = commands.add_parser("serve", help="Inicia a bancada e o backend local")
     serve.add_argument("--port", type=int, default=8766)
     serve.add_argument("--live", action="store_true")
@@ -106,7 +107,7 @@ def main(argv=None):
                 print(f"{path.parent.name}: {status}")
         elif args.command == "herd":
             from norvald_lab.herd.run_command import run_herd
-            return run_herd(runner, bank_path=args.bank, panel_path=args.panel, run_id=args.run_id, questions=args.questions, live=args.live, progress=_progress)
+            return run_herd(runner, bank_path=args.bank, panel_path=args.panel, run_id=args.run_id, questions=args.questions, live=args.live, progress=_progress, pilot=args.pilot)
         elif args.command == "serve":
             import uvicorn
             from norvald_lab.api import create_app

@@ -22,7 +22,10 @@ class Step:
         return self.condition_id in {"B3", "E"}
 
 
-def protocol_order(question_ids: Sequence[str]) -> list[Step]:
+def protocol_order(question_ids: Sequence[str], *, blind_first_only: bool = False) -> list[Step]:
+    """blind_first_only: só B1, para os pilotos do TESE-002 §5.3 e §5.4."""
+    if blind_first_only:
+        return [Step(qid, "B1") for qid in question_ids]
     steps: list[Step] = []
     for position, qid in enumerate(question_ids):
         pair = ("B1", "B2") if position % 2 == 0 else ("B2", "B1")

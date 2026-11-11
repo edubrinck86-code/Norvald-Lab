@@ -46,6 +46,10 @@ def test_protocol_order_interleaves_and_alternates():
                      ("q01", "B3"), ("q01", "E"), ("q02", "E"), ("q02", "B3")]
 
 
+def test_pilot_order_is_blind_first_only():
+    assert [(s.question_id, s.condition_id) for s in protocol_order(["q01", "g01"], blind_first_only=True)] == [("q01", "B1"), ("g01", "B1")]
+
+
 def test_participants_have_neutral_labels():
     spec = blind_spec(BANK["questions"][0], PANEL, run_id="t", condition_id="B1")
     assert [p["id"] for p in spec["participants"]] == ["analista-1", "analista-2", "analista-3"]

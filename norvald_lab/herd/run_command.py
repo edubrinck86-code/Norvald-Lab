@@ -40,12 +40,12 @@ def freeze_plan(root: Path, run_id: str, bank, panel) -> Path:
     return path
 
 
-def run_herd(runner, *, bank_path: Path, panel_path: Path, run_id: str, questions: str, live: bool, progress=None) -> int:
+def run_herd(runner, *, bank_path: Path, panel_path: Path, run_id: str, questions: str, live: bool, progress=None, pilot: bool = False) -> int:
     bank, panel = _read(bank_path), _read(panel_path)
     plan_path = freeze_plan(runner.root, run_id, bank, panel)
     ids = [q.strip() for q in questions.split(",") if q.strip()] or default_questions(bank)
     batch = HerdBatch(runner, bank, panel, run_id=run_id)
-    report = asyncio.run(batch.run(ids, allow_live=live, on_event=progress, on_step=lambda step, expid: print(f"== {expid}", flush=True)))
+    report = asyncio.run(batch.run(ids, allow_live=live, on_event=progress, on_step=lambda step, expid: print(f"== {expid}", flush=True), blind_first_only=pilot))
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out = plan_path.parent / f"report-{stamp}.json"
     out.write_text(json.dumps(report.to_dict(), ensure_ascii=False, indent=1) + "\n", encoding="utf-8")

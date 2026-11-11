@@ -52,12 +52,12 @@ class HerdBatch:
         exposure = "self" if step.condition_id == "B3" else "exposed"
         return derive_spec(self.runner.root, source, experiment_id(self.run_id, step.question_id, step.condition_id), exposure, condition_id=step.condition_id)
 
-    async def run(self, question_ids: Sequence[str], *, allow_live: bool, on_event: Callable | None = None, on_step: Callable | None = None) -> BatchReport:
+    async def run(self, question_ids: Sequence[str], *, allow_live: bool, on_event: Callable | None = None, on_step: Callable | None = None, blind_first_only: bool = False) -> BatchReport:
         unknown = [q for q in question_ids if q not in self.questions]
         if unknown:
             raise ValueError("Perguntas fora do banco: " + ", ".join(unknown))
         report = BatchReport()
-        for step in protocol_order(question_ids):
+        for step in protocol_order(question_ids, blind_first_only=blind_first_only):
             expid = experiment_id(self.run_id, step.question_id, step.condition_id)
             status = self._status(expid)
             if status is not None:
