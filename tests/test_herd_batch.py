@@ -103,3 +103,24 @@ def test_plan_is_frozen_per_run(tmp_path):
     changed = json.loads(json.dumps(PANEL)) | {"sampling": {"temperature": 0.2, "top_p": 1.0, "max_tokens": 800}}
     with pytest.raises(ValueError, match="congelada"):
         freeze_plan(tmp_path, "rodada", BANK, changed)
+
+
+def test_english_panel_produces_an_english_spec():
+    # 11/11/2026: coleta em inglês; nem o rótulo do participante pode ficar em português.
+    panel = PANEL | {"language": "en", "instructions": "Choose exactly one option."}
+    spec = blind_spec(BANK_EN["questions"][0], panel, run_id="t", condition_id="B1")
+    assert spec["language"] == "en"
+    assert [p["name"] for p in spec["participants"]] == ["Analyst 1", "Analyst 2", "Analyst 3"]
+    assert "Analista" not in json.dumps(spec)
+    assert "language" not in blind_spec(BANK["questions"][0], PANEL, run_id="t", condition_id="B1")
+
+
+@pytest.mark.asyncio
+async def test_english_batch_runs_end_to_end_in_demo(tmp_path):
+    panel = PANEL | {"language": "en", "instructions": "Choose exactly one option."}
+    bank = {"questions": [q for q in BANK_EN["questions"] if q["id"] in {"q01", "h01"}]}
+    report = await HerdBatch(ExperimentRunner(tmp_path), bank, panel, run_id="en").run(["q01", "h01"], allow_live=False)
+    assert len(report.ran) == 8 and not report.blocked
+    for path in tmp_path.rglob("*.json"):
+        text = path.read_text(encoding="utf-8")
+        assert "Reconsidere" not in text and "Você é" not in text

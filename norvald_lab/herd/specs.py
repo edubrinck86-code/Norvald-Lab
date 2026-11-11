@@ -14,16 +14,21 @@ from typing import Any, Mapping
 
 BLIND_CONDITIONS = ("B1", "B2")
 
+# Rótulos neutros por idioma. Em inglês (decisão de 11/11/2026), um "Analista" em
+# português dentro do prompt seria o único texto em outra língua visto pelos pares.
+LABELS = {"pt-BR": ("analista", "Analista"), "en": ("analyst", "Analyst")}
+
 
 def experiment_id(run_id: str, question_id: str, condition_id: str) -> str:
     return f"{run_id}-{question_id}-{condition_id.lower()}"
 
 
 def participants_for(panel: Mapping[str, Any]) -> list[dict[str, Any]]:
+    slug, label = LABELS[panel.get("language", "pt-BR")]
     out = []
     for position, slot in enumerate(panel["participants"], start=1):
         out.append({
-            "id": f"analista-{position}", "name": f"Analista {position}", "role": "Analista",
+            "id": f"{slug}-{position}", "name": f"{label} {position}", "role": label,
             "provider": slot["provider"], "model": slot["model"],
             "reasoning_effort": panel.get("reasoning_effort", "default"),
             "sampling_with_reasoning": bool(panel.get("sampling_with_reasoning", False)),
@@ -36,7 +41,8 @@ def blind_spec(question: Mapping[str, Any], panel: Mapping[str, Any], *, run_id:
     if condition_id not in BLIND_CONDITIONS:
         raise ValueError("Só B1 e B2 nascem aqui; B3 e E derivam de B1.")
     participants = participants_for(panel)
-    return {
+    language = {"language": panel["language"]} if "language" in panel else {}
+    return language | {
         "schema_version": "norvald.lab.spec.v1",
         "experiment_id": experiment_id(run_id, question["id"], condition_id),
         "mode": panel.get("mode", "live"),
