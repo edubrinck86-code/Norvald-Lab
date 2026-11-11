@@ -78,6 +78,7 @@ def main(argv=None):
     measures.add_argument("--bank", type=Path, action="append", default=[], help="Banco extra, para rodadas sem plan.json")
     measures.add_argument("--answers", type=Path, action="append", default=[], help="Gabarito; padrão: os de studies/herd")
     measures.add_argument("--similarity-threshold", type=float, default=None, help="Limiar provisório de 'razões diversas'")
+    measures.add_argument("--contrast-run", default=None, help="run_id do painel homogêneo de contraste (aw9vf, 344-83): ρ̄_erro e N_eff em B1 dele")
     serve = commands.add_parser("serve", help="Inicia a bancada e o backend local")
     serve.add_argument("--port", type=int, default=8766)
     serve.add_argument("--live", action="store_true")
@@ -119,7 +120,7 @@ def main(argv=None):
             return run_herd(runner, bank_path=args.bank, panel_path=args.panel, run_id=args.run_id, questions=args.questions, live=args.live, progress=_progress, pilot=args.pilot)
         elif args.command == "measures":
             from norvald_lab.measures.command import run_measures
-            return run_measures(root, runs=args.run, out=args.out, seed=args.seed, reps=args.reps, bank_paths=args.bank, answer_paths=args.answers, threshold=args.similarity_threshold)
+            return run_measures(root, runs=args.run, out=args.out, seed=args.seed, reps=args.reps, bank_paths=args.bank, answer_paths=args.answers, threshold=args.similarity_threshold, contrast_run=args.contrast_run)
         elif args.command == "serve":
             import uvicorn
             from norvald_lab.api import create_app

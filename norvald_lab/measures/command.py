@@ -23,13 +23,18 @@ DEFAULT_BANKS = (STUDY / "bank.en.json", STUDY / "mmlu-pro" / "bank.json")
 DEFAULT_ANSWERS = (STUDY / "answers.json", STUDY / "mmlu-pro" / "answers.json")
 
 
-def run_measures(root: Path, *, runs: Sequence[str], out: Path, seed: int, reps: int, bank_paths: Sequence[Path] = (), answer_paths: Sequence[Path] = (), threshold: float | None = None) -> int:
-    catalog = QuestionCatalog.from_files(root, runs, bank_paths or DEFAULT_BANKS, answer_paths or DEFAULT_ANSWERS)
-    table = ObservationLoader(root, catalog).load(runs)
+def run_measures(root: Path, *, runs: Sequence[str], out: Path, seed: int, reps: int, bank_paths: Sequence[Path] = (), answer_paths: Sequence[Path] = (), threshold: float | None = None, contrast_run: str | None = None) -> int:
+    catalog = QuestionCatalog.from_files(root, [*runs, *([contrast_run] if contrast_run else [])], bank_paths or DEFAULT_BANKS, answer_paths or DEFAULT_ANSWERS)
+    loader = ObservationLoader(root, catalog)
+    table = loader.load(runs)
     if not table.rows:
         raise ValueError("Nenhuma observação encontrada para as rodadas: " + ", ".join(runs))
+    # Painel homogêneo de contraste (aw9vf, 344-83 item 2): rodada à parte, nunca misturada à principal.
+    contrast = loader.load([contrast_run]) if contrast_run else None
+    if contrast is not None and not contrast.rows:
+        raise ValueError(f"Nenhuma observação encontrada para a rodada de contraste: {contrast_run}")
     reasons = SameAnswerReasons(threshold=threshold) if threshold is not None else None
-    report = MeasuresReport(ClusteredBootstrap(reps=reps, seed=seed), reasons).build(table)
+    report = MeasuresReport(ClusteredBootstrap(reps=reps, seed=seed), reasons).build(table, contrast)
     out = Path(out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")

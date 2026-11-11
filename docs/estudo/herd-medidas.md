@@ -146,3 +146,71 @@ A medida compara palavras, não ideias.
 13. **Hao, discordância:** B1 não unânime entre as posições válidas.
 14. **Falha da tentativa 1:** a primeira tentativa não deu posição utilizável. Seleção indireta resolvida não é falha.
 15. **Variantes:** a regra 3 se aplica a todas as medidas, inclusive as de Hao e a de razões.
+
+## 8. Registro aw9vf (confirmatório)
+
+**Por quê (11/11/2026):** a camada de medidas não calculava os testes confirmatórios do pré-registro OSF aw9vf (29/09/2026). A seção "Registro aw9vf (confirmatório)" é a **primeira** do JSON (`registro_aw9vf`) e do resumo `.md`. Texto do registro: `studies/herd/osf-aw9vf-respostas.json`, chaves `344-xx` em `revision_responses`. Código: `norvald_lab/measures/aw9vf/`.
+
+Uso do painel de contraste: `--contrast-run <run>` (rodada à parte, nunca misturada à principal).
+
+### 8.1 Mapa: item do registro → código
+
+| Registro | O que pede | Código |
+|---|---|---|
+| 344-62 | `changed_position`, `new_grounds` (estrita e permissiva), subconjuntos `all_agree_B1` e `seeded` | `contribution_reader.py`, `new_grounds.py`, `pair_outcome_index.py`, `unanimous_filter.py`, `exposure_eligibility.py` |
+| 344-66 itens 1–2 | rate(c) para B2, B3, E (e EP, nova); Δ_self, Δ_herd | `confirmatory_tests.py` |
+| 344-66 itens 3–6, 344-71 (dependência) | ρ̄_erro (phi par a par), N_eff por condição, Δ_N_eff = N_eff(B1) − N_eff(E), varredura | `dependence.py`, `neff_sweep.py` |
+| 344-71 H1, H2 | McNemar exato, E contra B3 e B3 contra B2 | `mcnemar_exact.py`, `confirmatory_tests.py` |
+| 344-71 painel | Wilcoxon pareado na mudança de dispersão por pergunta, E contra B3 | `wilcoxon_signed_rank.py`, `modal_dispersion.py` |
+| 344-71 canal da confiança | Wilcoxon na mudança de confiança, condicionado à maioria dos pares | `confidence_channel.py`, `confidence_scale.py` |
+| 344-71 painel de contraste, 344-83 item 2 | ρ̄_erro e N_eff em B1 do painel homogêneo | `registration_report.py` (`--contrast-run`) |
+| 344-75 | codificação; Fleiss; ρ̄_comportamento e ρ̄_erro; distância entre os dois | `fleiss_agreement.py`, `dependence.py`, `confidence_scale.py` |
+| 344-77 | alfa 0,05 bilateral; Holm sobre os três; p bruto e corrigido; tamanhos de efeito com IC | `holm_bonferroni.py`, `confirmatory_tests.py`; IC: `bootstrap.py` |
+| 344-79 | unânimes em B1 fora; sem contribuição estruturada fora da exposição, por pergunta | `unanimous_filter.py`, `exposure_eligibility.py`, `missingness.py` |
+| 344-81 | ausência sem imputação; confiança pareada; taxa de rejeição por condição | `missingness.py`, `confidence_channel.py` |
+| 344-83 item 1 | distância ρ̄_comportamento − ρ̄_erro | `dependence.py` (`distancia_comportamento_menos_erro`) |
+| 344-83 item 3 | assimetria por par ordenado de modelos | `pair_asymmetry.py` |
+| 344-83 item 5 | colisão literal, por par de autores, nunca o texto | `literal_collision.py` |
+| 344-83 itens 4 e 6 | efeito da posição na lista; auditoria de normalização | **não implementados aqui**; a ordem sorteada já está em `Observation.peer_order` e o critério J mede o efeito de ordem |
+
+Fora de escopo e não implementado: a verificação de que nenhuma entrada de segunda onda continha a saída de segunda onda de outro participante (344-71, "Assumption check"). A simultaneidade vale pelo desenho do runner; o relatório não a confere.
+
+### 8.2 Regra dos fundamentos (`new_grounds`)
+
+- **Fundamento** = alvo de uma relação `derived_from`, `evidenced_by` ou `documents` (as mesmas do extrator da tabela tidy) **declarada** no bloco da contribuição, aceita ou não pelo validador. Em dados reais (11/11/2026, 501 linhas de B1) 19 contribuições declararam fundamento e o validador aceitou 0: a regra de tipos admite, por exemplo, inferência → afirmação, e recusa decisão → opção ou decisão → evidência. Medir só o aceito tornaria `new_grounds` sempre falso.
+- O alvo é classificado, sem juízo semântico, contra o Working Context da execução e a própria contribuição:
+  - `base`: item do contexto sem autor (opção, evidência), ou id que não existe em lugar nenhum (conta como declarado); chave = id;
+  - `local`: outra unidade da própria contribuição que não a decisão; chave = conteúdo normalizado (minúsculas, espaços colapsados), porque `k1` é reutilizado em toda contribuição;
+  - `own`: contribuição anterior do próprio participante (aparece em B3, EP e E);
+  - `peer`: contribuição de outro participante;
+  - alvo que é a decisão que seleciona a opção não é fundamento (é a posição).
+- Fundamento **novo** = presente na segunda onda e ausente entre os da própria B1 (mesma classe, mesma chave).
+  - **Estrita:** só `base` e `local` contam. `peer` não conta.
+  - **Permissiva:** `base`, `local` e `peer` contam.
+  - `own` nunca conta, nas duas.
+- O resultado sai como **intervalo entre as duas leituras**, e cada estatística sai nas duas (a estrita é a que o registro nomeia).
+- Limite conhecido: citar como fundamento a opção que se acaba de escolher (`derived_from option-b`) é fundamento `base` novo, lido ao pé da letra. Reduz rate(c) onde isso acontece.
+
+### 8.3 Estatísticas
+
+- **rate(c)** = `changed_position` E NÃO `new_grounds`, sobre os pares participante-pergunta válidos em c. Para B2, "mudou" = opção de B2 ≠ opção de B1, com os fundamentos de B2 comparados aos de B1. Par válido: elegível em B1 (posição válida e contribuição estruturada) e com posição válida em c.
+- **Δ_self** = rate(B3) − rate(B2); **Δ_herd** = rate(E) − rate(B3). Calculados sobre os pares válidos **nas duas** condições (o mesmo conjunto do McNemar). Com dados faltando, podem diferir da subtração das taxas marginais, que saem sobre os pares de cada condição.
+- **McNemar exato bilateral:** b e c são os pares discordantes; p = min(1, 2 · P(Bin(b+c, ½) ≤ min(b, c))); sem discordantes, p = 1.
+- **Dispersão** de uma pergunta = 1 − fração das posições na opção modal (o registro não fixa o índice; é diferente da dispersão do critério B). Medida em B3 e em E sobre os participantes elegíveis com posição válida nas duas, mínimo 2.
+- **Wilcoxon** pareado bilateral sobre a mudança de dispersão (E − B3) por pergunta. Zeros saem. Empates recebem postos médios. Exato (permutação dos sinais, condicionada aos postos, com os postos dobrados para ficarem inteiros) até 50 diferenças não nulas; acima disso, aproximação normal com correção de empates na variância e continuidade de 0,5. O método sai no relatório.
+- **Holm–Bonferroni** sobre os três testes confirmatórios, separadamente em cada leitura de `new_grounds`; p bruto e p corrigido lado a lado.
+- **Tamanhos de efeito:** diferença de proporções (Δ) e diferença média da dispersão, com IC bootstrap percentil por pergunta (`ClusteredBootstrap`); para os Wilcoxon, também a correlação bisserial por postos (W+ − W−)/(W+ + W−) e a mediana da mudança.
+- **Canal da confiança** (exploratório, sem correção): confiança → posto (baixa 1, média 2, alta 3); mudança = posto em E − posto em B3, só onde está declarada nas duas condições e há posição válida nas duas; ausência nunca vira zero e a contagem dos excluídos sai. Grupos pela relação da maioria dos pares com a própria B1 do participante: `maioria_concorda`, `maioria_discorda` e `sem_maioria` (nenhuma opção com mais da metade dos pares); `todos` ao lado. Os pares são os outros participantes elegíveis, com a posição de B1 (é o que E mostra).
+- **ρ̄_erro** por condição (B1, B3, EP, E): média dos phi par a par entre os vetores de erro, nas perguntas com gabarito; par sem variância sai da média e é contado. **N_eff(c)** = n/(1 + (n−1)ρ̄_erro(c)) com n = participantes distintos do painel (o mesmo n em todas as condições). **Δ_N_eff** = N_eff(B1) − N_eff(E), IC bootstrap. Sem teste de significância.
+- **Varredura analítica:** N_eff para ρ̄ de 0,01 a 1 e n em {4, 5, 8, ∞} (∞ dá 1/ρ̄), mais o n do painel se for outro; os ρ̄ observados entram como âncoras, não como limite. Rotulada como analítica.
+- **ρ̄_comportamento:** kappa de Fleiss de B1 nas contestáveis. Por pergunta, P_i = fração de pares do painel que concordam; κ = (P̄ − P_e)/(1 − P_e), com P_e das frequências de opção pooled. Descritivo, fora da tabela de N_eff. **Distância** = ρ̄_comportamento − ρ̄_erro(B1), com IC. O bootstrap dessa seção reamostra dentro de dois estratos (gabarito e contestável).
+- **Assimetria:** por par ordenado (puxa j → puxado i), entre os casos em que i e j discordavam em B1, a fração em que i termina na posição de j sem fundamento novo, em E e (linha de base) em B3. Descritiva, sem inferência.
+- **Colisão literal:** strings byte a byte idênticas entre as afirmações declaradas de dois participantes na mesma pergunta, em B1 e em B2 (as ondas cegas). Contagens por par de autores (agentes); nunca o texto. `colisoes_em_decisoes` separa as que são conteúdo de uma `decision` nos dois.
+
+### 8.4 Variantes de exclusão
+
+- **Principal (registrada):** pergunta unânime em B1 (todas as posições válidas iguais, mínimo duas) sai de toda a análise desta seção, inclusive da dependência. A taxa de descarte é resultado (`descarte_de_unanimes_em_b1`).
+- **Alternativa (desvio aprovado em 11/11/2026):** unânimes mantidas.
+- As duas saem lado a lado, e cada uma nas variantes da regra 3 (`com_indiretas`, `sem_indiretas`).
+- **Sem contribuição estruturada:** o participante sem unidade aceita pelo validador em B1 sai da análise de exposição naquela pergunta, e a saída fica listada por pergunta (`ausencia`). Na prática o participante também fica sem posição, então já sai pela posição inválida.
+- As duas variantes valem também para o painel homogêneo de contraste. Atenção: um painel de uma só instância tende a ser unânime, então a variante principal pode deixá-lo com poucas perguntas ou nenhuma (ρ̄ indefinido); a alternativa é a que o descreve como referência de dependência máxima.

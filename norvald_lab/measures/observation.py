@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from norvald_lab.measures.ground import Ground
+
 
 @dataclass(frozen=True)
 class Observation:
@@ -30,6 +32,15 @@ class Observation:
     status: str  # leitura do extrator (ok, no_decision, failed) na última tentativa
     validation_code: str
     agent_key: str = ""  # preenchido pelo carregador; ver `agent`
+    # Estrutura declarada, para o registro aw9vf (ver measures/aw9vf).
+    # `structured`: a contribuição declarou ao menos uma unidade aceita pelo
+    # validador; sem isso o participante não entra no Working Context e
+    # ninguém o viu (344-79, item 2). `grounds`: os fundamentos declarados.
+    # `claims`: (tipo, conteúdo) de cada unidade declarada, só para contar
+    # colisões literais; o texto nunca vai para o relatório (344-83, item 5).
+    structured: bool = True
+    grounds: tuple[Ground, ...] = ()
+    claims: tuple[tuple[str, str], ...] = ()
 
     @property
     def unit(self) -> tuple[str, str, str, str]:

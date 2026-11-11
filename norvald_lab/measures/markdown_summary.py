@@ -8,18 +8,8 @@ from __future__ import annotations
 
 from typing import Any
 
-
-def _number(value: Any, digits: int = 3) -> str:
-    if value is None:
-        return "—"
-    return f"{value:.{digits}f}".replace(".", ",")
-
-
-def _interval(data: dict | None) -> str:
-    if not data:
-        return "—"
-    low, high = data.get("ic", [None, None])
-    return f"{_number(data.get('estimativa'))} [{_number(low)}; {_number(high)}] (n={data.get('n') if data.get('n') is not None else '—'})"
+from norvald_lab.measures.aw9vf.registration_markdown import RegistrationMarkdown
+from norvald_lab.measures.markdown_format import interval as _interval, number as _number
 
 
 def _get(data: Any, *path: str) -> Any:
@@ -57,6 +47,7 @@ def render_markdown(report: dict) -> str:
         f"Gerado em {report['gerado_em']}. Bootstrap por pergunta, {boot['reps']} réplicas, seed {boot['seed']}, IC {int(boot['nivel'] * 100)}% percentil.",
         f"Tabela: {table['linhas']} linhas, {table['perguntas']} perguntas ({table['perguntas_com_gabarito']} com gabarito), {table['selecoes_indiretas']} seleções indiretas.",
         "",
+        *RegistrationMarkdown().render(report.get("registro_aw9vf")),
         "## Tentativas e custo",
         f"Custo total: US$ {_number(report['tentativas_e_custo']['custo_total_usd'], 4)}.",
         "",
