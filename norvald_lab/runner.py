@@ -17,6 +17,7 @@ from norvald_lab.application.arof.corpus import fingerprint_payload
 from norvald_lab.application.arof.dataset import ExperimentManifest
 from norvald_lab.application.arof.exposed_context import seed_peer_contributions
 from norvald_lab.application.arof.outcome_extract import rows_from_raw, write_csv
+from norvald_lab.application.arof.outcome_validation import validation_from_payload
 from norvald_lab.application.arof.peer_order import PEER_ORDER_METHOD, draw_peer_order, reorder_by_author
 from norvald_lab.application.arof.prior_contribution import PriorContribution
 from norvald_lab.application.arof.raw_observation import build_raw_observation
@@ -57,6 +58,23 @@ def _json(value):
 
 def _utc():
     return datetime.now(timezone.utc).isoformat()
+
+
+def _has_valid_contribution(observation) -> bool:
+    """Se a execução trouxe uma contribuição com opção selecionada aceita pelo validador.
+
+    Reaproveita as leituras que o Lab já usa para recusar uma origem incompleta
+    (prepare: falha ou resposta vazia; seed: autor sem unidade aceita) e a coluna
+    option_accepted de outcomes.csv (validation_from_payload, sobre o contexto gravado no
+    próprio registro). Aceitar uma opção implica as duas primeiras.
+    """
+    payload = observation.to_dict()
+    if payload.get("error"):
+        return False
+    content = (payload.get("result") or {}).get("content") or ""
+    if not content.strip():
+        return False
+    return bool(validation_from_payload(payload, response=content, grounding_relations=()).option_accepted)
 
 
 @dataclass(frozen=True)
@@ -228,7 +246,9 @@ class ExperimentRunner:
         directory.mkdir(parents=True, exist_ok=False)
         planned = len(prepared.requests_json)
         budget = spec["budget"]
-        manifest = ExperimentManifest(experiment_id=expid, framework_version="AROF-Lab-v1", task=spec["task"], conditions=(spec["condition"] | {"repetitions": spec["repetitions"]},), models=tuple(spec["participants"]), budget=budget | {"planned_logical_executions": planned, "max_attempts": planned}, corpus={"documents": spec["documents"], "fingerprint": fingerprint_payload(spec["documents"])}, metadata={"runner_version": RUNNER_VERSION, "prompt_profile": PROMPT_PROFILE, "condition_fingerprint": prepared.condition_fingerprint, "execution_revision": EXECUTION_REVISION, "studio_revision": STUDIO_REVISION, "synthetic": spec["mode"] == "demo", "agent_attempts_per_execution": 1, "transport_retries": "Norvald-Execution policy; not independent samples"}, notes=("Corpus integral em todas as condições; sem replanejamento automático; não equivale ao perfil nativo de ferramentas do Studio.",))
+        # Uma nova tentativa por participante (piloto-mmlu-1, 11/11/2026): o padrão 1 é a coleta de sempre.
+        max_attempts = budget.get("max_agent_attempts", 1)
+        manifest = ExperimentManifest(experiment_id=expid, framework_version="AROF-Lab-v1", task=spec["task"], conditions=(spec["condition"] | {"repetitions": spec["repetitions"]},), models=tuple(spec["participants"]), budget=budget | {"planned_logical_executions": planned, "max_attempts": planned * max_attempts}, corpus={"documents": spec["documents"], "fingerprint": fingerprint_payload(spec["documents"])}, metadata={"runner_version": RUNNER_VERSION, "prompt_profile": PROMPT_PROFILE, "condition_fingerprint": prepared.condition_fingerprint, "execution_revision": EXECUTION_REVISION, "studio_revision": STUDIO_REVISION, "synthetic": spec["mode"] == "demo", "agent_attempts_per_execution": max_attempts, "transport_retries": "Norvald-Execution policy; not independent samples"}, notes=("Corpus integral em todas as condições; sem replanejamento automático; não equivale ao perfil nativo de ferramentas do Studio.",))
         write_manifest(manifest, root=self.root)
         write_once(directory / "spec.json", spec)
         write_once(directory / "requests.json", [json.loads(s) for s in prepared.requests_json])
@@ -257,31 +277,38 @@ class ExperimentRunner:
             participant = next(p for p in spec["participants"] if p["id"] == data["agent_id"])
             request = ExecutionRequest(**{k: v for k, v in data.items() if k not in {"context", "sampling"}}, context=ExecutionContext(**data["context"]), sampling=ResolvedSampling(**data["sampling"]))
             async with slots, provider_slots[participant["provider"]]:
-                started = _utc()
-                emit("execution.started", {"participant_id": participant["id"], "run_id": metadata["run_id"]})
-                # Mesmo sem ferramentas, o runtime recebe os eventos de transporte.
-                runtime = corpus_runtime(spec["documents"] if request.allow_tools else [], on_event=lambda event, details: emit(event, details | {"execution_id": metadata["execution_id"]}))
-                orchestrator = AgentOrchestrator(registry, tool_registry=runtime, tool_loop=tool_loop)
-                result = None
-                error = None
-                cancelled = False
-                try:
-                    result = await asyncio.wait_for(orchestrator.execute(request), timeout=budget["timeout_seconds"])
-                except asyncio.CancelledError:
-                    error = RuntimeError("Execução interrompida antes da conclusão.")
-                    cancelled = True
-                except Exception as exc:
-                    error = exc
-                if result is not None:
-                    result.metadata = redact(result.metadata)
-                observation = build_raw_observation(request=request, attempt_index=1, started_at=started, requested_provider_kind=spec["providers"][participant["provider"]]["kind"], requested_model=participant["model"], available_tool_names=[d.name for d in runtime.definitions()] if request.allow_tools else [], result=result, error=error)
-                observation = replace(observation, error=redact(observation.error), request=observation.request | {"boundary": "norvald_lab_execution", "studio_metadata": observation.request["studio_metadata"] | {k: metadata[k] for k in LAB_RAW_METADATA_KEYS}})
-                sink.record(observation)
-                output = {"participant_id": participant["id"], "run_id": metadata["run_id"], "ok": error is None, "error": redact(str(error)) if error else None, "provider": participant["provider"], "model": participant["model"], "reasoning_captured": bool(result and result.reasoning), "input_tokens": result.input_tokens if result else None, "output_tokens": result.output_tokens if result else None}
-                outputs.append(output)
-                emit("execution.completed" if error is None else "execution.failed", output)
-                if cancelled:
-                    raise asyncio.CancelledError
+                # Cada tentativa é uma observação própria (attempt_index); a seguinte só existe
+                # se a anterior não trouxe contribuição válida e ainda há tentativas no orçamento.
+                for attempt in range(1, max_attempts + 1):
+                    started = _utc()
+                    emit("execution.started", {"participant_id": participant["id"], "run_id": metadata["run_id"]} | ({"attempt_index": attempt} if max_attempts > 1 else {}))
+                    # Mesmo sem ferramentas, o runtime recebe os eventos de transporte.
+                    runtime = corpus_runtime(spec["documents"] if request.allow_tools else [], on_event=lambda event, details: emit(event, details | {"execution_id": metadata["execution_id"]}))
+                    orchestrator = AgentOrchestrator(registry, tool_registry=runtime, tool_loop=tool_loop)
+                    result = None
+                    error = None
+                    cancelled = False
+                    try:
+                        result = await asyncio.wait_for(orchestrator.execute(request), timeout=budget["timeout_seconds"])
+                    except asyncio.CancelledError:
+                        error = RuntimeError("Execução interrompida antes da conclusão.")
+                        cancelled = True
+                    except Exception as exc:
+                        error = exc
+                    if result is not None:
+                        result.metadata = redact(result.metadata)
+                    observation = build_raw_observation(request=request, attempt_index=attempt, started_at=started, requested_provider_kind=spec["providers"][participant["provider"]]["kind"], requested_model=participant["model"], available_tool_names=[d.name for d in runtime.definitions()] if request.allow_tools else [], result=result, error=error)
+                    observation = replace(observation, error=redact(observation.error), request=observation.request | {"boundary": "norvald_lab_execution", "studio_metadata": observation.request["studio_metadata"] | {k: metadata[k] for k in LAB_RAW_METADATA_KEYS}})
+                    sink.record(observation)
+                    output = {"participant_id": participant["id"], "run_id": metadata["run_id"], "ok": error is None, "error": redact(str(error)) if error else None, "provider": participant["provider"], "model": participant["model"], "reasoning_captured": bool(result and result.reasoning), "input_tokens": result.input_tokens if result else None, "output_tokens": result.output_tokens if result else None}
+                    if max_attempts > 1:
+                        output["attempt_index"] = attempt
+                    outputs.append(output)
+                    emit("execution.completed" if error is None else "execution.failed", output)
+                    if cancelled:
+                        raise asyncio.CancelledError
+                    if _has_valid_contribution(observation):
+                        break
         tasks = [asyncio.create_task(execute(s)) for s in prepared.requests_json]
         aborted = False
         infrastructure_error = None
@@ -294,15 +321,19 @@ class ExperimentRunner:
                 task.cancel()
             await asyncio.gather(*tasks, return_exceptions=True)
         finally:
-            capacity = await monitor.stop(logical_executions=len(outputs), attempts=len(outputs), failures=sum(not x["ok"] for x in outputs)) if monitor else None
+            # Execução lógica é o par (repetição, participante); tentativa é cada chamada. Falha conta por tentativa.
+            capacity = await monitor.stop(logical_executions=len({(x["run_id"], x["participant_id"]) for x in outputs}), attempts=len(outputs), failures=sum(not x["ok"] for x in outputs)) if monitor else None
         if capacity:
             write_capacity_report(expid, capacity, root=self.root)
-        status = "aborted" if aborted else "incomplete" if any(not x["ok"] for x in outputs) else "complete"
+        # O estado vale pela última tentativa de cada execução lógica; a falha da 1ª fica nos registros.
+        final = {(x["run_id"], x["participant_id"]): x for x in outputs}
+        failures = sum(not x["ok"] for x in final.values())
+        status = "aborted" if aborted else "incomplete" if failures else "complete"
         raw_files = sorted((directory / "raw").rglob("*.jsonl"))
         close_experiment(expid, raw_files, status=status, root=self.root)
-        rows = rows_from_raw(raw_files, experiment_id=expid)
+        rows = rows_from_raw(raw_files, experiment_id=expid, all_attempts=True)
         write_csv(rows, directory / "outcomes.csv")
-        result_view = {"experiment_id": expid, "condition_id": spec["condition"]["id"], "status": status, "synthetic": spec["mode"] == "demo", "planned": planned, "executed": len(outputs), "failures": sum(not x["ok"] for x in outputs), "executions": sorted(outputs, key=lambda x: (x["run_id"], x["participant_id"])), "condition_fingerprint": prepared.condition_fingerprint, "completed_at": _utc(), "capacity": capacity.to_dict() if capacity else None}
+        result_view = {"experiment_id": expid, "condition_id": spec["condition"]["id"], "status": status, "synthetic": spec["mode"] == "demo", "planned": planned, "executed": len(final), "failures": failures, "executions": sorted(outputs, key=lambda x: (x["run_id"], x["participant_id"], x.get("attempt_index", 1))), "condition_fingerprint": prepared.condition_fingerprint, "completed_at": _utc(), "capacity": capacity.to_dict() if capacity else None} | ({"attempts": len(outputs)} if max_attempts > 1 else {})
         write_once(directory / "result.json", result_view)
         emit("experiment.completed", {"experiment_id": expid, "status": status})
         seal(directory)

@@ -8,7 +8,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from norvald_lab.config import identifier
-from norvald_lab.contribution_check import check_records
+from norvald_lab.contribution_check import check_records, latest_checks
 from norvald_lab.storage import verify_experiment
 
 
@@ -47,7 +47,10 @@ def snapshot(root: Path, experiment_id: str, status: str) -> dict:
             "events": read_jsonl(directory / "events.jsonl", provisional=check is None),
             "records": [item for path in sorted((directory / "raw").rglob("*.jsonl"))
                         for item in read_jsonl(path, provisional=check is None)]}
-    result["contribution_checks"] = check_records(result["records"], result["requests"])
+    # Com nova tentativa, o diagnóstico que vale para cada (participante, repetição) é o da última;
+    # o de todas as tentativas fica em contribution_checks_all.
+    result["contribution_checks_all"] = check_records(result["records"], result["requests"])
+    result["contribution_checks"] = latest_checks(result["contribution_checks_all"])
     return result
 
 

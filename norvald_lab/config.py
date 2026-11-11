@@ -134,10 +134,14 @@ def validate_spec(payload: dict) -> dict:
         if condition.get(name) is not None:
             _positive(condition[name], name)
     budget = spec.setdefault("budget", {})
-    _keys(budget, "max_concurrency max_concurrency_per_provider timeout_seconds max_logical_executions", "budget")
+    _keys(budget, "max_concurrency max_concurrency_per_provider timeout_seconds max_logical_executions max_agent_attempts", "budget")
     planned = len(participants) * spec["repetitions"]
     for name, default in (("max_concurrency", 3), ("max_concurrency_per_provider", 2), ("timeout_seconds", 300), ("max_logical_executions", planned)):
         _positive(budget.setdefault(name, default), name)
+    # Tentativas por participante (11/11/2026). Ausente = 1, e o campo não é gravado no spec
+    # quando ausente: o snapshot e a impressão digital das coletas anteriores não mudam.
+    if "max_agent_attempts" in budget and (type(budget["max_agent_attempts"]) is not int or not 1 <= budget["max_agent_attempts"] <= 3):
+        raise ValueError("max_agent_attempts deve ser um inteiro entre 1 e 3.")
     if planned > budget["max_logical_executions"]:
         raise ValueError("Execuções planejadas excedem o orçamento declarado.")
     source = spec.setdefault("source", {})
