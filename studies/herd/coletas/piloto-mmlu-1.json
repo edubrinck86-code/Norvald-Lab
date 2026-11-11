@@ -1,0 +1,18 @@
+{
+ "run_id": "piloto-mmlu-1",
+ "inicio_utc": "2026-11-11T18:18:20.968235+00:00",
+ "inicio_brasilia": "11/11/2026 15:18:20",
+ "fim_utc": "2026-11-11T18:30:13.016524+00:00",
+ "fim_brasilia": "11/11/2026 15:30:13",
+ "duracao_min": 11.9,
+ "experimentos_fechados": {
+  "B1": 28
+ },
+ "experimentos_abertos": [],
+ "chamadas": 140,
+ "segundas_tentativas": 0,
+ "falhas_da_1a_tentativa_por_modelo": {},
+ "tokens_de_saida": 136386,
+ "custo_usd": 0.144,
+ "registrado_em_utc": "2026-11-11T19:04:40.486188+00:00"
+}
