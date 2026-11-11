@@ -57,9 +57,12 @@ def test_answers_never_reach_the_spec():
 
 
 def test_protocol_order_interleaves_and_alternates():
+    # Contrato mudou de propósito em 11/11/2026 (5ª condição EP): a fase derivada tem três
+    # condições e gira em quadrado latino pela posição da pergunta (ver schedule.py).
     steps = [(s.question_id, s.condition_id) for s in protocol_order(["q01", "q02"])]
     assert steps == [("q01", "B1"), ("q01", "B2"), ("q02", "B2"), ("q02", "B1"),
-                     ("q01", "B3"), ("q01", "E"), ("q02", "E"), ("q02", "B3")]
+                     ("q01", "B3"), ("q01", "EP"), ("q01", "E"),
+                     ("q02", "EP"), ("q02", "E"), ("q02", "B3")]
 
 
 def test_pilot_order_is_blind_first_only():
@@ -75,16 +78,16 @@ def test_participants_have_neutral_labels():
 
 
 @pytest.mark.asyncio
-async def test_batch_runs_four_conditions_and_resumes(tmp_path):
+async def test_batch_runs_five_conditions_and_resumes(tmp_path):
     runner = ExperimentRunner(tmp_path)
     batch = HerdBatch(runner, BANK, PANEL, run_id="piloto")
     report = await batch.run(["q01", "g01"], allow_live=False)
-    assert len(report.ran) == 8 and all(status == "complete" for _, status in report.ran)
+    assert len(report.ran) == 10 and all(status == "complete" for _, status in report.ran)
     assert not report.blocked
     e = json.loads((tmp_path / "experiments" / experiment_id("piloto", "q01", "E") / "spec.json").read_text())
     assert e["condition"] == {"id": "E", "exposure": "exposed", "tools": "off", "prior_experiment": "piloto-q01-b1"}
     again = await batch.run(["q01", "g01"], allow_live=False)
-    assert not again.ran and len(again.existing) == 8
+    assert not again.ran and len(again.existing) == 10
 
 
 @pytest.mark.asyncio
@@ -93,7 +96,7 @@ async def test_derived_conditions_blocked_when_b1_missing(tmp_path):
     batch = HerdBatch(runner, BANK, PANEL, run_id="piloto")
     (tmp_path / "experiments" / "piloto-q01-b1").mkdir(parents=True)  # B1 que não fechou
     report = await batch.run(["q01"], allow_live=False)
-    assert {expid for expid, _ in report.blocked} == {"piloto-q01-b3", "piloto-q01-e"}
+    assert {expid for expid, _ in report.blocked} == {"piloto-q01-b3", "piloto-q01-ep", "piloto-q01-e"}
     assert ("piloto-q01-b1", "unfinished") in report.existing
 
 
@@ -120,7 +123,7 @@ async def test_english_batch_runs_end_to_end_in_demo(tmp_path):
     panel = PANEL | {"language": "en", "instructions": "Choose exactly one option."}
     bank = {"questions": [q for q in BANK_EN["questions"] if q["id"] in {"q01", "h01"}]}
     report = await HerdBatch(ExperimentRunner(tmp_path), bank, panel, run_id="en").run(["q01", "h01"], allow_live=False)
-    assert len(report.ran) == 8 and not report.blocked
+    assert len(report.ran) == 10 and not report.blocked
     for path in tmp_path.rglob("*.json"):
         text = path.read_text(encoding="utf-8")
         assert "Reconsidere" not in text and "Você é" not in text

@@ -1,7 +1,7 @@
 """Executa a coleta do Δ_herd em lote, na ordem do protocolo, retomável.
 
 Um experimento que já existe não é refeito: o Lab proíbe reutilizar id.
-Se B1 de uma pergunta não terminou completo, B3 e E dela são pulados e
+Se B1 de uma pergunta não terminou completo, B3, EP e E dela são pulados e
 registrados como bloqueados, porque a exposição exige resposta válida de
 todos (runner.prepare recusa). Nada é descartado em silêncio: o resumo
 diz o que rodou, o que já existia e o que ficou bloqueado, e por quê.
@@ -49,7 +49,7 @@ class HerdBatch:
         if not step.derived:
             return blind_spec(self.questions[step.question_id], self.panel, run_id=self.run_id, condition_id=step.condition_id)
         source = experiment_id(self.run_id, step.question_id, "B1")
-        exposure = "self" if step.condition_id == "B3" else "exposed"
+        exposure = {"B3": "self", "EP": "stance"}.get(step.condition_id, "exposed")
         return derive_spec(self.runner.root, source, experiment_id(self.run_id, step.question_id, step.condition_id), exposure, condition_id=step.condition_id)
 
     async def run(self, question_ids: Sequence[str], *, allow_live: bool, on_event: Callable | None = None, on_step: Callable | None = None, blind_first_only: bool = False) -> BatchReport:

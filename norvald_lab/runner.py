@@ -121,28 +121,52 @@ class ExperimentRunner:
         prepared_requests = []
         seed_audits = []
         frozen_contexts = {}
+        option_ids = {item.id for item in base.active_items() if item.type == "option"}
+
+        def seed(raws, index):
+            """Semeia o contexto com as respostas cegas dadas; um único congelamento por conjunto visível."""
+            visibility_key = (index, tuple(raw["observation_id"] for raw in raws))
+            if visibility_key not in frozen_contexts:
+                seeded, authors, audit = seed_peer_contributions(WorkingContext.from_dict(base.to_dict()), [PriorContribution(raw["participant_id"], raw["result"]["content"]) for raw in raws])
+                if set(authors) != {raw["participant_id"] for raw in raws}:
+                    missing = [raw for raw in raws if raw["participant_id"] not in authors]
+                    details = [f"{raw['participant_name']} ({raw['participant_id']}, {raw['requested_model']}), repetição {index}: " + check_contribution(raw["result"]["content"], raw["participant_id"], base)["message"] for raw in missing]
+                    raise ValueError("Exposição incompleta recusada. " + " | ".join(details) + " A coleta original permanece salva. Confira o diagnóstico e a resposta original na bancada.")
+                frozen_contexts[visibility_key] = (seeded.to_dict(), audit)
+            return frozen_contexts[visibility_key]
+
         for index in range(1, spec["repetitions"] + 1):
             for participant in spec["participants"]:
-                visible = [prior_by_run[(index, p["id"])] for p in spec["participants"] if exposure == "exposed" or (exposure == "self" and p["id"] == participant["id"])] if exposure != "blind" else []
-                # TESE-002 §4.1: em E, a ordem dos pares é sorteada por execução e gravada (ver peer_order.py).
-                peer_order = draw_peer_order([raw["participant_id"] for raw in visible], experiment_id=spec["experiment_id"], repetition_index=index, participant_id=participant["id"]) if exposure == "exposed" else []
+                everyone = [prior_by_run[(index, p["id"])] for p in spec["participants"]] if exposure != "blind" else []
+                # Em B3 e EP o participante só vê a própria contribuição inteira; em E, a de todos.
+                visible = [raw for raw in everyone if exposure == "exposed" or (exposure in {"self", "stance"} and raw["participant_id"] == participant["id"])]
+                # TESE-002 §4.1: em E (e em EP, que usa a mesma ordem) a ordem dos pares é sorteada por execução e gravada (ver peer_order.py).
+                shows_peers = exposure in {"exposed", "stance"}
+                peer_order = draw_peer_order([raw["participant_id"] for raw in everyone], experiment_id=spec["experiment_id"], repetition_index=index, participant_id=participant["id"]) if shows_peers else []
                 wc = WorkingContext.from_dict(base.to_dict())
+                peer_positions = None
                 if visible:
-                    visibility_key = (index, tuple(raw["observation_id"] for raw in visible))
-                    if visibility_key not in frozen_contexts:
-                        seeded, authors, audit = seed_peer_contributions(wc, [PriorContribution(raw["participant_id"], raw["result"]["content"]) for raw in visible])
-                        if set(authors) != {raw["participant_id"] for raw in visible}:
-                            missing = [raw for raw in visible if raw["participant_id"] not in authors]
-                            details = [f"{raw['participant_name']} ({raw['participant_id']}, {raw['requested_model']}), repetição {index}: " + check_contribution(raw["result"]["content"], raw["participant_id"], wc)["message"] for raw in missing]
-                            raise ValueError("Exposição incompleta recusada. " + " | ".join(details) + " A coleta original permanece salva. Confira o diagnóstico e a resposta original na bancada.")
-                        frozen_contexts[visibility_key] = (seeded.to_dict(), audit)
-                    context_snapshot, audit = frozen_contexts[visibility_key]
-                    if peer_order:
+                    context_snapshot, audit = seed(visible, index)
+                    if exposure == "exposed" and peer_order:
                         context_snapshot = reorder_by_author(context_snapshot, peer_order)
                     wc = WorkingContext.from_dict(context_snapshot)
+                    if exposure == "stance":
+                        # Os pares entram pelo mesmo caminho validado de E, mas só as relações `selects` saem dele:
+                        # o texto, a confiança e os demais itens dos pares nunca chegam ao prompt.
+                        full_snapshot, audit = seed(everyone, index)
+                        chosen = {}
+                        for rel in full_snapshot["relations"]:
+                            if rel["relation_type"] == "selects" and rel["target_id"] in option_ids:
+                                chosen.setdefault(rel["author_id"], [])
+                                if rel["target_id"] not in chosen[rel["author_id"]]:
+                                    chosen[rel["author_id"]].append(rel["target_id"])
+                        peer_positions = [{"author_id": author, "selects": chosen.get(author, [])} for author in peer_order if author != participant["id"]]
                     seed_audits.append({"repetition_index": index, "participant_id": participant["id"], "peer_order": peer_order, **asdict(audit)})
                 # A projeção é integral, sem seleção semântica ou truncamento silencioso.
-                context = _json({"question": wc.question, "items": [item.to_dict() for item in wc.active_items()], "relations": [rel.to_dict() for rel in wc.relations]})
+                projection = {"question": wc.question, "items": [item.to_dict() for item in wc.active_items()], "relations": [rel.to_dict() for rel in wc.relations]}
+                if peer_positions is not None:
+                    projection["peer_positions"] = peer_positions
+                context = _json(projection)
                 round_number = 1 if exposure == "blind" else 2
                 evidence = texts["corpus_header"] + "\n" + _json(spec["documents"])
                 shared = render_shared_instructions(evidence_block=evidence, has_library_tools=condition["tools"] == "corpus", round_number=round_number, language=language)
@@ -159,9 +183,9 @@ class ExperimentRunner:
                     "experiment_id": spec["experiment_id"], "condition_id": condition["id"], "run_id": f"r{index:04d}",
                     "round": round_number, "repetition_index": index, "participant_id": participant["id"], "participant_name": participant["name"], "participant_role": participant["role"],
                     "task_id": spec["task"]["id"], "task_label": spec["task"]["id"],
-                    "peer_exposure_mode": "exposed" if exposure == "exposed" else "blind", "lab_exposure_mode": exposure,
-                    "source_experiment_id": condition.get("prior_experiment"), "source_observation_ids": [raw["observation_id"] for raw in visible],
-                    "peer_order": peer_order, "peer_order_method": PEER_ORDER_METHOD if exposure == "exposed" else None,
+                    "peer_exposure_mode": exposure if exposure in {"exposed", "stance"} else "blind", "lab_exposure_mode": exposure,
+                    "source_experiment_id": condition.get("prior_experiment"), "source_observation_ids": [raw["observation_id"] for raw in (everyone if exposure == "stance" else visible)],
+                    "peer_order": peer_order, "peer_order_method": PEER_ORDER_METHOD if shows_peers else None,
                     "reasoning_exposure_mode": "unknown", "can_modify_deliberation_artifacts": False,
                     "library_corpus_fingerprint": corpus_hash, "library_corpus_item_count": len(spec["documents"]), "library_corpus_algorithm": "sha256-canonical-json-v1",
                     **({"prompt_language": language} if language != "pt-BR" else {}),
