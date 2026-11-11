@@ -1,0 +1,873 @@
+{
+ "schema": "norvald.lab.herd.bank.v1",
+ "source": "docs/estudo/tese/02_Mapa_de_Teste.md §5.1–5.2",
+ "language": "pt-BR",
+ "questions": [
+  {
+   "id": "q01",
+   "kind": "contestavel",
+   "question": "Serviço interno com 50 req/s e latência alvo de 20 ms entre dois times da mesma empresa. Protocolo?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "REST/JSON"
+    },
+    {
+     "id": "option-b",
+     "content": "gRPC"
+    }
+   ]
+  },
+  {
+   "id": "q02",
+   "kind": "contestavel",
+   "question": "Monólito de 200 mil linhas, time de 12 pessoas, deploy semanal doloroso. Primeiro passo?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Extrair serviço"
+    },
+    {
+     "id": "option-b",
+     "content": "Modularizar internamente"
+    },
+    {
+     "id": "option-c",
+     "content": "Melhorar o pipeline"
+    }
+   ]
+  },
+  {
+   "id": "q03",
+   "kind": "contestavel",
+   "question": "Aplicação nova, time de 3 pessoas, domínio ainda instável. Banco?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Relacional"
+    },
+    {
+     "id": "option-b",
+     "content": "Documento"
+    }
+   ]
+  },
+  {
+   "id": "q04",
+   "kind": "contestavel",
+   "question": "Fila de trabalho com 10 mil mensagens/dia e exigência de ordenação por chave.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Kafka"
+    },
+    {
+     "id": "option-b",
+     "content": "Fila gerenciada simples"
+    },
+    {
+     "id": "option-c",
+     "content": "Tabela no próprio banco"
+    }
+   ]
+  },
+  {
+   "id": "q05",
+   "kind": "contestavel",
+   "question": "Cache de leitura para catálogo que muda 2 vezes por dia.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Cache distribuído"
+    },
+    {
+     "id": "option-b",
+     "content": "Cache em processo"
+    },
+    {
+     "id": "option-c",
+     "content": "Sem cache"
+    }
+   ]
+  },
+  {
+   "id": "q06",
+   "kind": "contestavel",
+   "question": "Autenticação de API interna entre 6 serviços na mesma rede privada.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "mTLS"
+    },
+    {
+     "id": "option-b",
+     "content": "Token assinado"
+    },
+    {
+     "id": "option-c",
+     "content": "Chave estática"
+    }
+   ]
+  },
+  {
+   "id": "q07",
+   "kind": "contestavel",
+   "question": "Time sem experiência em Kubernetes precisa subir 4 serviços.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Kubernetes gerenciado"
+    },
+    {
+     "id": "option-b",
+     "content": "PaaS"
+    },
+    {
+     "id": "option-c",
+     "content": "VMs com systemd"
+    }
+   ]
+  },
+  {
+   "id": "q08",
+   "kind": "contestavel",
+   "question": "Migração de schema com 40 milhões de linhas e janela de manutenção inexistente.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Expand/contract"
+    },
+    {
+     "id": "option-b",
+     "content": "Dual write"
+    },
+    {
+     "id": "option-c",
+     "content": "Cópia e troca"
+    }
+   ]
+  },
+  {
+   "id": "q09",
+   "kind": "contestavel",
+   "question": "Testes de integração levam 40 minutos e travam o merge.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Paralelizar"
+    },
+    {
+     "id": "option-b",
+     "content": "Reduzir escopo e mover para contrato"
+    },
+    {
+     "id": "option-c",
+     "content": "Rodar só no merge"
+    }
+   ]
+  },
+  {
+   "id": "q10",
+   "kind": "contestavel",
+   "question": "Config de aplicação em 3 ambientes, 2 pessoas mexem.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Variável de ambiente"
+    },
+    {
+     "id": "option-b",
+     "content": "Arquivo versionado por ambiente"
+    },
+    {
+     "id": "option-c",
+     "content": "Serviço de config"
+    }
+   ]
+  },
+  {
+   "id": "q11",
+   "kind": "contestavel",
+   "question": "Erro transitório de rede em chamada externa, 0,5% das vezes.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Retry com backoff"
+    },
+    {
+     "id": "option-b",
+     "content": "Circuit breaker"
+    },
+    {
+     "id": "option-c",
+     "content": "Falhar rápido e reprocessar"
+    }
+   ]
+  },
+  {
+   "id": "q12",
+   "kind": "contestavel",
+   "question": "Observabilidade em sistema de 5 serviços, orçamento apertado.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Tracing distribuído"
+    },
+    {
+     "id": "option-b",
+     "content": "Log estruturado + métricas"
+    },
+    {
+     "id": "option-c",
+     "content": "Só métricas"
+    }
+   ]
+  },
+  {
+   "id": "q13",
+   "kind": "contestavel",
+   "question": "API pública versionando quebra incompatível.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Versão na URL"
+    },
+    {
+     "id": "option-b",
+     "content": "Versão no header"
+    },
+    {
+     "id": "option-c",
+     "content": "Novo endpoint"
+    }
+   ]
+  },
+  {
+   "id": "q14",
+   "kind": "contestavel",
+   "question": "Dados sensíveis em repouso num banco gerenciado.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Cripto na aplicação"
+    },
+    {
+     "id": "option-b",
+     "content": "Cripto no banco"
+    },
+    {
+     "id": "option-c",
+     "content": "Só cripto de disco"
+    }
+   ]
+  },
+  {
+   "id": "q15",
+   "kind": "contestavel",
+   "question": "Job noturno que às vezes falha no meio, sem idempotência.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Tornar idempotente"
+    },
+    {
+     "id": "option-b",
+     "content": "Checkpoint por lote"
+    },
+    {
+     "id": "option-c",
+     "content": "Reexecução manual"
+    }
+   ]
+  },
+  {
+   "id": "q16",
+   "kind": "contestavel",
+   "question": "Front-end precisa de dados de 4 serviços numa tela.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "BFF"
+    },
+    {
+     "id": "option-b",
+     "content": "Gateway com composição"
+    },
+    {
+     "id": "option-c",
+     "content": "Chamadas paralelas no cliente"
+    }
+   ]
+  },
+  {
+   "id": "q17",
+   "kind": "contestavel",
+   "question": "Feature grande, 3 semanas, time trabalhando em paralelo.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Feature flag em main"
+    },
+    {
+     "id": "option-b",
+     "content": "Branch longa"
+    },
+    {
+     "id": "option-c",
+     "content": "Fatiar em incrementos"
+    }
+   ]
+  },
+  {
+   "id": "q18",
+   "kind": "contestavel",
+   "question": "Contrato entre dois times mudando toda sprint.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Schema registry"
+    },
+    {
+     "id": "option-b",
+     "content": "Testes de contrato"
+    },
+    {
+     "id": "option-c",
+     "content": "Coordenação por reunião"
+    }
+   ]
+  },
+  {
+   "id": "q19",
+   "kind": "contestavel",
+   "question": "Busca textual em 2 milhões de documentos.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Motor de busca dedicado"
+    },
+    {
+     "id": "option-b",
+     "content": "Full-text do banco relacional"
+    },
+    {
+     "id": "option-c",
+     "content": "Índice próprio"
+    }
+   ]
+  },
+  {
+   "id": "q20",
+   "kind": "contestavel",
+   "question": "Rate limiting numa API pública.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Token bucket no gateway"
+    },
+    {
+     "id": "option-b",
+     "content": "Por serviço"
+    },
+    {
+     "id": "option-c",
+     "content": "Não limitar ainda"
+    }
+   ]
+  },
+  {
+   "id": "q21",
+   "kind": "contestavel",
+   "question": "Sistema precisa de auditoria de quem mudou o quê.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Event sourcing"
+    },
+    {
+     "id": "option-b",
+     "content": "Tabela de auditoria"
+    },
+    {
+     "id": "option-c",
+     "content": "Log de aplicação"
+    }
+   ]
+  },
+  {
+   "id": "q22",
+   "kind": "contestavel",
+   "question": "Deploy de emergência às 23h com um revisor disponível.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Exigir revisão"
+    },
+    {
+     "id": "option-b",
+     "content": "Deploy direto com post-mortem"
+    },
+    {
+     "id": "option-c",
+     "content": "Rollback preparado e deploy"
+    }
+   ]
+  },
+  {
+   "id": "q23",
+   "kind": "contestavel",
+   "question": "Dependência crítica com CVE alta e sem patch há 2 semanas.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Trocar a dependência"
+    },
+    {
+     "id": "option-b",
+     "content": "Mitigar no perímetro"
+    },
+    {
+     "id": "option-c",
+     "content": "Aceitar e monitorar"
+    }
+   ]
+  },
+  {
+   "id": "q24",
+   "kind": "contestavel",
+   "question": "Monorepo ou múltiplos repositórios para 6 serviços do mesmo time.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Monorepo"
+    },
+    {
+     "id": "option-b",
+     "content": "Repositórios separados"
+    }
+   ]
+  },
+  {
+   "id": "q25",
+   "kind": "contestavel",
+   "question": "Processamento que hoje leva 4 h e precisa rodar em 1 h.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Paralelizar"
+    },
+    {
+     "id": "option-b",
+     "content": "Otimizar o gargalo"
+    },
+    {
+     "id": "option-c",
+     "content": "Aceitar e rodar antes"
+    }
+   ]
+  },
+  {
+   "id": "q26",
+   "kind": "contestavel",
+   "question": "Comunicação entre serviços que não podem se acoplar no tempo.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Fila"
+    },
+    {
+     "id": "option-b",
+     "content": "Chamada síncrona com retry"
+    },
+    {
+     "id": "option-c",
+     "content": "Polling"
+    }
+   ]
+  },
+  {
+   "id": "q27",
+   "kind": "contestavel",
+   "question": "Time quer adotar linguagem nova para um serviço novo.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Permitir"
+    },
+    {
+     "id": "option-b",
+     "content": "Manter a stack atual"
+    },
+    {
+     "id": "option-c",
+     "content": "Permitir com prazo de reversão"
+    }
+   ]
+  },
+  {
+   "id": "q28",
+   "kind": "contestavel",
+   "question": "Dívida técnica conhecida competindo com entrega de roadmap.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Percentual fixo por sprint"
+    },
+    {
+     "id": "option-b",
+     "content": "Sprint dedicada"
+    },
+    {
+     "id": "option-c",
+     "content": "Só quando bloquear"
+    }
+   ]
+  },
+  {
+   "id": "q29",
+   "kind": "contestavel",
+   "question": "Documento de arquitetura que ninguém lê e está desatualizado.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Gerar do código"
+    },
+    {
+     "id": "option-b",
+     "content": "Manter à mão com revisão"
+    },
+    {
+     "id": "option-c",
+     "content": "Abandonar"
+    }
+   ]
+  },
+  {
+   "id": "q30",
+   "kind": "contestavel",
+   "question": "LLM em produção com resposta ocasionalmente errada e sem ground truth.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Revisão humana amostral"
+    },
+    {
+     "id": "option-b",
+     "content": "Painel de modelos"
+    },
+    {
+     "id": "option-c",
+     "content": "Aceitar e medir reclamação"
+    }
+   ]
+  },
+  {
+   "id": "q31",
+   "kind": "contestavel",
+   "question": "Dois serviços precisam da mesma regra de negócio.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Biblioteca compartilhada"
+    },
+    {
+     "id": "option-b",
+     "content": "Duplicar"
+    },
+    {
+     "id": "option-c",
+     "content": "Terceiro serviço"
+    }
+   ]
+  },
+  {
+   "id": "q32",
+   "kind": "contestavel",
+   "question": "Banco chegando a 80% de CPU em horário de pico.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Réplica de leitura"
+    },
+    {
+     "id": "option-b",
+     "content": "Otimizar consultas"
+    },
+    {
+     "id": "option-c",
+     "content": "Escalar vertical"
+    }
+   ]
+  },
+  {
+   "id": "g01",
+   "kind": "gabarito",
+   "question": "Sob isolamento READ COMMITTED, phantom read pode ocorrer?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g02",
+   "kind": "gabarito",
+   "question": "Índice composto em (a, b): consulta que filtra apenas por b usa o índice de forma eficiente?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g03",
+   "kind": "gabarito",
+   "question": "Em Kafka, a ordenação é garantida entre partições diferentes do mesmo tópico?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g04",
+   "kind": "gabarito",
+   "question": "UUIDv4 como chave de índice clusterizado tende a aumentar a fragmentação de página?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g05",
+   "kind": "gabarito",
+   "question": "HTTPS protege o tráfego contra um atacante que controla uma CA instalada no cliente?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g06",
+   "kind": "gabarito",
+   "question": "Inserção em vetor dinâmico com duplicação de capacidade é O(1) amortizado?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g07",
+   "kind": "gabarito",
+   "question": "O algoritmo de Nagle pode aumentar a latência de mensagens pequenas em TCP?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g08",
+   "kind": "gabarito",
+   "question": "git rebase altera o hash dos commits reescritos?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g09",
+   "kind": "gabarito",
+   "question": "Em Python, a preservação da ordem de inserção em dict é garantia da linguagem a partir da 3.7?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g10",
+   "kind": "gabarito",
+   "question": "Em ponto flutuante IEEE 754 de dupla precisão, 0.1 + 0.2 == 0.3 é verdadeiro?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g11",
+   "kind": "gabarito",
+   "question": "Camadas de imagem Docker são imutáveis e compartilháveis entre imagens diferentes?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g12",
+   "kind": "gabarito",
+   "question": "Um índice em coluna com baixa cardinalidade (por exemplo, booleana) costuma acelerar consulta que retorna metade das linhas?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g13",
+   "kind": "reserva",
+   "question": "Em PostgreSQL, VACUUM comum devolve o espaço liberado ao sistema operacional?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g14",
+   "kind": "reserva",
+   "question": "Sob replicação assíncrona, uma leitura na réplica pode retornar dado anterior a uma escrita já confirmada no primário?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g15",
+   "kind": "reserva",
+   "question": "Em HTTP, uma resposta 200 a um POST pode ser armazenada por cache compartilhado sem cabeçalho explícito que a autorize?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g16",
+   "kind": "reserva",
+   "question": "Em Unicode, o número de pontos de código de uma string é sempre igual ao número de caracteres percebidos pelo usuário?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g17",
+   "kind": "reserva",
+   "question": "Num índice B-tree, LIKE '%termo' (curinga à esquerda) permite busca por intervalo no índice?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  },
+  {
+   "id": "g18",
+   "kind": "reserva",
+   "question": "Em Kubernetes, a falha de um livenessProbe faz o pod ser reagendado em outro nó?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sim"
+    },
+    {
+     "id": "option-b",
+     "content": "Não"
+    }
+   ]
+  }
+ ]
+}

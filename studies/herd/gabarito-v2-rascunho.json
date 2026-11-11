@@ -1,0 +1,247 @@
+{
+ "schema": "norvald.lab.herd.gabarito-v2.draft",
+ "status": "rascunho — gabarito ainda não conferido na fonte",
+ "author": "Opus, 11/11/2026, a pedido do Eduardo; alvo: modelos de ~30B (crenças comuns erradas, detalhes de versão, exceções de especificação)",
+ "items": [
+  {
+   "question": "No MySQL com InnoDB, em REPEATABLE READ (o padrão), um SELECT ... FOR UPDATE com condição de intervalo numa coluna indexada pode impedir outra transação de inserir linhas nesse intervalo, mesmo que o intervalo ainda não tenha nenhuma linha?",
+   "answer": "Sim",
+   "source_hint": "MySQL 8 Reference Manual, InnoDB Locking (gap locks, next-key locks)",
+   "id": "h01"
+  },
+  {
+   "question": "No PostgreSQL, o nível de isolamento REPEATABLE READ permite phantom reads?",
+   "answer": "Não",
+   "source_hint": "PostgreSQL docs, Transaction Isolation (tabela de fenômenos)",
+   "id": "h02"
+  },
+  {
+   "question": "Em TCP, o estado TIME_WAIT fica no lado que envia o primeiro FIN, isto é, o que fecha a conexão primeiro?",
+   "answer": "Sim",
+   "source_hint": "RFC 9293, diagrama de estados da conexão",
+   "id": "h03"
+  },
+  {
+   "question": "No CPython com GIL, a instrução x += 1 sobre uma variável global compartilhada entre threads é atômica?",
+   "answer": "Não",
+   "source_hint": "Python docs / dis: LOAD, BINARY_OP, STORE em bytecodes separados",
+   "id": "h04"
+  },
+  {
+   "question": "O comando git pull --rebase pode alterar o hash de commits locais que ainda não foram enviados ao remoto?",
+   "answer": "Sim",
+   "source_hint": "git-pull e git-rebase, documentação oficial",
+   "id": "h05"
+  },
+  {
+   "question": "Em JavaScript, [10, 9, 1].sort() retorna [1, 9, 10]?",
+   "answer": "Não",
+   "source_hint": "ECMAScript, Array.prototype.sort (comparação por string sem comparador)",
+   "id": "h06"
+  },
+  {
+   "question": "Em ponto flutuante IEEE 754 de dupla precisão, todo número inteiro entre 0 e 2^53 pode ser representado exatamente?",
+   "answer": "Sim",
+   "source_hint": "IEEE 754 binary64 (53 bits de significando)",
+   "id": "h07"
+  },
+  {
+   "question": "Em IPv4, o checksum do cabeçalho UDP é obrigatório?",
+   "answer": "Não",
+   "source_hint": "RFC 768; RFC 8200 §8.1 (obrigatório só em IPv6)",
+   "id": "h08"
+  },
+  {
+   "question": "No PostgreSQL, CREATE INDEX sem a opção CONCURRENTLY bloqueia INSERT, UPDATE e DELETE na tabela até o índice ficar pronto?",
+   "answer": "Sim",
+   "source_hint": "PostgreSQL docs, CREATE INDEX (Building Indexes Concurrently)",
+   "id": "h09"
+  },
+  {
+   "question": "Pela especificação (RFC 5789), o método HTTP PATCH é idempotente?",
+   "answer": "Não",
+   "source_hint": "RFC 5789 §2",
+   "id": "h10"
+  },
+  {
+   "question": "No PostgreSQL, uma consulta somente de leitura que fica horas em execução pode impedir o VACUUM de remover versões mortas de linhas de outras tabelas que ela nem acessa?",
+   "answer": "Sim",
+   "source_hint": "PostgreSQL docs, Routine Vacuuming / xmin horizon",
+   "id": "h11"
+  },
+  {
+   "question": "Uma resposta HTTP 304 Not Modified pode conter corpo de mensagem?",
+   "answer": "Não",
+   "source_hint": "RFC 9110 §15.4.5",
+   "id": "h12"
+  },
+  {
+   "question": "No Kubernetes, um pod em que todos os containers têm requests iguais aos limits, tanto de CPU quanto de memória, recebe a classe de QoS Guaranteed?",
+   "answer": "Sim",
+   "source_hint": "Kubernetes docs, Pod Quality of Service Classes",
+   "id": "h13"
+  },
+  {
+   "question": "No DNS, um nome que tem registro CNAME pode ter também um registro MX?",
+   "answer": "Não",
+   "source_hint": "RFC 1034 §3.6.2; RFC 2181 §10.1",
+   "id": "h14"
+  },
+  {
+   "question": "No PostgreSQL, com o comportamento padrão, uma coluna com restrição UNIQUE aceita várias linhas com NULL nessa coluna?",
+   "answer": "Sim",
+   "source_hint": "PostgreSQL docs, Unique Constraints (NULLS DISTINCT)",
+   "id": "h15"
+  },
+  {
+   "question": "No Kafka, com acks=all, a confirmação ao produtor exige que a mensagem tenha sido gravada em todas as réplicas da partição, inclusive as que estão fora do ISR?",
+   "answer": "Não",
+   "source_hint": "Kafka docs, Producer configs (acks) e Replication",
+   "id": "h16"
+  },
+  {
+   "question": "No PostgreSQL, um índice B-tree comum (em ordem crescente) sobre uma coluna pode atender a um ORDER BY dessa coluna DESC sem etapa extra de ordenação?",
+   "answer": "Sim",
+   "source_hint": "PostgreSQL docs, Indexes and ORDER BY",
+   "id": "h17"
+  },
+  {
+   "question": "No Kafka, ao aumentar o número de partições de um tópico, as novas mensagens de uma mesma chave continuam indo para a mesma partição de antes, com o particionador padrão?",
+   "answer": "Não",
+   "source_hint": "Kafka docs, Modifying topics (adding partitions)",
+   "id": "h18"
+  },
+  {
+   "question": "No PostgreSQL, um UPDATE que não altera nenhuma coluna indexada pode deixar de criar novas entradas nos índices da tabela?",
+   "answer": "Sim",
+   "source_hint": "PostgreSQL docs, Heap-Only Tuples (HOT)",
+   "id": "h19"
+  },
+  {
+   "question": "No Raft, o líder pode considerar comprometida uma entrada de um termo anterior só porque ela já está replicada na maioria dos servidores?",
+   "answer": "Não",
+   "source_hint": "Ongaro & Ousterhout, In Search of an Understandable Consensus Algorithm, §5.4.2",
+   "id": "h20"
+  },
+  {
+   "question": "Em TCP, depois de receber um FIN do outro lado, uma ponta ainda pode continuar enviando dados nessa conexão?",
+   "answer": "Sim",
+   "source_hint": "RFC 9293, half-close / CLOSE-WAIT",
+   "id": "h21"
+  },
+  {
+   "question": "No TLS 1.3, os dados enviados em 0-RTT são protegidos contra replay pelo próprio protocolo?",
+   "answer": "Não",
+   "source_hint": "RFC 8446 §2.3 e §8",
+   "id": "h22"
+  },
+  {
+   "question": "No Git, depois de um git reset --hard que descartou commits, é possível recuperá-los pelo reflog enquanto a coleta de lixo não os remover?",
+   "answer": "Sim",
+   "source_hint": "git-reflog, documentação oficial",
+   "id": "h23"
+  },
+  {
+   "question": "Numa requisição de origem cruzada do tipo simples (simple request), o CORS impede que a requisição chegue ao servidor?",
+   "answer": "Não",
+   "source_hint": "Fetch Standard / MDN CORS",
+   "id": "h24"
+  },
+  {
+   "question": "A especificação HTTP (RFC 9110) admite que, por razões históricas, um cliente troque o método de POST para GET ao seguir um redirecionamento 301?",
+   "answer": "Sim",
+   "source_hint": "RFC 9110 §15.4.2",
+   "id": "h25"
+  },
+  {
+   "question": "Um cookie com SameSite=Lax é enviado numa requisição POST de navegação de nível superior iniciada por outro site?",
+   "answer": "Não",
+   "source_hint": "RFC 6265bis, SameSite / MDN Set-Cookie",
+   "id": "h26"
+  },
+  {
+   "question": "No DNS, o tempo que um resolvedor guarda em cache uma resposta negativa (NXDOMAIN) é determinado a partir do registro SOA da zona?",
+   "answer": "Sim",
+   "source_hint": "RFC 2308 §5",
+   "id": "h27"
+  },
+  {
+   "question": "Em SQL, WHERE x NOT IN (SELECT y ...) pode retornar linhas quando a subconsulta devolve algum NULL?",
+   "answer": "Não",
+   "source_hint": "Lógica de três valores do SQL; PostgreSQL docs, Subquery Expressions (NOT IN)",
+   "id": "h28"
+  },
+  {
+   "question": "Num banco de dados relacional, pode ocorrer deadlock entre duas transações que acessam uma única tabela?",
+   "answer": "Sim",
+   "source_hint": "PostgreSQL docs, Explicit Locking / Deadlocks",
+   "id": "h29"
+  },
+  {
+   "question": "No PostgreSQL 11 ou mais novo, adicionar uma coluna com DEFAULT constante a uma tabela grande reescreve a tabela inteira?",
+   "answer": "Não",
+   "source_hint": "PostgreSQL 11 release notes / ALTER TABLE",
+   "id": "h30"
+  },
+  {
+   "question": "No Kubernetes, durante um RollingUpdate de um Deployment com as configurações padrão, o número de pods pode passar momentaneamente do número de réplicas declarado?",
+   "answer": "Sim",
+   "source_hint": "Kubernetes docs, Deployments (maxSurge)",
+   "id": "h31"
+  },
+  {
+   "question": "No Kubernetes, um container que tenta usar mais CPU do que o seu limit é encerrado?",
+   "answer": "Não",
+   "source_hint": "Kubernetes docs, Resource Management for Pods and Containers",
+   "id": "h32"
+  },
+  {
+   "question": "Em Go, quando vários casos de um select estão prontos ao mesmo tempo, a escolha entre eles é feita por sorteio pseudoaleatório uniforme?",
+   "answer": "Sim",
+   "source_hint": "The Go Programming Language Specification, Select statements",
+   "id": "h33"
+  },
+  {
+   "question": "O tempo Unix (POSIX time) conta os segundos bissextos (leap seconds)?",
+   "answer": "Não",
+   "source_hint": "POSIX, Seconds Since the Epoch",
+   "id": "h34"
+  },
+  {
+   "question": "No padrão IEEE 754, +0 e −0 têm representações binárias diferentes?",
+   "answer": "Sim",
+   "source_hint": "IEEE 754 (bit de sinal)",
+   "id": "h35"
+  },
+  {
+   "question": "O cabeçalho Cache-Control: no-cache proíbe que a resposta seja armazenada em cache?",
+   "answer": "Não",
+   "source_hint": "RFC 9111 §5.2.2.4 (no-cache) e §5.2.2.5 (no-store)",
+   "id": "h36"
+  },
+  {
+   "question": "No PostgreSQL, uma transação SERIALIZABLE pode ser abortada com erro de falha de serialização mesmo sem haver deadlock?",
+   "answer": "Sim",
+   "source_hint": "PostgreSQL docs, Transaction Isolation (Serializable)",
+   "id": "h37"
+  },
+  {
+   "question": "Em Java 5 ou mais novo, o double-checked locking para inicialização preguiçosa é correto sem declarar o campo como volatile?",
+   "answer": "Não",
+   "source_hint": "JSR-133 / The \"Double-Checked Locking is Broken\" Declaration",
+   "id": "h38"
+  },
+  {
+   "question": "No TLS 1.3 sem Encrypted Client Hello (ECH), o nome do site acessado, enviado na extensão SNI, trafega sem cifragem?",
+   "answer": "Sim",
+   "source_hint": "RFC 8446 (ClientHello em claro); RFC 6066 (SNI)",
+   "id": "h39"
+  },
+  {
+   "question": "No TLS 1.2, o certificado do servidor é enviado cifrado durante o handshake?",
+   "answer": "Não",
+   "source_hint": "RFC 5246 §7.4.2 (Certificate antes de ChangeCipherSpec)",
+   "id": "h40"
+  }
+ ]
+}

@@ -1,0 +1,1473 @@
+{
+ "schema": "norvald.lab.herd.bank.v1",
+ "language": "en",
+ "source": "docs/estudo/tese/02_Mapa_de_Teste.md §5.1–5.2 (q01–q32, g01–g18), traduzido em 11/11/2026; h01–h40 escritos pelo Opus em 11/11/2026 e conferidos na fonte (studies/herd/gabarito-v2-conferencia.md)",
+ "questions": [
+  {
+   "id": "q01",
+   "kind": "contestavel",
+   "question": "Internal service with 50 req/s and a 20 ms latency target between two teams of the same company. Which protocol?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "REST/JSON"
+    },
+    {
+     "id": "option-b",
+     "content": "gRPC"
+    }
+   ]
+  },
+  {
+   "id": "q02",
+   "kind": "contestavel",
+   "question": "A 200k-line monolith, a 12-person team, and a painful weekly deploy. What is the first step?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Extract a service"
+    },
+    {
+     "id": "option-b",
+     "content": "Modularize internally"
+    },
+    {
+     "id": "option-c",
+     "content": "Improve the pipeline"
+    }
+   ]
+  },
+  {
+   "id": "q03",
+   "kind": "contestavel",
+   "question": "New application, a 3-person team, and a domain that is still unstable. Which database?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Relational"
+    },
+    {
+     "id": "option-b",
+     "content": "Document"
+    }
+   ]
+  },
+  {
+   "id": "q04",
+   "kind": "contestavel",
+   "question": "Work queue with 10k messages/day that must preserve ordering per key.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Kafka"
+    },
+    {
+     "id": "option-b",
+     "content": "Simple managed queue"
+    },
+    {
+     "id": "option-c",
+     "content": "Table in the existing database"
+    }
+   ]
+  },
+  {
+   "id": "q05",
+   "kind": "contestavel",
+   "question": "Read cache for a catalog that changes twice a day.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Distributed cache"
+    },
+    {
+     "id": "option-b",
+     "content": "In-process cache"
+    },
+    {
+     "id": "option-c",
+     "content": "No cache"
+    }
+   ]
+  },
+  {
+   "id": "q06",
+   "kind": "contestavel",
+   "question": "Authentication of an internal API among 6 services on the same private network.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "mTLS"
+    },
+    {
+     "id": "option-b",
+     "content": "Signed token"
+    },
+    {
+     "id": "option-c",
+     "content": "Static key"
+    }
+   ]
+  },
+  {
+   "id": "q07",
+   "kind": "contestavel",
+   "question": "A team with no Kubernetes experience needs to deploy 4 services.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Managed Kubernetes"
+    },
+    {
+     "id": "option-b",
+     "content": "PaaS"
+    },
+    {
+     "id": "option-c",
+     "content": "VMs with systemd"
+    }
+   ]
+  },
+  {
+   "id": "q08",
+   "kind": "contestavel",
+   "question": "Schema migration on a 40-million-row table with no maintenance window available.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Expand/contract"
+    },
+    {
+     "id": "option-b",
+     "content": "Dual write"
+    },
+    {
+     "id": "option-c",
+     "content": "Copy and swap"
+    }
+   ]
+  },
+  {
+   "id": "q09",
+   "kind": "contestavel",
+   "question": "Integration tests take 40 minutes and block merges.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Parallelize"
+    },
+    {
+     "id": "option-b",
+     "content": "Reduce scope and move to contract tests"
+    },
+    {
+     "id": "option-c",
+     "content": "Run only on merge"
+    }
+   ]
+  },
+  {
+   "id": "q10",
+   "kind": "contestavel",
+   "question": "Application config across 3 environments, edited by 2 people.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Environment variables"
+    },
+    {
+     "id": "option-b",
+     "content": "Versioned file per environment"
+    },
+    {
+     "id": "option-c",
+     "content": "Config service"
+    }
+   ]
+  },
+  {
+   "id": "q11",
+   "kind": "contestavel",
+   "question": "Transient network error on an external call, 0.5% of the time.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Retry with backoff"
+    },
+    {
+     "id": "option-b",
+     "content": "Circuit breaker"
+    },
+    {
+     "id": "option-c",
+     "content": "Fail fast and reprocess"
+    }
+   ]
+  },
+  {
+   "id": "q12",
+   "kind": "contestavel",
+   "question": "Observability for a 5-service system on a tight budget.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Distributed tracing"
+    },
+    {
+     "id": "option-b",
+     "content": "Structured logs + metrics"
+    },
+    {
+     "id": "option-c",
+     "content": "Metrics only"
+    }
+   ]
+  },
+  {
+   "id": "q13",
+   "kind": "contestavel",
+   "question": "Public API introducing a breaking change. How to version it?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Version in the URL"
+    },
+    {
+     "id": "option-b",
+     "content": "Version in a header"
+    },
+    {
+     "id": "option-c",
+     "content": "New endpoint"
+    }
+   ]
+  },
+  {
+   "id": "q14",
+   "kind": "contestavel",
+   "question": "Sensitive data at rest in a managed database.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Application-level encryption"
+    },
+    {
+     "id": "option-b",
+     "content": "Database-level encryption"
+    },
+    {
+     "id": "option-c",
+     "content": "Disk encryption only"
+    }
+   ]
+  },
+  {
+   "id": "q15",
+   "kind": "contestavel",
+   "question": "Nightly job that sometimes fails midway, with no idempotency.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Make it idempotent"
+    },
+    {
+     "id": "option-b",
+     "content": "Per-batch checkpoints"
+    },
+    {
+     "id": "option-c",
+     "content": "Manual re-run"
+    }
+   ]
+  },
+  {
+   "id": "q16",
+   "kind": "contestavel",
+   "question": "A front end needs data from 4 services on one screen.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "BFF"
+    },
+    {
+     "id": "option-b",
+     "content": "Gateway with composition"
+    },
+    {
+     "id": "option-c",
+     "content": "Parallel calls from the client"
+    }
+   ]
+  },
+  {
+   "id": "q17",
+   "kind": "contestavel",
+   "question": "Large feature, 3 weeks, team working in parallel.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Feature flag on main"
+    },
+    {
+     "id": "option-b",
+     "content": "Long-lived branch"
+    },
+    {
+     "id": "option-c",
+     "content": "Slice into increments"
+    }
+   ]
+  },
+  {
+   "id": "q18",
+   "kind": "contestavel",
+   "question": "A contract between two teams changes every sprint.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Schema registry"
+    },
+    {
+     "id": "option-b",
+     "content": "Contract tests"
+    },
+    {
+     "id": "option-c",
+     "content": "Coordination through meetings"
+    }
+   ]
+  },
+  {
+   "id": "q19",
+   "kind": "contestavel",
+   "question": "Full-text search over 2 million documents.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Dedicated search engine"
+    },
+    {
+     "id": "option-b",
+     "content": "Relational database full-text search"
+    },
+    {
+     "id": "option-c",
+     "content": "Custom index"
+    }
+   ]
+  },
+  {
+   "id": "q20",
+   "kind": "contestavel",
+   "question": "Rate limiting on a public API.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Token bucket at the gateway"
+    },
+    {
+     "id": "option-b",
+     "content": "Per service"
+    },
+    {
+     "id": "option-c",
+     "content": "Do not limit yet"
+    }
+   ]
+  },
+  {
+   "id": "q21",
+   "kind": "contestavel",
+   "question": "The system needs an audit trail of who changed what.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Event sourcing"
+    },
+    {
+     "id": "option-b",
+     "content": "Audit table"
+    },
+    {
+     "id": "option-c",
+     "content": "Application log"
+    }
+   ]
+  },
+  {
+   "id": "q22",
+   "kind": "contestavel",
+   "question": "Emergency deploy at 11 p.m. with one reviewer available.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Require review"
+    },
+    {
+     "id": "option-b",
+     "content": "Deploy directly with a post-mortem"
+    },
+    {
+     "id": "option-c",
+     "content": "Prepare a rollback and deploy"
+    }
+   ]
+  },
+  {
+   "id": "q23",
+   "kind": "contestavel",
+   "question": "Critical dependency with a high-severity CVE and no patch for 2 weeks.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Replace the dependency"
+    },
+    {
+     "id": "option-b",
+     "content": "Mitigate at the perimeter"
+    },
+    {
+     "id": "option-c",
+     "content": "Accept and monitor"
+    }
+   ]
+  },
+  {
+   "id": "q24",
+   "kind": "contestavel",
+   "question": "Monorepo or multiple repositories for 6 services owned by the same team?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Monorepo"
+    },
+    {
+     "id": "option-b",
+     "content": "Separate repositories"
+    }
+   ]
+  },
+  {
+   "id": "q25",
+   "kind": "contestavel",
+   "question": "A process that currently takes 4 h needs to run in 1 h.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Parallelize"
+    },
+    {
+     "id": "option-b",
+     "content": "Optimize the bottleneck"
+    },
+    {
+     "id": "option-c",
+     "content": "Accept it and start earlier"
+    }
+   ]
+  },
+  {
+   "id": "q26",
+   "kind": "contestavel",
+   "question": "Communication between services that must not be coupled in time.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Queue"
+    },
+    {
+     "id": "option-b",
+     "content": "Synchronous call with retry"
+    },
+    {
+     "id": "option-c",
+     "content": "Polling"
+    }
+   ]
+  },
+  {
+   "id": "q27",
+   "kind": "contestavel",
+   "question": "A team wants to adopt a new language for a new service.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Allow it"
+    },
+    {
+     "id": "option-b",
+     "content": "Keep the current stack"
+    },
+    {
+     "id": "option-c",
+     "content": "Allow it with a rollback deadline"
+    }
+   ]
+  },
+  {
+   "id": "q28",
+   "kind": "contestavel",
+   "question": "Known technical debt competing with roadmap delivery.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Fixed percentage per sprint"
+    },
+    {
+     "id": "option-b",
+     "content": "Dedicated sprint"
+    },
+    {
+     "id": "option-c",
+     "content": "Only when it blocks"
+    }
+   ]
+  },
+  {
+   "id": "q29",
+   "kind": "contestavel",
+   "question": "An architecture document nobody reads and that is out of date.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Generate it from code"
+    },
+    {
+     "id": "option-b",
+     "content": "Maintain it by hand with review"
+    },
+    {
+     "id": "option-c",
+     "content": "Abandon it"
+    }
+   ]
+  },
+  {
+   "id": "q30",
+   "kind": "contestavel",
+   "question": "An LLM in production that is occasionally wrong, with no ground truth.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Sampled human review"
+    },
+    {
+     "id": "option-b",
+     "content": "Panel of models"
+    },
+    {
+     "id": "option-c",
+     "content": "Accept and track complaints"
+    }
+   ]
+  },
+  {
+   "id": "q31",
+   "kind": "contestavel",
+   "question": "Two services need the same business rule.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Shared library"
+    },
+    {
+     "id": "option-b",
+     "content": "Duplicate it"
+    },
+    {
+     "id": "option-c",
+     "content": "Third service"
+    }
+   ]
+  },
+  {
+   "id": "q32",
+   "kind": "contestavel",
+   "question": "Database reaching 80% CPU at peak hours.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Read replica"
+    },
+    {
+     "id": "option-b",
+     "content": "Optimize queries"
+    },
+    {
+     "id": "option-c",
+     "content": "Scale vertically"
+    }
+   ]
+  },
+  {
+   "id": "g01",
+   "kind": "gabarito",
+   "question": "Under READ COMMITTED isolation, can a phantom read occur?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g02",
+   "kind": "gabarito",
+   "question": "With a composite index on (a, b), does a query that filters only by b use the index efficiently?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g03",
+   "kind": "gabarito",
+   "question": "In Kafka, is ordering guaranteed across different partitions of the same topic?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g04",
+   "kind": "gabarito",
+   "question": "Does using UUIDv4 as a clustered index key tend to increase page fragmentation?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g05",
+   "kind": "gabarito",
+   "question": "Does HTTPS protect traffic against an attacker who controls a CA installed on the client?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g06",
+   "kind": "gabarito",
+   "question": "Is insertion into a dynamic array that doubles its capacity O(1) amortized?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g07",
+   "kind": "gabarito",
+   "question": "Can Nagle's algorithm increase the latency of small messages over TCP?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g08",
+   "kind": "gabarito",
+   "question": "Does git rebase change the hash of the rewritten commits?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g09",
+   "kind": "gabarito",
+   "question": "In Python, is preservation of insertion order in dict a language guarantee from 3.7 onward?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g10",
+   "kind": "gabarito",
+   "question": "In IEEE 754 double precision, is 0.1 + 0.2 == 0.3 true?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g11",
+   "kind": "gabarito",
+   "question": "Are Docker image layers immutable and shareable across different images?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g12",
+   "kind": "gabarito",
+   "question": "Does an index on a low-cardinality column (for example, a boolean) usually speed up a query that returns half of the rows?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g13",
+   "kind": "reserva",
+   "question": "In PostgreSQL, does a regular VACUUM return the freed space to the operating system?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g14",
+   "kind": "reserva",
+   "question": "Under asynchronous replication, can a read on the replica return data older than a write already committed on the primary?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g15",
+   "kind": "reserva",
+   "question": "In HTTP, can a 200 response to a POST be stored by a shared cache without an explicit header that allows it?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g16",
+   "kind": "reserva",
+   "question": "In Unicode, is the number of code points in a string always equal to the number of characters perceived by the user?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g17",
+   "kind": "reserva",
+   "question": "In a B-tree index, does LIKE '%term' (leading wildcard) allow a range scan on the index?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "g18",
+   "kind": "reserva",
+   "question": "In Kubernetes, does a failing livenessProbe cause the pod to be rescheduled onto another node?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h01",
+   "kind": "gabarito",
+   "question": "In MySQL with InnoDB, under REPEATABLE READ (the default), can a SELECT ... FOR UPDATE with a range condition on an indexed column prevent another transaction from inserting rows into that range, even if the range currently contains no rows?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h02",
+   "kind": "gabarito",
+   "question": "In PostgreSQL, does the REPEATABLE READ isolation level allow phantom reads?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h03",
+   "kind": "gabarito",
+   "question": "In TCP, does the TIME_WAIT state occur on the side that sends the first FIN, that is, the side that closes the connection first?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h04",
+   "kind": "gabarito",
+   "question": "In CPython with the GIL, is the statement x += 1 on a global variable shared between threads atomic?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h05",
+   "kind": "gabarito",
+   "question": "Can git pull --rebase change the hash of local commits that have not yet been pushed to the remote?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h06",
+   "kind": "gabarito",
+   "question": "In JavaScript, does [10, 9, 1].sort() return [1, 9, 10]?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h07",
+   "kind": "gabarito",
+   "question": "In IEEE 754 double precision, can every integer between 0 and 2^53 be represented exactly?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h08",
+   "kind": "gabarito",
+   "question": "In IPv4, is the UDP header checksum mandatory?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h09",
+   "kind": "gabarito",
+   "question": "In PostgreSQL, does CREATE INDEX without the CONCURRENTLY option block INSERT, UPDATE and DELETE on the table until the index is built?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h10",
+   "kind": "gabarito",
+   "question": "According to the specification (RFC 5789), is the HTTP PATCH method idempotent?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h11",
+   "kind": "gabarito",
+   "question": "According to RFC 9110, is the HTTP OPTIONS method defined as safe?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h12",
+   "kind": "gabarito",
+   "question": "Can an HTTP 304 Not Modified response contain a message body?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h13",
+   "kind": "gabarito",
+   "question": "In Kubernetes, does a pod in which every container has requests equal to limits, for both CPU and memory, get the Guaranteed QoS class?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h14",
+   "kind": "gabarito",
+   "question": "In DNS, can a name that has a CNAME record also have an MX record?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h15",
+   "kind": "gabarito",
+   "question": "In PostgreSQL, with the default behavior, does a column with a UNIQUE constraint accept multiple rows with NULL in that column?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h16",
+   "kind": "gabarito",
+   "question": "In Kafka, with acks=all, does the acknowledgment to the producer require the message to have been written to every replica of the partition, including those outside the ISR?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h17",
+   "kind": "gabarito",
+   "question": "In PostgreSQL, can a regular (ascending) B-tree index on a column serve an ORDER BY on that column DESC without an extra sort step?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h18",
+   "kind": "gabarito",
+   "question": "In Kafka, after increasing the number of partitions of a topic, do new messages with a given key keep going to the same partition as before, with the default partitioner?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h19",
+   "kind": "gabarito",
+   "question": "In PostgreSQL, can an UPDATE that changes no indexed column avoid creating new entries in the table's indexes?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h20",
+   "kind": "gabarito",
+   "question": "In Raft, can the leader consider an entry from a previous term committed just because it is already replicated on a majority of servers?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h21",
+   "kind": "gabarito",
+   "question": "In TCP, after receiving a FIN from the other side, can an endpoint keep sending data on that connection?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h22",
+   "kind": "gabarito",
+   "question": "In TLS 1.3, is data sent as 0-RTT protected against replay by the protocol itself?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h23",
+   "kind": "gabarito",
+   "question": "In Git, after a git reset --hard that discarded commits, can they be recovered through the reflog as long as garbage collection has not removed them?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h24",
+   "kind": "gabarito",
+   "question": "For a cross-origin simple request, does CORS prevent the request from reaching the server?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h25",
+   "kind": "gabarito",
+   "question": "Does the HTTP specification (RFC 9110) allow, for historical reasons, a client to change the method from POST to GET when following a 301 redirect?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h26",
+   "kind": "gabarito",
+   "question": "Is a cookie with SameSite=Lax sent on a top-level navigation POST request initiated by another site?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h27",
+   "kind": "gabarito",
+   "question": "In DNS, is the time a resolver caches a negative answer (NXDOMAIN) determined from the zone's SOA record?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h28",
+   "kind": "gabarito",
+   "question": "In SQL, can WHERE x NOT IN (SELECT y ...) return rows when the subquery returns any NULL?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h29",
+   "kind": "gabarito",
+   "question": "In a relational database, can a deadlock occur between two transactions that access a single table?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h30",
+   "kind": "gabarito",
+   "question": "In PostgreSQL 11 or later, does adding a column with a constant DEFAULT to a large table rewrite the whole table?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h31",
+   "kind": "gabarito",
+   "question": "In Kubernetes, during a RollingUpdate of a Deployment with default settings, can the number of pods temporarily exceed the declared number of replicas?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h32",
+   "kind": "gabarito",
+   "question": "In Kubernetes, is a container that tries to use more CPU than its limit terminated?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h33",
+   "kind": "gabarito",
+   "question": "In Go, when several cases of a select statement are ready at the same time, is the choice among them made by uniform pseudo-random selection?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h34",
+   "kind": "gabarito",
+   "question": "Does Unix time (POSIX time) count leap seconds?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h35",
+   "kind": "gabarito",
+   "question": "In the IEEE 754 standard, do +0 and −0 have different binary representations?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h36",
+   "kind": "gabarito",
+   "question": "Does the Cache-Control: no-cache header forbid storing the response in a cache?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h37",
+   "kind": "gabarito",
+   "question": "In PostgreSQL, can a SERIALIZABLE transaction be aborted with a serialization failure error even when no deadlock occurs?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h38",
+   "kind": "gabarito",
+   "question": "In Java 5 or later, is double-checked locking for lazy initialization correct without declaring the field volatile?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h39",
+   "kind": "gabarito",
+   "question": "In TLS 1.3 without Encrypted Client Hello (ECH), is the name of the site being accessed, sent in the SNI extension, transmitted unencrypted?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  },
+  {
+   "id": "h40",
+   "kind": "gabarito",
+   "question": "In TLS 1.2, is the server certificate sent encrypted during the handshake?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "Yes"
+    },
+    {
+     "id": "option-b",
+     "content": "No"
+    }
+   ]
+  }
+ ]
+}
