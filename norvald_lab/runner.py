@@ -41,6 +41,11 @@ from norvald_lab.vendor.norvald_execution.tools import tool_loop
 # O valor entra no manifesto e no fingerprint da condição: coleta v1 e
 # coleta v2 ficam distinguíveis pelo registro, não pela memória.
 RUNNER_VERSION = "norvald.lab.runner.v2"
+# Campos do Lab copiados para o registro bruto de cada execução.
+# peer_order e peer_order_method entraram em 11/11/2026: o teste de fumaça
+# fumaca-2 mostrou que a ordem sorteada dos pares (TESE-002 §4.1) ficava só no
+# requests.json, fora do registro bruto que alimenta as medidas.
+LAB_RAW_METADATA_KEYS = ("repetition_index", "lab_exposure_mode", "source_experiment_id", "source_observation_ids", "peer_order", "peer_order_method")
 PROMPT_PROFILE = "lab-controlled-structured-v1"
 EXECUTION_REVISION = "c903aa42af8a959c7868c6d8be3b744c9677ac16"
 STUDIO_REVISION = "f0d640779324bdde8c1f76e83b1a1869602af089"
@@ -241,7 +246,7 @@ class ExperimentRunner:
                 if result is not None:
                     result.metadata = redact(result.metadata)
                 observation = build_raw_observation(request=request, attempt_index=1, started_at=started, requested_provider_kind=spec["providers"][participant["provider"]]["kind"], requested_model=participant["model"], available_tool_names=[d.name for d in runtime.definitions()] if request.allow_tools else [], result=result, error=error)
-                observation = replace(observation, error=redact(observation.error), request=observation.request | {"boundary": "norvald_lab_execution", "studio_metadata": observation.request["studio_metadata"] | {k: metadata[k] for k in ("repetition_index", "lab_exposure_mode", "source_experiment_id", "source_observation_ids")}})
+                observation = replace(observation, error=redact(observation.error), request=observation.request | {"boundary": "norvald_lab_execution", "studio_metadata": observation.request["studio_metadata"] | {k: metadata[k] for k in LAB_RAW_METADATA_KEYS}})
                 sink.record(observation)
                 output = {"participant_id": participant["id"], "run_id": metadata["run_id"], "ok": error is None, "error": redact(str(error)) if error else None, "provider": participant["provider"], "model": participant["model"], "reasoning_captured": bool(result and result.reasoning), "input_tokens": result.input_tokens if result else None, "output_tokens": result.output_tokens if result else None}
                 outputs.append(output)
