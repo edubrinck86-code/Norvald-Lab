@@ -20,7 +20,7 @@ from norvald_lab.application.arof.outcome_extract import rows_from_raw, write_cs
 from norvald_lab.application.arof.peer_order import PEER_ORDER_METHOD, draw_peer_order, reorder_by_author
 from norvald_lab.application.arof.prior_contribution import PriorContribution
 from norvald_lab.application.arof.raw_observation import build_raw_observation
-from norvald_lab.application.deliberation.round_prompt import render_shared_instructions
+from norvald_lab.application.deliberation.round_prompt import render_shared_instructions, texts_for
 from norvald_lab.config import validate_spec
 from norvald_lab.contribution_check import check_contribution
 from norvald_lab.domain.deliberation.context_item import ContextItem
@@ -73,7 +73,9 @@ class PreparedExperiment:
 
 
 def _comparison_base(spec):
-    return {k: spec[k] for k in ("task", "participants", "providers", "documents", "working_context", "repetitions", "mode")} | {"tools": {k: spec["condition"].get(k) for k in ("tools", "max_tool_calls", "max_tool_iterations")}, "prompt_profile": PROMPT_PROFILE}
+    # O idioma só entra quando não é o padrão: specs em pt-BR (com ou sem o campo) mantêm a base de sempre.
+    language = {"language": spec["language"]} if spec.get("language", "pt-BR") != "pt-BR" else {}
+    return {k: spec[k] for k in ("task", "participants", "providers", "documents", "working_context", "repetitions", "mode")} | language | {"tools": {k: spec["condition"].get(k) for k in ("tools", "max_tool_calls", "max_tool_iterations")}, "prompt_profile": PROMPT_PROFILE}
 
 
 class ExperimentRunner:
@@ -114,6 +116,8 @@ class ExperimentRunner:
             if set(prior_by_run) != expected or any(raw.get("error") or not (raw.get("result") or {}).get("content") for raw in prior_by_run.values()):
                 raise ValueError("A origem não possui resposta válida de todos os participantes em cada repetição.")
         corpus_hash = fingerprint_payload(spec["documents"])
+        language = spec.get("language", "pt-BR")
+        texts = texts_for(language)
         prepared_requests = []
         seed_audits = []
         frozen_contexts = {}
@@ -140,12 +144,12 @@ class ExperimentRunner:
                 # A projeção é integral, sem seleção semântica ou truncamento silencioso.
                 context = _json({"question": wc.question, "items": [item.to_dict() for item in wc.active_items()], "relations": [rel.to_dict() for rel in wc.relations]})
                 round_number = 1 if exposure == "blind" else 2
-                evidence = "CORPUS CONGELADO DESTE EXPERIMENTO:\n" + _json(spec["documents"])
-                shared = render_shared_instructions(evidence_block=evidence, has_library_tools=condition["tools"] == "corpus", round_number=round_number)
-                shared += "\n\nPERFIL DO LABORATÓRIO: o corpus e o contexto acima são integrais e congelados. As únicas ferramentas possíveis são list_documents e read_document quando oferecidas. Não há acesso ao Studio, busca web ou outros documentos. Não existe scan_context nesta execução."
-                instructions = f"Você é {participant['name']}, atuando como {participant['role']}.\n" + spec["task"]["instructions"]
+                evidence = texts["corpus_header"] + "\n" + _json(spec["documents"])
+                shared = render_shared_instructions(evidence_block=evidence, has_library_tools=condition["tools"] == "corpus", round_number=round_number, language=language)
+                shared += "\n\n" + texts["lab_profile"]
+                instructions = texts["identity"].format(name=participant["name"], role=participant["role"]) + "\n" + spec["task"]["instructions"]
                 if exposure != "blind":
-                    instructions += "\nReconsidere a tarefa à luz das contribuições disponíveis no contexto."
+                    instructions += "\n" + texts["reconsider"]
                 provider_kind = spec["providers"][participant["provider"]]["kind"]
                 sampling = resolve_sampling(SamplingParams.from_dict(participant["sampling"]), provider_kind=provider_kind, model=participant["model"], reasoning_effort=participant["reasoning_effort"], keep_sampling_with_reasoning=participant.get("sampling_with_reasoning", False))
                 metadata = {
@@ -160,9 +164,10 @@ class ExperimentRunner:
                     "peer_order": peer_order, "peer_order_method": PEER_ORDER_METHOD if exposure == "exposed" else None,
                     "reasoning_exposure_mode": "unknown", "can_modify_deliberation_artifacts": False,
                     "library_corpus_fingerprint": corpus_hash, "library_corpus_item_count": len(spec["documents"]), "library_corpus_algorithm": "sha256-canonical-json-v1",
+                    **({"prompt_language": language} if language != "pt-BR" else {}),
                     "research_anchor_ids": ["evidence-" + d["id"] for d in spec["documents"]], "attached_evidence_mode": "lab_inline_full", "tool_phase": "lab_frozen_corpus", "tool_limits_explicit": condition.get("max_tool_calls") is not None or condition.get("max_tool_iterations") is not None,
                 }
-                prepared_requests.append({"agent_id": participant["id"], "instructions": instructions, "shared_instructions": shared, "wave_instructions": "WORKING CONTEXT INTEGRAL:\n" + context, "user_message": spec["task"]["objective"], "reasoning_effort": participant["reasoning_effort"], "sampling": sampling.as_dict(), "allow_tools": condition["tools"] == "corpus", "max_tool_calls": condition.get("max_tool_calls"), "max_tool_iterations": condition.get("max_tool_iterations"), "context": {"objective": spec["task"]["objective"], "working_context": context, "metadata": metadata}})
+                prepared_requests.append({"agent_id": participant["id"], "instructions": instructions, "shared_instructions": shared, "wave_instructions": texts["wc_header"] + "\n" + context, "user_message": spec["task"]["objective"], "reasoning_effort": participant["reasoning_effort"], "sampling": sampling.as_dict(), "allow_tools": condition["tools"] == "corpus", "max_tool_calls": condition.get("max_tool_calls"), "max_tool_iterations": condition.get("max_tool_iterations"), "context": {"objective": spec["task"]["objective"], "working_context": context, "metadata": metadata}})
         fingerprint = fingerprint_payload({"spec": spec, "requests": prepared_requests, "execution_revision": EXECUTION_REVISION, "studio_revision": STUDIO_REVISION, "runner_version": RUNNER_VERSION})
         for request in prepared_requests:
             request["context"]["metadata"]["condition_fingerprint"] = fingerprint
