@@ -44,9 +44,13 @@ async def test_independent_blind_self_and_peer_with_repetition_pairing(tmp_path)
         prepared2 = runner.prepare(spec2)
         requests = [json.loads(r) for r in prepared2.requests_json]
         if exposure == "exposed":
+            # Reavaliado em 11/11/2026: antes a leva inteira via o contexto na mesma ordem.
+            # O TESE-002 §4.1 pede ordem dos pares sorteada por execução; agora a leva vê
+            # os mesmos itens (ids e conteúdo idênticos), em ordens diferentes e gravadas.
             for repetition in (1, 2):
-                same_wave = [r["context"]["working_context"] for r in requests if r["context"]["metadata"]["repetition_index"] == repetition]
-                assert len(set(same_wave)) == 1  # IDs e conteúdo idênticos na leva
+                same_wave = [json.loads(r["context"]["working_context"]) for r in requests if r["context"]["metadata"]["repetition_index"] == repetition]
+                canonical = {json.dumps(sorted(json.dumps(i, sort_keys=True) for i in wc["items"])) for wc in same_wave}
+                assert len(canonical) == 1  # IDs e conteúdo idênticos na leva
         await runner.run(prepared2, monitor_capacity=False)
         for record in raw(tmp_path, expid):
             meta = record["request"]["studio_metadata"]
