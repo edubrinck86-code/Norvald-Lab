@@ -53,7 +53,7 @@ def test_pilot_order_is_blind_first_only():
 def test_participants_have_neutral_labels():
     spec = blind_spec(BANK["questions"][0], PANEL, run_id="t", condition_id="B1")
     assert [p["id"] for p in spec["participants"]] == ["analista-1", "analista-2", "analista-3"]
-    assert all(p["reasoning_effort"] == "default" for p in spec["participants"])
+    assert all(p["reasoning_effort"] == "default" and p["sampling_with_reasoning"] is False for p in spec["participants"])
     with pytest.raises(ValueError):
         blind_spec(BANK["questions"][0], PANEL, run_id="t", condition_id="E")
 

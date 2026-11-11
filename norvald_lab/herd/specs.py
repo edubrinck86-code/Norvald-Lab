@@ -26,6 +26,7 @@ def participants_for(panel: Mapping[str, Any]) -> list[dict[str, Any]]:
             "id": f"analista-{position}", "name": f"Analista {position}", "role": "Analista",
             "provider": slot["provider"], "model": slot["model"],
             "reasoning_effort": panel.get("reasoning_effort", "default"),
+            "sampling_with_reasoning": bool(panel.get("sampling_with_reasoning", False)),
             "sampling": copy.deepcopy(panel["sampling"]),
         })
     return out
