@@ -474,6 +474,12 @@ class OpenAICompatibleProvider(LLMProvider):
         Z.AI separa thinking on/off de reasoning_effort.
         """
         effort = self._effort(request)
+        # "default" (11/11/2026, coleta do Δ_herd): não mandar nenhum campo de
+        # raciocínio, para que cada provider use o próprio padrão (TESE-002 §3).
+        # Motivo: "off" não é uniforme — no OpenRouter não envia nada, mas no
+        # Mistral e no Cohere vira "none" e desliga o raciocínio.
+        if effort == "default":
+            return
         kind = self._catalog_kind
         model_key = (model or "").strip().lower()
 

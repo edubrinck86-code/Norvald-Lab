@@ -62,7 +62,7 @@ def validate_spec(payload: dict) -> dict:
             _text(p.get(key), f"participant.{key}")
         _text(p.setdefault("name", p["id"]), "participant.name")
         _text(p.setdefault("role", "Analista"), "participant.role")
-        if p.setdefault("reasoning_effort", "off") not in {"off", "none", "minimal", "low", "medium", "high", "xhigh", "max"}:
+        if p.setdefault("reasoning_effort", "off") not in {"default", "off", "none", "minimal", "low", "medium", "high", "xhigh", "max"}:
             raise ValueError("reasoning_effort inválido.")
         sampling = p.setdefault("sampling", {})
         _keys(sampling, "temperature top_p max_tokens", "sampling")

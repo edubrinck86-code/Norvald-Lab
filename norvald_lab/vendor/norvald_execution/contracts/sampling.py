@@ -141,7 +141,9 @@ def resolve_sampling(
             )
         return ResolvedSampling(max_tokens=max_tokens, notes=tuple(notes))
 
-    if reasoning_effort and reasoning_effort != "off":
+    # "default" (11/11/2026) = não enviar controle de raciocínio; o provider decide.
+    # A amostragem pedida segue normalmente, como em "off".
+    if reasoning_effort and reasoning_effort not in {"off", "default"}:
         if temperature is not None or top_p is not None:
             notes.append(
                 "Raciocínio estendido ativo: o provider fixa a amostragem, então temperatura e top_p foram omitidos."
