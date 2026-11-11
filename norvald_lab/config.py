@@ -118,15 +118,15 @@ def validate_spec(payload: dict) -> dict:
     condition = spec.setdefault("condition", {})
     _keys(condition, "id exposure prior_experiment tools max_tool_calls max_tool_iterations", "condition")
     identifier(condition.setdefault("id", "B1"), "condition.id")
-    if condition.setdefault("exposure", "blind") not in {"blind", "self", "exposed"}:
-        raise ValueError("exposure deve ser blind, self ou exposed.")
+    if condition.setdefault("exposure", "blind") not in {"blind", "self", "exposed", "stance"}:
+        raise ValueError("exposure deve ser blind, self, exposed ou stance.")
     if condition["exposure"] == "blind" and condition.get("prior_experiment"):
         raise ValueError("Condição cega não recebe respostas anteriores.")
     if condition["exposure"] != "blind":
         identifier(condition.get("prior_experiment"), "condition.prior_experiment")
         if condition["prior_experiment"] == spec["experiment_id"]:
             raise ValueError("Experimento não pode usar a si próprio como origem.")
-        if condition["exposure"] == "exposed" and len(ids) < 2:
+        if condition["exposure"] in {"exposed", "stance"} and len(ids) < 2:
             raise ValueError("Exposição a pares exige pelo menos dois participantes.")
     if condition.setdefault("tools", "off") not in {"off", "corpus"}:
         raise ValueError("tools deve ser off ou corpus.")
