@@ -155,7 +155,7 @@ class OllamaProvider(LLMProvider):
                 options["num_predict"] = sampling.max_tokens
             if options:
                 payload["options"] = options
-        if request.reasoning_effort != "off":
+        if request.reasoning_effort not in {"off", "default"}:
             payload["think"] = True
         return payload, attachment_results
 
