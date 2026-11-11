@@ -1,0 +1,24 @@
+{
+ "schema": "norvald.lab.herd.answers.v1",
+ "note": "Gabarito; nunca entra no prompt. Sim = option-a, Não = option-b.",
+ "answers": {
+  "g01": "option-a",
+  "g02": "option-b",
+  "g03": "option-b",
+  "g04": "option-a",
+  "g05": "option-b",
+  "g06": "option-a",
+  "g07": "option-a",
+  "g08": "option-a",
+  "g09": "option-a",
+  "g10": "option-b",
+  "g11": "option-a",
+  "g12": "option-b",
+  "g13": "option-b",
+  "g14": "option-a",
+  "g15": "option-b",
+  "g16": "option-b",
+  "g17": "option-b",
+  "g18": "option-b"
+ }
+}

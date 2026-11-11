@@ -1,0 +1,20 @@
+{
+  "schema": "norvald.lab.herd.panel.v1",
+  "decided": "11/11/2026, Opus (autonomia dada pelo Eduardo). Quatro famílias, classe de 24 a 31 bilhões de parâmetros, todos de 2025-12 a 2026-08. Cohere fora: os modelos de classe média dele são de 2024 e trariam capacidade como confundidor (TESE-002 §2.1).",
+  "language": "pt-BR (decisão: o banco fica em português e o idioma entra como limite de escopo declarado, TESE-002 §3)",
+  "providers": {
+    "openrouter": {"kind": "openrouter"},
+    "mistral": {"kind": "mistral"}
+  },
+  "participants": [
+    {"provider": "openrouter", "model": "google/gemma-4-31b-it:free", "family": "Google"},
+    {"provider": "openrouter", "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", "family": "NVIDIA"},
+    {"provider": "mistral", "model": "mistral-small-2603", "family": "Mistral"},
+    {"provider": "openrouter", "model": "qwen/qwen3.8-27b", "family": "Alibaba (Qwen)"}
+  ],
+  "reasoning_effort": "default",
+  "sampling": {"temperature": 0.7, "top_p": 1.0, "max_tokens": 2000},
+  "max_concurrency_per_provider": 3,
+  "timeout_seconds": 300,
+  "instructions": "Escolha exatamente uma das opções presentes no Working Context. Declare um item do tipo decision e uma relação selects ligando essa decision ao id da opção escolhida. Justifique em no máximo três frases."
+}
