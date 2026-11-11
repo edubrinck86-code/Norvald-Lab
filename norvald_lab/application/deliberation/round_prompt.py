@@ -140,6 +140,94 @@ def _relation_guide() -> str:
     return "\n".join(linhas)
 
 
+# Catálogo de textos em português, o padrão. Os valores são os mesmos que
+# estavam inline em `render_shared_instructions`: mover não pode mudar um
+# byte do prompt, porque specs antigos precisam gerar os mesmos requests
+# (e a mesma impressão digital). A versão em inglês está em
+# `round_prompt_en.py`, com as mesmas chaves.
+TEXTS_PT: Dict[str, str] = {
+    "goal": "Seu objetivo é produzir a melhor contribuição possível para o objetivo da deliberação. A LLM é responsável por interpretar a pergunta, raciocinar, decidir se precisa das ferramentas disponíveis nesta fase e avaliar os resultados obtidos.",
+    "wc_truth": "O Working Context é a fonte de verdade do conhecimento deliberativo. O que está nele foi declarado e validado. Não trate resultado de ferramenta, documento, busca ou raciocínio intermediário como conhecimento do WC sem declará-lo no bloco CONTRIBUTION.",
+    "tools_optional": "Ferramentas são meios opcionais, não o objetivo do turno. Você pode responder diretamente. Não use ferramentas apenas porque elas estão disponíveis. A única exceção operacional é scan_context quando o runtime informar que a projeção do Working Context é parcial: percorra todos os blocos antes de concluir.",
+    "n0": "N+0: use o WC inicial, suas âncoras e a Evidence anexada que foi passada diretamente nesta primeira execução. Library/Repository/WC podem ser consultados quando estiverem disponíveis nesta execução; MCP/Web ainda não fazem parte desta fase.",
+    "n1plus": "N+1 em diante: primeiro consulte/avalie o WC e as posições já declaradas. Se o WC não couber integralmente na projeção residente, o Studio não escolhe quais partes são relevantes: o restante é apresentado em ordem canônica por scan_context. Ao ler cada bloco, retain_ids deve conter apenas os endereços que você próprio julgar possivelmente pertinentes para reencontro posterior. As âncoras de Evidence permanecem no WC, mas o corpo anexado não é reenviado como bloco a cada rodada. Library/Repository podem ser usados quando estiverem disponíveis nesta execução; MCP/Web podem ser usados quando configurados, permitidos e materialmente necessários.",
+    "no_dump": "Não despeje catálogos, grafos, resultados brutos ou documentos completos no contexto da deliberação. Use as ferramentas para investigar e transforme o resultado em conhecimento somente quando houver uma declaração deliberativa válida.",
+    "evidence": "Evidence pode vir da aba Contexto, Library, Repository ou de fonte declarada pelo especialista. Ao usar Evidence, preserve a citação e a proveniência; não incorpore o documento completo ao WC.",
+    "after_tool": "Depois de uma ferramenta, avalie o resultado e decida se deve responder ou investigar mais. Não repita uma consulta sem motivo novo. Se a evidência for suficiente, pare de pesquisar e componha a contribuição.",
+    "focus": "O objetivo da deliberação é o problema permanente. O FOCO DO MODERADOR, quando presente na mensagem, governa somente esta rodada: use-o para decidir onde concentrar a análise, mesmo que a rodada anterior estivesse seguindo outra ênfase. Ele não apaga nem reescreve o objetivo permanente.",
+    "respond_prev": "Se a rodada anterior aparecer na mensagem, responda a ela: concorde com fundamento, discorde com fundamento ou avance o ponto. Não repita o que já foi dito.",
+    "tool_rules": "As ferramentas disponíveis são capacidades reais do Studio. O runtime controla permissão, segurança, tempo e execução; ele não escolhe a ferramenta por você. Não existe um número nativo de chamadas que você precise economizar: investigue enquanto houver progresso material e pare quando houver fundamento suficiente para compor a Contribution. Chamadas repetidas sem informação nova não avançam a tarefa.",
+    "contribution_intro": "OBRIGATÓRIO: termine sua resposta com o bloco abaixo, exatamente com estes delimitadores e JSON puro (sem cerca de código, sem indentação e sem quebras de linha dentro do JSON):\n<<CONTRIBUTION>>\n",
+    "contribution_example": '{"knowledge":[{"local_id":"k1","type":"inference","content":"...","confidence":"média"}],"relations":[{"relation_type":"derived_from","source":"k1","target":"evidence-<id>"}]}\n',
+    "contribution_tail": "type é um de: {types}. Uma unidade por afirmação sua. "
+    "Em claim, argument, counterargument, inference e decision, declare "
+    "`confidence` (alta, média ou baixa): sem ela o leitor do documento "
+    "não distingue constatação de aposta. Não é certificação de verdade "
+    "— é o peso que você mesmo atribui à sua afirmação. "
+    "Regras de brevidade valem para a prosa, não para este bloco: sem ele nada entra no Working Context e a rodada não deixa conhecimento.",
+    "relations": "RELAÇÕES declaram o tecido entre as unidades — não são um extra "
+    "opcional. Uma unidade sem relação fica isolada no grafo: não "
+    "conta para cobertura de nenhum critério e não aparece ligada a "
+    "nada quando o CDD for consultado depois. Sempre que uma unidade "
+    "sua responde, refina, contesta, apoia ou deriva de outra — sua "
+    "ou já existente no Working Context —, declare a relação "
+    "correspondente; isso vale tanto quanto declarar a própria "
+    "unidade. Só não declare quando a relação genuinamente não "
+    "existir: fabricar uma para preencher é pior do que declarar de "
+    "menos, mas declarar de menos tem custo real. `source` é um "
+    "`local_id` desta contribuição; `target` é um `local_id` desta "
+    "contribuição OU um id já existente no Working Context (as "
+    "evidências deste caso aparecem como `evidence-<id>` no bloco de "
+    "evidências e são alvos válidos). As permitidas:\n",
+    "lifecycle": "LIFECYCLE DE LACUNAS: um [gap] já existente é endereçável pelo "
+    "UUID mostrado no Working Context. Se seu novo conhecimento realmente "
+    "preenche uma lacuna existente, não crie outra cópia textual: declare "
+    "o claim/evidence novo e uma relação resolves apontando para o UUID "
+    "do gap. Se o problema continua existindo mas precisa ser reformulado, "
+    "declare o novo gap e uma relação supersedes apontando para o UUID do "
+    "gap anterior. Só crie um gap novo sem essas relações quando for uma "
+    "lacuna genuinamente nova. O Studio não decide por similaridade se "
+    "duas lacunas são a mesma; esse julgamento semântico é seu.",
+    "channels": "SEPARE OS DOIS CANAIS. A prosa é o argumento dirigido aos outros "
+    "especialistas: o que você sustenta e por quê. O bloco é a "
+    "declaração estruturada, lida pelo Studio. Não narre o bloco na "
+    "prosa — não escreva \"declaro um claim\", não liste os tipos, os "
+    "local_id, as relações, a confiança nem as dimensões em texto "
+    "corrido. Isso já está no bloco, e repetir na prosa polui a "
+    "leitura sem acrescentar conhecimento. Escreva a prosa como "
+    "escreveria a um colega que não conhece o formato.",
+    "dimensions": 'Em cada unidade, inclua "dimension_id" com a dimensão do Framework a que ela pertence, quando houver uma que sirva. Omita o campo se nenhuma servir. Use exatamente o nome, em minúsculas e com hífen no lugar do espaço (ex.: "Human Factors" vira "human-factors"). Dimensões: ',
+    "constitution": "REGRAS DESTA DELIBERAÇÃO (Constitution). Não são material a "
+    "deliberar: são instruções a seguir neste turno, e prevalecem "
+    "sobre preferências suas de formato ou abordagem. Onde "
+    "conflitarem com o objetivo declarado, siga a regra e aponte o "
+    "conflito na prosa.\n\n{bodies}",
+    "lab_profile": "PERFIL DO LABORATÓRIO: o corpus e o contexto acima são integrais e congelados. As únicas ferramentas possíveis são list_documents e read_document quando oferecidas. Não há acesso ao Studio, busca web ou outros documentos. Não existe scan_context nesta execução.",
+    "identity": "Você é {name}, atuando como {role}.",
+    "reconsider": "Reconsidere a tarefa à luz das contribuições disponíveis no contexto.",
+    "corpus_header": "CORPUS CONGELADO DESTE EXPERIMENTO:",
+    "wc_header": "WORKING CONTEXT INTEGRAL:",
+}
+
+DEFAULT_LANGUAGE = "pt-BR"
+SUPPORTED_LANGUAGES = ("pt-BR", "en")
+
+
+def texts_for(language: str = DEFAULT_LANGUAGE) -> Dict[str, str]:
+    """O catálogo de textos do idioma. Idioma desconhecido é erro, não fallback.
+
+    Cair em silêncio no português deixaria uma coleta "em inglês" com
+    prompt em português, que é exatamente o que o campo existe para evitar.
+    """
+    if language == "pt-BR":
+        return TEXTS_PT
+    if language == "en":
+        from norvald_lab.application.deliberation.round_prompt_en import TEXTS_EN
+
+        return TEXTS_EN
+    raise ValueError(f"Idioma de prompt não suportado: {language!r}.")
+
+
 def render_shared_instructions(
     *,
     constitution_block: str = "",
@@ -148,46 +236,37 @@ def render_shared_instructions(
     has_library_tools: bool = True,
     dimensions: Optional["DimensionRegistry"] = None,
     round_number: int = 1,
+    language: str = DEFAULT_LANGUAGE,
 ) -> str:
     """As instruções do turno.
 
     Variam com a rodada porque a fase varia. N+0 recebe Evidence direta,
     âncoras do WC e ferramentas ancoradas de Library/Repository/WC.
     N+1+ mantém as âncoras e amplia o catálogo com capacidades externas.
+
+    `language` só escolhe o catálogo de textos; a estrutura e a ordem das
+    seções são as mesmas nos dois idiomas.
     """
+    t = texts_for(language)
     parts = [
-        "Seu objetivo é produzir a melhor contribuição possível para o objetivo da deliberação. A LLM é responsável por interpretar a pergunta, raciocinar, decidir se precisa das ferramentas disponíveis nesta fase e avaliar os resultados obtidos.",
-        "O Working Context é a fonte de verdade do conhecimento deliberativo. O que está nele foi declarado e validado. Não trate resultado de ferramenta, documento, busca ou raciocínio intermediário como conhecimento do WC sem declará-lo no bloco CONTRIBUTION.",
-        "Ferramentas são meios opcionais, não o objetivo do turno. Você pode responder diretamente. Não use ferramentas apenas porque elas estão disponíveis. A única exceção operacional é scan_context quando o runtime informar que a projeção do Working Context é parcial: percorra todos os blocos antes de concluir.",
-        "N+0: use o WC inicial, suas âncoras e a Evidence anexada que foi passada diretamente nesta primeira execução. Library/Repository/WC podem ser consultados quando estiverem disponíveis nesta execução; MCP/Web ainda não fazem parte desta fase.",
-        "N+1 em diante: primeiro consulte/avalie o WC e as posições já declaradas. Se o WC não couber integralmente na projeção residente, o Studio não escolhe quais partes são relevantes: o restante é apresentado em ordem canônica por scan_context. Ao ler cada bloco, retain_ids deve conter apenas os endereços que você próprio julgar possivelmente pertinentes para reencontro posterior. As âncoras de Evidence permanecem no WC, mas o corpo anexado não é reenviado como bloco a cada rodada. Library/Repository podem ser usados quando estiverem disponíveis nesta execução; MCP/Web podem ser usados quando configurados, permitidos e materialmente necessários.",
-        "Não despeje catálogos, grafos, resultados brutos ou documentos completos no contexto da deliberação. Use as ferramentas para investigar e transforme o resultado em conhecimento somente quando houver uma declaração deliberativa válida.",
-        "Evidence pode vir da aba Contexto, Library, Repository ou de fonte declarada pelo especialista. Ao usar Evidence, preserve a citação e a proveniência; não incorpore o documento completo ao WC.",
-        "Depois de uma ferramenta, avalie o resultado e decida se deve responder ou investigar mais. Não repita uma consulta sem motivo novo. Se a evidência for suficiente, pare de pesquisar e componha a contribuição.",
-        "O objetivo da deliberação é o problema permanente. O FOCO DO MODERADOR, quando presente na mensagem, governa somente esta rodada: use-o para decidir onde concentrar a análise, mesmo que a rodada anterior estivesse seguindo outra ênfase. Ele não apaga nem reescreve o objetivo permanente.",
-        *(
-            [
-                "Se a rodada anterior aparecer na mensagem, responda a ela: concorde com fundamento, discorde com fundamento ou avance o ponto. Não repita o que já foi dito.",
-            ]
-            if round_number > 1
-            else []
-        ),
+        t["goal"],
+        t["wc_truth"],
+        t["tools_optional"],
+        t["n0"],
+        t["n1plus"],
+        t["no_dump"],
+        t["evidence"],
+        t["after_tool"],
+        t["focus"],
+        *([t["respond_prev"]] if round_number > 1 else []),
     ]
     if has_library_tools and policy_for(round_number).include_tool_rules:
-        parts.append(
-            "As ferramentas disponíveis são capacidades reais do Studio. O runtime controla permissão, segurança, tempo e execução; ele não escolhe a ferramenta por você. Não existe um número nativo de chamadas que você precise economizar: investigue enquanto houver progresso material e pare quando houver fundamento suficiente para compor a Contribution. Chamadas repetidas sem informação nova não avançam a tarefa."
-        )
+        parts.append(t["tool_rules"])
     parts.append(
-        "OBRIGATÓRIO: termine sua resposta com o bloco abaixo, exatamente com estes delimitadores e JSON puro (sem cerca de código, sem indentação e sem quebras de linha dentro do JSON):\n"
-        "<<CONTRIBUTION>>\n"
-        '{"knowledge":[{"local_id":"k1","type":"inference","content":"...","confidence":"média"}],"relations":[{"relation_type":"derived_from","source":"k1","target":"evidence-<id>"}]}\n'
-        "<<END_CONTRIBUTION>>\n"
-        "type é um de: " + ", ".join(DECLARABLE_KNOWLEDGE_TYPES) + ". Uma unidade por afirmação sua. "
-        "Em claim, argument, counterargument, inference e decision, declare "
-        "`confidence` (alta, média ou baixa): sem ela o leitor do documento "
-        "não distingue constatação de aposta. Não é certificação de verdade "
-        "— é o peso que você mesmo atribui à sua afirmação. "
-        "Regras de brevidade valem para a prosa, não para este bloco: sem ele nada entra no Working Context e a rodada não deixa conhecimento."
+        t["contribution_intro"]
+        + t["contribution_example"]
+        + "<<END_CONTRIBUTION>>\n"
+        + t["contribution_tail"].format(types=", ".join(DECLARABLE_KNOWLEDGE_TYPES))
     )
     parts.append(
         # O conhecimento sem relação é uma pilha de afirmações soltas: o
@@ -211,33 +290,9 @@ def render_shared_instructions(
         # ligando os dois. A correção dá à omissão o mesmo peso que o
         # bloco de conteúdo já tinha, sem enfraquecer o alerta contra
         # fabricar.
-        "RELAÇÕES declaram o tecido entre as unidades — não são um extra "
-        "opcional. Uma unidade sem relação fica isolada no grafo: não "
-        "conta para cobertura de nenhum critério e não aparece ligada a "
-        "nada quando o CDD for consultado depois. Sempre que uma unidade "
-        "sua responde, refina, contesta, apoia ou deriva de outra — sua "
-        "ou já existente no Working Context —, declare a relação "
-        "correspondente; isso vale tanto quanto declarar a própria "
-        "unidade. Só não declare quando a relação genuinamente não "
-        "existir: fabricar uma para preencher é pior do que declarar de "
-        "menos, mas declarar de menos tem custo real. `source` é um "
-        "`local_id` desta contribuição; `target` é um `local_id` desta "
-        "contribuição OU um id já existente no Working Context (as "
-        "evidências deste caso aparecem como `evidence-<id>` no bloco de "
-        "evidências e são alvos válidos). As permitidas:\n"
-        + _relation_guide()
+        t["relations"] + _relation_guide()
     )
-    parts.append(
-        "LIFECYCLE DE LACUNAS: um [gap] já existente é endereçável pelo "
-        "UUID mostrado no Working Context. Se seu novo conhecimento realmente "
-        "preenche uma lacuna existente, não crie outra cópia textual: declare "
-        "o claim/evidence novo e uma relação resolves apontando para o UUID "
-        "do gap. Se o problema continua existindo mas precisa ser reformulado, "
-        "declare o novo gap e uma relação supersedes apontando para o UUID do "
-        "gap anterior. Só crie um gap novo sem essas relações quando for uma "
-        "lacuna genuinamente nova. O Studio não decide por similaridade se "
-        "duas lacunas são a mesma; esse julgamento semântico é seu."
-    )
+    parts.append(t["lifecycle"])
     parts.append(
         # Os dois canais, e o que não fazer em cada um.
         #
@@ -247,22 +302,11 @@ def render_shared_instructions(
         # texto corrido — "declaro claim: X, confiança alta" —, que só
         # ocupa a tela. Quem lê o chat recebe a estrutura interna do
         # Studio em vez do argumento.
-        "SEPARE OS DOIS CANAIS. A prosa é o argumento dirigido aos outros "
-        "especialistas: o que você sustenta e por quê. O bloco é a "
-        "declaração estruturada, lida pelo Studio. Não narre o bloco na "
-        "prosa — não escreva \"declaro um claim\", não liste os tipos, os "
-        "local_id, as relações, a confiança nem as dimensões em texto "
-        "corrido. Isso já está no bloco, e repetir na prosa polui a "
-        "leitura sem acrescentar conhecimento. Escreva a prosa como "
-        "escreveria a um colega que não conhece o formato."
+        t["channels"]
     )
     if dimensions is not None and dimensions.dimensions:
         names = sorted(d.name for d in dimensions.dimensions.values() if d.state == "ACTIVE")
-        parts.append(
-            'Em cada unidade, inclua "dimension_id" com a dimensão do Framework a que ela pertence, quando houver uma que sirva. Omita o campo se nenhuma servir. Use exatamente o nome, em minúsculas e com hífen no lugar do espaço (ex.: "Human Factors" vira "human-factors"). Dimensões: '
-            + ", ".join(names)
-            + "."
-        )
+        parts.append(t["dimensions"] + ", ".join(names) + ".")
     # A norma antes do material, e separada dele: Constitution é regra a
     # seguir, não objeto sobre o qual deliberar. Misturada às evidências
     # ela disputaria espaço com o material e seria lida como algo a
@@ -276,7 +320,7 @@ def render_shared_instructions(
     return "\n\n".join(parts)
 
 
-def render_constitution_block(constitutions: List[Any]) -> str:
+def render_constitution_block(constitutions: List[Any], *, language: str = DEFAULT_LANGUAGE) -> str:
     """As Constitutions referenciadas, como instrução do turno.
 
     Ordem de anexo, que é estável e declarada — não reordenada por
@@ -289,13 +333,7 @@ def render_constitution_block(constitutions: List[Any]) -> str:
     ]
     if not corpos:
         return ""
-    return (
-        "REGRAS DESTA DELIBERAÇÃO (Constitution). Não são material a "
-        "deliberar: são instruções a seguir neste turno, e prevalecem "
-        "sobre preferências suas de formato ou abordagem. Onde "
-        "conflitarem com o objetivo declarado, siga a regra e aponte o "
-        "conflito na prosa.\n\n" + "\n\n".join(corpos)
-    )
+    return texts_for(language)["constitution"].format(bodies="\n\n".join(corpos))
 
 
 def render_instructions(

@@ -102,6 +102,9 @@ def _decisao_selecionadora(contribuicao: Contribution) -> tuple[Any | None, str]
     return None, ""
 
 
+CONFIANCA_EM_INGLES = {"high": "alta", "medium": "média", "low": "baixa"}
+
+
 def _confianca_declarada(decisao: Any | None) -> str:
     """A confiança da decisão, como texto, ou vazio quando não declarada.
 
@@ -113,7 +116,13 @@ def _confianca_declarada(decisao: Any | None) -> str:
     if decisao is None:
         return ""
     valor = getattr(decisao, "confidence", None)
-    return "" if valor is None else str(valor).strip()
+    if valor is None:
+        return ""
+    texto = str(valor).strip()
+    # Coleta em inglês (11/11/2026) pede high/medium/low. Normalizar para os
+    # valores canônicos em português mantém uma única escala na análise;
+    # qualquer outro texto passa como veio, como sempre foi.
+    return CONFIANCA_EM_INGLES.get(texto.lower(), texto)
 
 
 def _alvos_de_fundamento(contribuicao: Contribution) -> tuple[str, ...]:

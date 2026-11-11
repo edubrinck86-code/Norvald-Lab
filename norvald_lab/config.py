@@ -39,13 +39,18 @@ def _positive(value, field):
 
 def validate_spec(payload: dict) -> dict:
     """Validação antes de escrever manifesto ou criar clientes de rede."""
-    _keys(payload, "schema_version experiment_id task participants providers documents working_context repetitions condition budget mode source", "experimento")
+    _keys(payload, "schema_version experiment_id task participants providers documents working_context repetitions condition budget mode source language", "experimento")
     spec = copy.deepcopy(payload)
     if spec.setdefault("schema_version", "norvald.lab.spec.v1") != "norvald.lab.spec.v1":
         raise ValueError("schema_version não suportada.")
     identifier(spec.get("experiment_id"), "experiment_id")
     if spec.setdefault("mode", "demo") not in {"demo", "live"}:
         raise ValueError("mode deve ser demo ou live.")
+    # `language` é opcional e NÃO ganha valor padrão no spec: acrescentar a
+    # chave mudaria a impressão digital de specs antigos, e um spec sem o
+    # campo precisa gerar exatamente os mesmos requests de sempre (pt-BR).
+    if "language" in spec and spec["language"] not in {"pt-BR", "en"}:
+        raise ValueError("language deve ser pt-BR ou en.")
     task = spec.get("task")
     _keys(task, "id objective instructions", "task")
     identifier(task.get("id"), "task.id")
