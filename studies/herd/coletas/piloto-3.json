@@ -1,0 +1,18 @@
+{
+ "run_id": "piloto-3",
+ "inicio_utc": "2026-11-11T17:54:35.675863+00:00",
+ "inicio_brasilia": "11/11/2026 14:54:35",
+ "fim_utc": "2026-11-11T17:56:49.664457+00:00",
+ "fim_brasilia": "11/11/2026 14:56:49",
+ "duracao_min": 2.2,
+ "experimentos_fechados": {
+  "B1": 10
+ },
+ "experimentos_abertos": [],
+ "chamadas": 50,
+ "segundas_tentativas": 0,
+ "falhas_da_1a_tentativa_por_modelo": {},
+ "tokens_de_saida": 32340,
+ "custo_usd": 0.0357,
+ "registrado_em_utc": "2026-11-11T19:04:40.310354+00:00"
+}
