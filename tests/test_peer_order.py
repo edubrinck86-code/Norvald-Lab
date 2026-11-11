@@ -63,3 +63,19 @@ async def test_self_condition_has_no_peer_order(tmp_path):
     for request in map(json.loads, prepared.requests_json):
         meta = request["context"]["metadata"]
         assert meta["peer_order"] == [] and meta["peer_order_method"] is None
+
+
+@pytest.mark.asyncio
+async def test_raw_record_keeps_the_peer_order(tmp_path):
+    # Defeito do fumaca-2 (11/11/2026): a ordem ficava só no requests.json.
+    runner = ExperimentRunner(tmp_path)
+    await runner.run(runner.prepare(demo_spec("b1")), monitor_capacity=False)
+    prepared = runner.prepare(derive_spec(tmp_path, "b1", "e", "exposed"))
+    await runner.run(prepared, monitor_capacity=False)
+    sent = {json.loads(r)["agent_id"]: json.loads(r)["context"]["metadata"]["peer_order"] for r in prepared.requests_json}
+    lines = [line for path in (tmp_path / "experiments" / "e" / "raw").rglob("*.jsonl") for line in path.read_text().splitlines()]
+    assert lines
+    for line in lines:
+        meta = json.loads(line)["request"]["studio_metadata"]
+        assert meta["peer_order"] == sent[meta["participant_id"]]
+        assert meta["peer_order_method"] == PEER_ORDER_METHOD
