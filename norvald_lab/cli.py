@@ -9,6 +9,7 @@ from pathlib import Path
 
 from norvald_lab.config import identifier
 from norvald_lab.infrastructure.arof.dataset_store import arof_data_root
+from norvald_lab.measures.bootstrap import DEFAULT_REPS, DEFAULT_SEED
 from norvald_lab.runner import ExperimentRunner
 from norvald_lab.storage import read_verified_records, verify_experiment, write_once
 
@@ -69,6 +70,14 @@ def main(argv=None):
     herd.add_argument("--questions", default="", help="Ids separados por vírgula; vazio = todas as contestáveis e as com gabarito")
     herd.add_argument("--live", action="store_true")
     herd.add_argument("--pilot", action="store_true", help="Só B1 (pilotos do TESE-002 §5.3 e §5.4)")
+    measures = commands.add_parser("measures", help="Medidas do Δ_herd (critérios A–J e Hao et al.) de uma ou mais rodadas; só lê")
+    measures.add_argument("--run", action="append", required=True, help="run_id do herd; repita para juntar rodadas")
+    measures.add_argument("--out", type=Path, required=True, help="Arquivo JSON; o resumo .md sai ao lado")
+    measures.add_argument("--seed", type=int, default=DEFAULT_SEED)
+    measures.add_argument("--reps", type=int, default=DEFAULT_REPS, help="Réplicas do bootstrap por pergunta")
+    measures.add_argument("--bank", type=Path, action="append", default=[], help="Banco extra, para rodadas sem plan.json")
+    measures.add_argument("--answers", type=Path, action="append", default=[], help="Gabarito; padrão: os de studies/herd")
+    measures.add_argument("--similarity-threshold", type=float, default=None, help="Limiar provisório de 'razões diversas'")
     serve = commands.add_parser("serve", help="Inicia a bancada e o backend local")
     serve.add_argument("--port", type=int, default=8766)
     serve.add_argument("--live", action="store_true")
@@ -108,6 +117,9 @@ def main(argv=None):
         elif args.command == "herd":
             from norvald_lab.herd.run_command import run_herd
             return run_herd(runner, bank_path=args.bank, panel_path=args.panel, run_id=args.run_id, questions=args.questions, live=args.live, progress=_progress, pilot=args.pilot)
+        elif args.command == "measures":
+            from norvald_lab.measures.command import run_measures
+            return run_measures(root, runs=args.run, out=args.out, seed=args.seed, reps=args.reps, bank_paths=args.bank, answer_paths=args.answers, threshold=args.similarity_threshold)
         elif args.command == "serve":
             import uvicorn
             from norvald_lab.api import create_app

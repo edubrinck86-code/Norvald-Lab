@@ -45,6 +45,7 @@ templates e auditorias do Studio. Nada disso descreve o experimento.
 | `arof/Knowledge_Isolation_Audit_AROF.md` | `docs/` | Auditoria de isolamento de conhecimento |
 | `adr/ADR-020...md` | `docs/adr/Processando/` | Fronteira pesquisa × produto; telemetria declarada |
 | `literatura/00_INDICE.md` a `07_ALERTAS.md` | — (produzido fora do repo) | Levantamento de literatura de 04/10/2026 |
+| `herd-medidas.md` | — (escrito aqui, 11/11/2026) | Medidas do Δ_herd: critérios A–J e Hao et al., fórmulas e escolhas. **Leitura pendente — proprietário** |
 
 ## Literatura — ler na ordem
 
