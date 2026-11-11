@@ -61,5 +61,15 @@ def check_records(records, requests):
             check = check | {"usable": False, "fully_valid": False, "code": "execution_failed", "message": "A execução falhou; não há resposta válida para exposição."}
         result.append(check | {"observation_id": record["observation_id"], "participant_id": record["participant_id"],
                               "participant_name": record["participant_name"], "run_id": record["run_id"],
-                              "model": record["requested_model"]})
+                              "model": record["requested_model"], "attempt_index": int(record.get("attempt_index") or 1)})
     return result
+
+
+def latest_checks(checks):
+    """Um diagnóstico por (participante, repetição): o da maior tentativa (nova tentativa do Lab, 11/11/2026)."""
+    latest = {}
+    for check in checks:
+        key = (check["participant_id"], check["run_id"])
+        if key not in latest or check.get("attempt_index", 1) >= latest[key].get("attempt_index", 1):
+            latest[key] = check
+    return list(latest.values())

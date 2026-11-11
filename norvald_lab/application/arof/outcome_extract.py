@@ -202,11 +202,17 @@ def rows_from_raw(
     paths: Sequence[str | Path],
     *,
     experiment_id: str | None = None,
+    all_attempts: bool = False,
 ) -> tuple[OutcomeRow, ...]:
     """Lê os JSONL do RAW e devolve as linhas, na ordem dos arquivos.
 
     Só a tentativa final de cada execução lógica entra: um replan não é
     um especialista independente, e contá-lo duplicaria a observação.
+
+    Com `all_attempts=True` entra uma linha por tentativa, na ordem do RAW
+    (nova tentativa do Lab, 11/11/2026): a taxa de falha da 1ª tentativa é
+    dado, e só se mede se a linha dela sobrevive. Quem analisa a resposta
+    de cada participante usa `latest_attempt_rows`.
     """
     from norvald_lab.application.arof.dataset import ReplayFilter
     from norvald_lab.infrastructure.arof.dataset_store import replay_jsonl
@@ -215,6 +221,8 @@ def rows_from_raw(
         [Path(p) for p in paths],
         filters=ReplayFilter(experiment_id=experiment_id) if experiment_id else None,
     )
+    if all_attempts:
+        return tuple(row_from_payload(registro.payload) for registro in resultado.records)
 
     ultima_por_execucao: dict[str, Mapping[str, Any]] = {}
     for registro in resultado.records:
@@ -227,6 +235,21 @@ def rows_from_raw(
             ultima_por_execucao[chave] = payload
 
     return tuple(row_from_payload(payload) for payload in ultima_por_execucao.values())
+
+
+def latest_attempt_rows(rows: Iterable[OutcomeRow]) -> tuple[OutcomeRow, ...]:
+    """Uma linha por (pergunta, condição, repetição, participante): a de maior attempt_index.
+
+    É a leitura certa para medir o que cada participante respondeu; a linha da
+    1ª tentativa, quando houve nova tentativa, só serve para medir falha de formato.
+    """
+    ultima: dict[tuple[str, str, str, str], OutcomeRow] = {}
+    for linha in rows:
+        chave = (linha.question_id, linha.condition, linha.run_id, linha.participant_id)
+        anterior = ultima.get(chave)
+        if anterior is None or linha.attempt_index >= anterior.attempt_index:
+            ultima[chave] = linha
+    return tuple(ultima.values())
 
 
 def write_csv(rows: Iterable[OutcomeRow], destination: str | Path) -> Path:
