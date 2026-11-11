@@ -16,6 +16,7 @@ from norvald_lab.herd.specs import blind_spec, experiment_id
 from norvald_lab.runner import ExperimentRunner
 
 BANK = json.loads(Path(__file__).resolve().parents[1].joinpath("studies/herd/bank.json").read_text(encoding="utf-8"))
+BANK_EN = json.loads(Path(__file__).resolve().parents[1].joinpath("studies/herd/bank.en.json").read_text(encoding="utf-8"))
 ANSWERS = json.loads(Path(__file__).resolve().parents[1].joinpath("studies/herd/answers.json").read_text(encoding="utf-8"))
 PANEL = {
     "mode": "demo",
@@ -31,8 +32,23 @@ def test_bank_matches_the_protocol():
     kinds = [q["kind"] for q in BANK["questions"]]
     assert (kinds.count("contestavel"), kinds.count("gabarito"), kinds.count("reserva")) == (32, 12, 6)
     assert all(2 <= len(q["options"]) <= 3 for q in BANK["questions"])
-    assert set(ANSWERS["answers"]) == {q["id"] for q in BANK["questions"] if q["kind"] != "contestavel"}
+    assert {q["id"] for q in BANK["questions"]} < {q["id"] for q in BANK_EN["questions"]}
     assert "Sim" not in json.dumps(ANSWERS["answers"])  # gabarito é id de opção, não texto
+
+
+def test_english_bank_is_the_collection_bank():
+    # 11/11/2026: a coleta passou a ser em inglês (decisão do Eduardo) e ganhou h01–h40,
+    # porque o gabarito g01–g12 foi fácil demais no piloto-2 (só g02 e g12 tiveram erro).
+    kinds = [q["kind"] for q in BANK_EN["questions"]]
+    assert (kinds.count("contestavel"), kinds.count("gabarito"), kinds.count("reserva")) == (32, 52, 6)
+    assert BANK_EN["language"] == "en"
+    assert set(ANSWERS["answers"]) == {q["id"] for q in BANK_EN["questions"] if q["kind"] != "contestavel"}
+    by_id = {q["id"]: q for q in BANK["questions"]}
+    for q in BANK_EN["questions"]:  # mesma pergunta, mesmos ids de opção, nos dois idiomas
+        if q["id"] in by_id:
+            assert [o["id"] for o in q["options"]] == [o["id"] for o in by_id[q["id"]]["options"]]
+    h = [ANSWERS["answers"][f"h{n:02d}"] for n in range(1, 41)]
+    assert h.count("option-a") == h.count("option-b") == 20
 
 
 def test_answers_never_reach_the_spec():
