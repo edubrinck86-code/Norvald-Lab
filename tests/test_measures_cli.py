@@ -50,10 +50,22 @@ async def test_demo_herd_run_to_measures_report(tmp_path):
     assert data["hao"]["com_indiretas"]["particao"]["todas"]["contagens"]["estaveis"] == data["hao"]["com_indiretas"]["n_pares_agente_pergunta"]["todas"]
     summary = out.with_suffix(".md").read_text(encoding="utf-8")
     assert summary.startswith("# Medidas do Δ_herd — demo") and "Hao et al." in summary
+    # Registro aw9vf: primeira chave do JSON e primeira seção do resumo.
+    assert next(iter(data)) == "registro_aw9vf"
+    assert summary.index("## Registro aw9vf (confirmatório)") < summary.index("## Tentativas e custo")
+    registro = data["registro_aw9vf"]["com_indiretas"]
+    assert set(registro) >= {"descarte_de_unanimes_em_b1", "principal_sem_unanimes", "alternativa_com_unanimes"}
+    assert registro["alternativa_com_unanimes"]["painel_homogeneo_de_contraste"] is None
 
     # Só lê: a pasta de dados do Lab não ganhou nem perdeu arquivo (a saída foi em saida/).
     after = sorted(p.relative_to(tmp_path) for p in tmp_path.rglob("*") if "saida" not in p.parts)
     assert after == before
+
+    # --contrast-run: painel homogêneo de contraste (aqui a mesma rodada, só para exercitar o caminho).
+    contrasted = tmp_path / "saida" / "contraste.json"
+    assert main(["--data-dir", str(tmp_path), "measures", "--run", "demo", "--contrast-run", "demo", "--out", str(contrasted), "--reps", "50", "--seed", "42"]) == 0
+    block = json.loads(contrasted.read_text(encoding="utf-8"))["registro_aw9vf"]["com_indiretas"]["alternativa_com_unanimes"]["painel_homogeneo_de_contraste"]
+    assert block["n_painel"] == 3 and set(block) >= {"rho_erro_B1", "n_eff_B1"}
 
     # Determinístico: mesma tabela, mesma seed, mesmo relatório.
     again = tmp_path / "saida" / "de-novo.json"

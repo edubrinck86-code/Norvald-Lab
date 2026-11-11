@@ -26,6 +26,7 @@ from typing import Any, Iterable, Mapping
 
 from norvald_lab.application.arof.outcome_extract import row_from_payload
 from norvald_lab.herd.specs import experiment_id
+from norvald_lab.measures.contribution_reader import ContributionReader
 from norvald_lab.measures.justification_text import justification_from_content
 from norvald_lab.measures.observation import Observation
 from norvald_lab.measures.observation_table import ObservationTable
@@ -53,6 +54,7 @@ class ObservationLoader:
         self.root = Path(root)
         self.catalog = catalog
         self.resolver = resolver or PositionResolver()
+        self.reader = ContributionReader()
 
     def load(self, runs: Iterable[str]) -> ObservationTable:
         runs = tuple(runs)
@@ -95,6 +97,7 @@ class ObservationLoader:
             info = self.catalog.get(question_id)
             correct = None if info.answer is None or position.option is None else position.option == info.answer
             metadata = ((latest_payload.get("request") or {}).get("studio_metadata") or {})
+            read = self.reader.read(latest_payload, latest_row)
             content = str((latest_payload.get("result") or {}).get("content") or "")
             rows.append(Observation(
                 run=run, question_id=question_id, kind=info.kind, category=info.category, condition=condition,
@@ -106,5 +109,6 @@ class ObservationLoader:
                 # seleção recusada). Seleção indireta resolvida não é falha.
                 attempt1_failed=positions[0].option is None,
                 cost=sum(_cost(p) for p in group), status=latest_row.status, validation_code=latest_row.validation_code,
+                structured=read.structured, grounds=read.grounds, claims=read.claims,
             ))
         return rows

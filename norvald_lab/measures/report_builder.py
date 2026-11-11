@@ -14,6 +14,7 @@ from collections import Counter
 from datetime import datetime, timezone
 
 from norvald_lab.measures.attempts_summary import AttemptsSummary
+from norvald_lab.measures.aw9vf.registration_report import RegistrationReport
 from norvald_lab.measures.bootstrap import ClusteredBootstrap
 from norvald_lab.measures.conditions import CONDITIONS, CONTRASTS
 from norvald_lab.measures.criteria import CRITERIA
@@ -58,8 +59,19 @@ class MeasuresReport:
             out[measure.name] = {name: measure.compute(subset(units, name), self.bootstrap) for name in SUBSETS}
         return out
 
-    def build(self, table: ObservationTable) -> dict:
+    def _registration(self, table: ObservationTable, contrast: ObservationTable | None) -> dict:
+        """Registro aw9vf (confirmatório). Variantes da regra 3 como nas demais seções."""
+        registration = RegistrationReport(self.bootstrap)
+        out = {**registration.header(), "com_indiretas": registration.build(table, contrast)}
+        if table.indirect_rows == 0 and (contrast is None or contrast.indirect_rows == 0):
+            out["sem_indiretas"] = SAME
+        else:
+            out["sem_indiretas"] = registration.build(table.without_indirect(), None if contrast is None else contrast.without_indirect())
+        return out
+
+    def build(self, table: ObservationTable, contrast_table: ObservationTable | None = None) -> dict:
         return {
+            "registro_aw9vf": self._registration(table, contrast_table),
             "schema": SCHEMA,
             "gerado_em": datetime.now(timezone.utc).isoformat(),
             "rodadas": list(table.runs),

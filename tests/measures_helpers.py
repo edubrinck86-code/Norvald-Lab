@@ -18,14 +18,15 @@ def option(letter: str) -> str | None:
     return None if letter == "-" else f"option-{letter}"
 
 
-def obs(question, condition, participant, letter, *, answer=None, model=None, run="r", peer_order=(), justification="", indirect=False, kind=None, cost=0.0, attempts=1, attempt1_failed=False):
+def obs(question, condition, participant, letter, *, answer=None, model=None, run="r", peer_order=(), justification="", indirect=False, kind=None, cost=0.0, attempts=1, attempt1_failed=False, confidence="alta", structured=True, grounds=(), claims=()):
     chosen = option(letter)
     return Observation(
         run=run, question_id=question, kind=kind or ("gabarito" if answer else "contestavel"), category="", condition=condition,
         repetition="r0001", participant_id=participant, model=model or f"m{participant[1:]}", option=chosen, indirect=indirect,
-        indirect_source="", correct=None if answer is None or chosen is None else chosen == option(answer), confidence="alta",
+        indirect_source="", correct=None if answer is None or chosen is None else chosen == option(answer), confidence=confidence,
         justification=justification, peer_order=tuple(peer_order), attempts=attempts, attempt1_failed=attempt1_failed,
         cost=cost, status="ok" if chosen else "no_decision", validation_code="usable",
+        structured=structured, grounds=tuple(grounds), claims=tuple(claims),
     )
 
 
@@ -41,6 +42,13 @@ def table(spec, answers=None, *, texts=None, peer_orders=None, justifications=No
                                 peer_order=peer_orders.get((question, condition, pid), ()),
                                 justification=justifications.get((question, condition, pid), "")))
     questions = {q: QuestionInfo(q, "gabarito" if q in answers else "contestavel", "", option(answers[q]) if q in answers else None, texts.get(q, "")) for q in spec}
+    return ObservationTable(tuple(rows), questions, ("r",))
+
+
+def rows_table(rows, answers=None) -> ObservationTable:
+    """Tabela a partir de linhas já montadas com `obs` (quando o teste precisa de fundamentos, confiança etc.)."""
+    answers = answers or {}
+    questions = {q: QuestionInfo(q, "gabarito" if q in answers else "contestavel", "", option(answers[q]) if q in answers else None, "") for q in {r.question_id for r in rows}}
     return ObservationTable(tuple(rows), questions, ("r",))
 
 
