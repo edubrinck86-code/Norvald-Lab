@@ -35,6 +35,7 @@ O **B3-rép** controla a deriva no tempo: o fornecedor e a versão servida podem
   - Se H1 se confirmar, o formato estruturado ancora a reconsideração.
   - Se B3T ficar perto de B3-rép, o que ancora é o conteúdo (ver o raciocínio), e o formato não importa.
 - **H2 (descritiva).** A ordem esperada é B3-rép ≤ B3T ≤ B3L. São relatadas as três taxas, com IC bootstrap.
+- **H3 (descritiva, acrescentada antes do registro).** Nas perguntas com gabarito, cada mudança é classificada pela chave, em cada condição: do errado para o certo, do certo para o errado, ou do errado para outro errado. Mudar pouco só é desejável se o modelo mantém o que está certo e ainda corrige o que está errado. As contagens saem sem teste.
 
 ## 5. Medida
 

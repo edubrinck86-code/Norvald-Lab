@@ -42,6 +42,8 @@ B3R controls for drift over time: provider and served version may have changed s
 
 **H2 (descriptive).** Expected order: B3R ≤ B3T ≤ B3L. The three rates are reported with bootstrap CIs.
 
+**H3 (descriptive, added before registration).** On keyed questions, each change is classified against the key, per condition: wrong → right, right → wrong, or wrong → another wrong. Changing less is only desirable if the model keeps right answers and still corrects wrong ones. These counts are reported without a test.
+
 ## 5. Measure
 
 **Changed option:** the option chosen in the condition differs from the B1 option. This is the same rule used for B3 and B3L. The strict and permissive readings of new_grounds are reported as in Δ_herd, without a test.
