@@ -210,3 +210,25 @@ def test_literal_collision_counts_by_author_pair_and_never_prints_text():
     assert pairs["p2·m2 × p3·m3"]["colisoes"] == 0
     assert result["ondas"]["B1"]["itens_par_comparados"] == 3 and result["ondas"]["B1"]["itens_par_com_colisao"] == 2
     assert segredo not in json.dumps(result, ensure_ascii=False) and result["texto_no_relatorio"] is False
+
+
+def test_rho_error_keeps_unanimous_items_in_both_variants_hand_computed():
+    """D7 (12/11/2026): o ρ̄ do registro é "on ground-truth items", sem o filtro de unânimes.
+
+    Dois participantes, gabarito "a". B1: q1 = bb e q5 = bb (unânimes no erro), q2 = aa
+    (unânime no acerto), q3 = ba, q4 = ab. Erros: p1 = [1,0,1,0,1], p2 = [1,0,0,1,1].
+    Todas: n=5, Σx=3, Σy=3, Σxy=2 → phi = (5·2 − 9)/√((15−9)(15−9)) = 1/6; N_eff = 2/(1+1/6) = 12/7.
+    Só as não unânimes (q3, q4): os dois discordam sempre → phi = −1. Era o que a principal mostrava.
+    """
+    spec = {"q1": "bb", "q2": "aa", "q3": "ba", "q4": "ab", "q5": "bb"}
+    t = table({q: {"B1": spec[q], "B2": spec[q], "B3": spec[q], "EP": spec[q], "E": spec[q]} for q in spec}, {q: "a" for q in spec})
+    without = Dependence(BOOT).compute(UnanimousFilter().without_unanimous(t), conditions=("B1",), behaviour=False)
+    assert without["rho_erro"]["B1"]["estimativa"] == pytest.approx(-1.0)
+    report = RegistrationReport(BOOT).build(t)
+    for variant in ("principal_sem_unanimes", "alternativa_com_unanimes"):
+        dependence = report[variant]["dependencia"]
+        assert dependence["perguntas_com_gabarito"] == 5
+        assert dependence["rho_erro"]["B1"]["estimativa"] == pytest.approx(1 / 6)
+        assert dependence["n_eff"]["B1"]["estimativa"] == pytest.approx(12 / 7)
+    # O confirmatório continua filtrado: só q3 e q4 (2 perguntas × 2 participantes).
+    assert report["principal_sem_unanimes"]["confirmatorio"]["n_pares_por_condicao"]["E"] == 4

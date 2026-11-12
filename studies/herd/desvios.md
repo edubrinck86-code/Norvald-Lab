@@ -80,6 +80,31 @@ Horários em Brasília (UTC−3). O registro completo das rodadas, com início, 
 
 **Efeito:** nenhuma conclusão do H1 e do H2 muda. Com Holm sobre cinco, os cinco testes ficam abaixo de 0,05 no banco, no MMLU-Pro e no combinado. No h01–h40 sozinho, só H1 e H2 passam (amostra pequena). Os números estão em `resultados/conf2-*-medidas.md`.
 
+## D7. ρ̄_erro e N_eff com todas as perguntas com gabarito (12/11/2026, fim da tarde)
+
+**O registro:** o ρ̄ é a média dos phi par a par entre os vetores de erro "on ground-truth items" (aw9vf 344-66; 5dpjr), sem filtro. O filtro de unânimes em B1 vale só para o critério A (`criterios-1.2.md`, regra 1).
+
+**O que o Lab fazia:** aplicava ao ρ̄, ao N_eff e ao contraste homogêneo o mesmo filtro de unânimes da análise principal do confirmatório. Na variante principal, o ρ̄ saía só das perguntas sem unanimidade em B1.
+
+**Causa:** no `RegistrationReport`, a dependência era calculada dentro de cada variante, sobre a tabela já filtrada. Tirar as unânimes tira justamente os acertos e os erros em comum, e o ρ̄ cai (no banco ficou negativo).
+
+**O que mudou:** o ρ̄, o N_eff e o contraste passam a usar todas as perguntas com gabarito nas duas variantes (Lab PR #PRNUM). O confirmatório e o exploratório continuam com o filtro. Nenhum dado foi coletado de novo.
+
+**Efeito (ρ̄_erro em B1, antes → depois; perguntas com gabarito entre parênteses):**
+
+| Medida | Antes | Depois |
+|---|---|---|
+| Banco, ρ̄_erro B1 | −0,272 (11) | 0,031 (52) |
+| Banco, Δ_N_eff (B1 − E) | indefinido | −1,595 [−4,488; −0,734] |
+| MMLU-Pro (painel misto), ρ̄_erro B1 | 0,306 (61) | 0,635 (140) |
+| MMLU-Pro, Δ_N_eff | 0,937 [0,643; 1,386] | 0,251 [0,153; 0,385] |
+| Combinado, ρ̄_erro B1 | 0,289 (72) | 0,615 (192) |
+| Combinado, Δ_N_eff | 0,990 [0,692; 1,453] | 0,269 [0,172; 0,404] |
+| h01–h40, ρ̄_erro B1 | −0,272 (11) | 0,013 (40) |
+| Contraste 5 × Gemma, MMLU-Pro, ρ̄_erro B1 | 0,041 (18) | 0,848 (140) |
+
+Os números de "depois" são os que a variante `alternativa_com_unanimes` já mostrava; agora as duas variantes coincidem nesse bloco. O H1, o H2 e o H4 não mudam (o confirmatório não foi tocado). Os relatórios estão em `resultados/conf2-*-medidas.md`.
+
 ## Pendências resolvidas (12/11/2026)
 
 - **Contraste do banco:** não é defeito. Os cinco Gemma acertaram as 52 perguntas com gabarito em B1; sem nenhum erro, a correlação de erros é indefinida. O contraste é lido só no MMLU-Pro.

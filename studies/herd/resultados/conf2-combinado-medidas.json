@@ -397,88 +397,88 @@
     },
     "dependencia": {
      "n_painel": 5,
-     "perguntas_com_gabarito": 72,
+     "perguntas_com_gabarito": 192,
      "rho_erro": {
       "B1": {
-       "estimativa": 0.288988209467809,
+       "estimativa": 0.6152836102089354,
        "ic": [
-        0.19000388913440097,
-        0.37924001440743266
+        0.519515452930337,
+        0.6985064854058168
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "B3": {
-       "estimativa": 0.32315817279707465,
+       "estimativa": 0.6292743754862713,
        "ic": [
-        0.2141578490502774,
-        0.4280293096774172
+        0.5330167784715465,
+        0.7123536799333754
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "EP": {
-       "estimativa": 0.4082612105754738,
+       "estimativa": 0.668883277369053,
        "ic": [
-        0.3018787042365032,
-        0.513089112273811
+        0.5757358121000564,
+        0.7495372038126324
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "E": {
-       "estimativa": 0.6905253492827048,
+       "estimativa": 0.8135604998727004,
        "ic": [
-        0.5872651028939552,
-        0.7856036374209109
+        0.7372254818232878,
+        0.878701344469644
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       }
      },
      "n_eff": {
       "B1": {
-       "estimativa": 2.3191601931965007,
+       "estimativa": 1.4446130554791963,
        "ic": [
-        1.9865233796119226,
-        2.84088398056978
+        1.317861310632874,
+        1.6243988281930701
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "B3": {
-       "estimativa": 2.1808988501374116,
+       "estimativa": 1.4216267809564036,
        "ic": [
-        1.8435781199749592,
-        2.6930493664468345
+        1.298898758599617,
+        1.5963898020949532
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "EP": {
-       "estimativa": 1.8989422130877323,
+       "estimativa": 1.3603468805951073,
        "ic": [
-        1.6380786725301468,
-        2.2649904603581477
+        1.250578763127543,
+        1.5138013656648128
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "E": {
-       "estimativa": 1.3290444547330034,
+       "estimativa": 1.1752975031976225,
        "ic": [
-        1.2070255017203413,
-        1.4929560491794158
+        1.1074674503368387,
+        1.2661747726508272
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       }
      },
@@ -490,98 +490,98 @@
      },
      "correlacao_por_par": {
       "B1": {
-       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.5972058130371567,
-       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.3878631169583169,
-       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.1939326711493819,
-       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.5939240266756143,
-       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.29974271363172633,
-       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.36432620803146437,
-       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.39887718762838253,
-       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.1484539238050411,
-       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.2795958845578088,
-       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": -0.07713160318672091
+       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.7552611078085526,
+       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.630357118901736,
+       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5358243299726502,
+       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.7557969212684027,
+       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.6176592765442303,
+       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.6531229201859176,
+       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.6451166740166543,
+       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5211651448497352,
+       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.6049082783236992,
+       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.43362433021777613
       },
       "B3": {
-       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.5830006053876384,
-       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.3882901373576604,
-       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.22031748593444053,
-       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.6078080037565888,
-       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.3549993250153623,
-       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.34135572482292764,
-       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.41147220173147164,
-       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.05609168914128041,
-       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.37941881076013345,
-       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.0010111223458038423
+       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.7507046220666725,
+       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.6390985123178652,
+       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5439331312863857,
+       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.769800358919501,
+       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.6574980695240094,
+       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.6373618055160926,
+       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.652345447174342,
+       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5383249861334178,
+       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.6523364041378296,
+       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.4513404177865977
       },
       "EP": {
-       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.7664460930336654,
-       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.4504234270290098,
-       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.28709367706354477,
-       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.7385489458759964,
-       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.38034299701237945,
-       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.3794925683351206,
-       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.5455426356589147,
-       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.003491278768231028,
-       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.44646857821597186,
-       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.08476190476190476
+       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.8527636732137112,
+       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.6597656593338185,
+       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5672023402361822,
+       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.8360171835451684,
+       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.6471139276668957,
+       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.6514489094540549,
+       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.7284419144001687,
+       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5566467450059465,
+       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.6852305764690012,
+       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.5042018443655831
       },
       "E": {
-       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.8842821310068666,
-       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.6525520483640947,
-       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5647152547110083,
-       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.8547197651203231,
-       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.6405365988177923,
-       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.6589238744110791,
-       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.829305782704029,
-       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.4937347343378172,
-       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.7606581512382993,
-       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.5658251521157384
+       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.9301850594404796,
+       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.7835233709990268,
+       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.7283095376340307,
+       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.9124017073867975,
+       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.7822446795083157,
+       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.7928112982418364,
+       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.8964025368650689,
+       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.721388256749692,
+       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.8519037372377646,
+       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.7364348146639921
       }
      },
      "delta_n_eff_B1_menos_E": {
-      "estimativa": 0.9901157384634973,
+      "estimativa": 0.2693155522815738,
       "ic": [
-       0.6923362373210369,
-       1.452719155090937
+       0.17226719178500094,
+       0.4043766079350337
       ],
       "n": null,
-      "n_perguntas": 91,
+      "n_perguntas": 224,
       "replicas_validas": 20000
      },
      "rho_comportamento": {
       "medida": "kappa de Fleiss de B1 nas contestáveis (descritivo; fora da tabela de N_eff)",
-      "contestaveis": 19,
+      "contestaveis": 32,
       "kappa": {
-       "estimativa": 0.20344483658124898,
+       "estimativa": 0.5110564741965596,
        "ic": [
-        0.07561225219965603,
-        0.2803038239214024
+        0.3455522439379639,
+        0.650064484713712
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "concordancia_observada_P": {
-       "estimativa": 0.5052631578947369,
+       "estimativa": 0.70625,
        "ic": [
-        0.45789473684210524,
-        0.5526315789473685
+        0.61875,
+        0.79375
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "leitura": "teto candidato, não piso (344-75, retratação declarada)"
      },
      "distancia_comportamento_menos_erro": {
       "definicao": "ρ̄_comportamento − ρ̄_erro(B1)",
-      "estimativa": -0.08554337288656003,
+      "estimativa": -0.10422713601237577,
       "ic": [
-       -0.24473665720274432,
-       0.03479128327182524
+       -0.2916614436474894,
+       0.06131319780241123
       ],
       "n": null,
-      "n_perguntas": 91,
+      "n_perguntas": 224,
       "replicas_validas": 20000
      },
      "varredura_analitica": {
@@ -689,32 +689,32 @@
       ],
       "ancoras_empiricas": {
        "rho_erro_B1": {
-        "rho": 0.288988209467809,
-        "n=4": 2.1425151495348267,
-        "n=5": 2.3191601931965007,
-        "n=8": 2.6464500236120965,
-        "n=inf": 3.4603487866912164
+        "rho": 0.6152836102089354,
+        "n=4": 1.405555047703955,
+        "n=5": 1.4446130554791963,
+        "n=8": 1.507447183435519,
+        "n=inf": 1.625266760576353
        },
        "rho_erro_B3": {
-        "rho": 0.32315817279707465,
-        "n=4": 2.0309986052865625,
-        "n=5": 2.1808988501374116,
-        "n=8": 2.4524025379997183,
-        "n=inf": 3.0944598780979753
+        "rho": 0.6292743754862713,
+        "n=4": 1.3851263823435718,
+        "n=5": 1.4216267809564036,
+        "n=8": 1.4801327438479779,
+        "n=inf": 1.589131925524936
        },
        "rho_erro_EP": {
-        "rho": 0.4082612105754738,
-        "n=4": 1.7979276469667387,
-        "n=5": 1.8989422130877323,
-        "n=8": 2.0737054676893028,
-        "n=inf": 2.449412224566785
+        "rho": 0.668883277369053,
+        "n=4": 1.3303843890582592,
+        "n=5": 1.3603468805951073,
+        "n=8": 1.4079096154145923,
+        "n=inf": 1.4950291535667366
        },
        "rho_erro_E": {
-        "rho": 0.6905253492827048,
-        "n=4": 1.3022630524815824,
-        "n=5": 1.3290444547330034,
-        "n=8": 1.3713476748505573,
-        "n=inf": 1.4481727586666693
+        "rho": 0.8135604998727004,
+        "n=4": 1.1625603824253947,
+        "n=5": 1.1752975031976225,
+        "n=8": 1.194935237283115,
+        "n=inf": 1.2291648871306708
        }
       }
      }
@@ -3397,88 +3397,88 @@
     },
     "dependencia": {
      "n_painel": 5,
-     "perguntas_com_gabarito": 72,
+     "perguntas_com_gabarito": 192,
      "rho_erro": {
       "B1": {
-       "estimativa": 0.288988209467809,
+       "estimativa": 0.6152836102089354,
        "ic": [
-        0.19000388913440097,
-        0.37924001440743266
+        0.519515452930337,
+        0.6985064854058168
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "B3": {
-       "estimativa": 0.32315817279707465,
+       "estimativa": 0.6290505329624084,
        "ic": [
-        0.2141578490502774,
-        0.4280293096774172
+        0.5326961132573046,
+        0.7120138594599734
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "EP": {
-       "estimativa": 0.4082612105754738,
+       "estimativa": 0.668883277369053,
        "ic": [
-        0.3018787042365032,
-        0.513089112273811
+        0.5757358121000564,
+        0.7495372038126324
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "E": {
-       "estimativa": 0.683885867955137,
+       "estimativa": 0.8089378193854534,
        "ic": [
-        0.5801824231696707,
-        0.7795544778657221
+        0.7311667753735193,
+        0.8749342317002823
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       }
      },
      "n_eff": {
       "B1": {
-       "estimativa": 2.3191601931965007,
+       "estimativa": 1.4446130554791963,
        "ic": [
-        1.9865233796119226,
-        2.84088398056978
+        1.317861310632874,
+        1.6243988281930701
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "B3": {
-       "estimativa": 2.1808988501374116,
+       "estimativa": 1.4219887857726319,
        "ic": [
-        1.8435781199749592,
-        2.6930493664468345
+        1.2993575796316663,
+        1.5970438320935847
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "EP": {
-       "estimativa": 1.8989422130877323,
+       "estimativa": 1.3603468805951073,
        "ic": [
-        1.6380786725301468,
-        2.2649904603581477
+        1.250578763127543,
+        1.5138013656648128
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "E": {
-       "estimativa": 1.3384933243898802,
+       "estimativa": 1.180428139515716,
        "ic": [
-        1.2141173944491044,
-        1.5056931651179433
+        1.1111760713255818,
+        1.273993404000625
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       }
      },
@@ -3490,98 +3490,98 @@
      },
      "correlacao_por_par": {
       "B1": {
-       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.5972058130371567,
-       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.3878631169583169,
-       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.1939326711493819,
-       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.5939240266756143,
-       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.29974271363172633,
-       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.36432620803146437,
-       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.39887718762838253,
-       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.1484539238050411,
-       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.2795958845578088,
-       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": -0.07713160318672091
+       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.7552611078085526,
+       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.630357118901736,
+       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5358243299726502,
+       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.7557969212684027,
+       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.6176592765442303,
+       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.6531229201859176,
+       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.6451166740166543,
+       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5211651448497352,
+       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.6049082783236992,
+       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.43362433021777613
       },
       "B3": {
-       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.5830006053876384,
-       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.3882901373576604,
-       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.22031748593444053,
-       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.6078080037565888,
-       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.3549993250153623,
-       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.34135572482292764,
-       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.41147220173147164,
-       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.05609168914128041,
-       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.37941881076013345,
-       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.0010111223458038423
+       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.7507046220666725,
+       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.6390985123178652,
+       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5439331312863857,
+       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.769800358919501,
+       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.6574980695240094,
+       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.636788728181945,
+       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.652345447174342,
+       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.537422294663803,
+       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.6523364041378296,
+       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.4505777613517307
       },
       "EP": {
-       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.7664460930336654,
-       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.4504234270290098,
-       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.28709367706354477,
-       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.7385489458759964,
-       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.38034299701237945,
-       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.3794925683351206,
-       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.5455426356589147,
-       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.003491278768231028,
-       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.44646857821597186,
-       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.08476190476190476
+       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.8527636732137112,
+       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.6597656593338185,
+       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5672023402361822,
+       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.8360171835451684,
+       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.6471139276668957,
+       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.6514489094540549,
+       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.7284419144001687,
+       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5566467450059465,
+       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.6852305764690012,
+       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.5042018443655831
       },
       "E": {
-       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.8842821310068666,
-       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.6525520483640947,
-       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.5473017179827891,
-       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.8547197651203231,
-       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.6405365988177923,
-       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.6461496094378588,
-       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.829305782704029,
-       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.4756157256418996,
-       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.7606581512382993,
-       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.5477371492374161
+       "google/gemma-4-31b-it × meta/muse-glimmer-30b": 0.9301850594404796,
+       "google/gemma-4-31b-it × mistralai/mistral-small-2603": 0.7835233709990268,
+       "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.715418084654348,
+       "google/gemma-4-31b-it × qwen/qwen3.8-27b": 0.9124017073867975,
+       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": 0.7822446795083157,
+       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.7837800593759271,
+       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": 0.8964025368650689,
+       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.7093638130570837,
+       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.8519037372377646,
+       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": 0.7241551453297229
       }
      },
      "delta_n_eff_B1_menos_E": {
-      "estimativa": 0.9806668688066205,
+      "estimativa": 0.26418491596348037,
       "ic": [
-       0.6815899311903921,
-       1.4426658663525664
+       0.1662036585031594,
+       0.3991144625716503
       ],
       "n": null,
-      "n_perguntas": 91,
+      "n_perguntas": 224,
       "replicas_validas": 20000
      },
      "rho_comportamento": {
       "medida": "kappa de Fleiss de B1 nas contestáveis (descritivo; fora da tabela de N_eff)",
-      "contestaveis": 19,
+      "contestaveis": 32,
       "kappa": {
-       "estimativa": 0.20344483658124898,
+       "estimativa": 0.5110564741965596,
        "ic": [
-        0.07561225219965603,
-        0.2803038239214024
+        0.3455522439379639,
+        0.650064484713712
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "concordancia_observada_P": {
-       "estimativa": 0.5052631578947369,
+       "estimativa": 0.70625,
        "ic": [
-        0.45789473684210524,
-        0.5526315789473685
+        0.61875,
+        0.79375
        ],
        "n": null,
-       "n_perguntas": 91,
+       "n_perguntas": 224,
        "replicas_validas": 20000
       },
       "leitura": "teto candidato, não piso (344-75, retratação declarada)"
      },
      "distancia_comportamento_menos_erro": {
       "definicao": "ρ̄_comportamento − ρ̄_erro(B1)",
-      "estimativa": -0.08554337288656003,
+      "estimativa": -0.10422713601237577,
       "ic": [
-       -0.24473665720274432,
-       0.03479128327182524
+       -0.2916614436474894,
+       0.06131319780241123
       ],
       "n": null,
-      "n_perguntas": 91,
+      "n_perguntas": 224,
       "replicas_validas": 20000
      },
      "varredura_analitica": {
@@ -3689,32 +3689,32 @@
       ],
       "ancoras_empiricas": {
        "rho_erro_B1": {
-        "rho": 0.288988209467809,
-        "n=4": 2.1425151495348267,
-        "n=5": 2.3191601931965007,
-        "n=8": 2.6464500236120965,
-        "n=inf": 3.4603487866912164
+        "rho": 0.6152836102089354,
+        "n=4": 1.405555047703955,
+        "n=5": 1.4446130554791963,
+        "n=8": 1.507447183435519,
+        "n=inf": 1.625266760576353
        },
        "rho_erro_B3": {
-        "rho": 0.32315817279707465,
-        "n=4": 2.0309986052865625,
-        "n=5": 2.1808988501374116,
-        "n=8": 2.4524025379997183,
-        "n=inf": 3.0944598780979753
+        "rho": 0.6290505329624084,
+        "n=4": 1.3854485512786,
+        "n=5": 1.4219887857726319,
+        "n=8": 1.4805619618223727,
+        "n=inf": 1.5896974052158688
        },
        "rho_erro_EP": {
-        "rho": 0.4082612105754738,
-        "n=4": 1.7979276469667387,
-        "n=5": 1.8989422130877323,
-        "n=8": 2.0737054676893028,
-        "n=inf": 2.449412224566785
+        "rho": 0.668883277369053,
+        "n=4": 1.3303843890582592,
+        "n=5": 1.3603468805951073,
+        "n=8": 1.4079096154145923,
+        "n=inf": 1.4950291535667366
        },
        "rho_erro_E": {
-        "rho": 0.683885867955137,
-        "n=4": 1.3107630406941337,
-        "n=5": 1.3384933243898802,
-        "n=8": 1.3823608157682266,
-        "n=inf": 1.4622322917566126
+        "rho": 0.8089378193854534,
+        "n=4": 1.1672651718112537,
+        "n=5": 1.180428139515716,
+        "n=8": 1.2007388021516425,
+        "n=inf": 1.2361889579593346
        }
       }
      }
@@ -6009,7 +6009,7 @@
   }
  },
  "schema": "norvald.lab.herd.measures.v1",
- "gerado_em": "2026-11-12T15:58:26.778304+00:00",
+ "gerado_em": "2026-11-12T17:58:26.213997+00:00",
  "rodadas": [
   "conf2-banco",
   "conf2-mmlu"

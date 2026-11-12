@@ -1,6 +1,6 @@
 # Medidas do Δ_herd — conf2-mmlu
 
-Gerado em 2026-11-12T15:56:47.376397+00:00. Bootstrap por pergunta, 20000 réplicas, seed 20261111, IC 95% percentil.
+Gerado em 2026-11-12T17:57:47.317044+00:00. Bootstrap por pergunta, 20000 réplicas, seed 20261111, IC 95% percentil.
 Tabela: 3422 linhas, 140 perguntas (140 com gabarito), 3 seleções indiretas.
 
 ## Registro aw9vf (confirmatório)
@@ -35,13 +35,13 @@ Dispersão (1 − fração da moda), E − B3 por pergunta: -0,180 [-0,222; -0,1
 
 | Dependência (erros, gabarito) | ρ̄_erro | N_eff |
 |---|---|---|
-| B1 | 0,306 [0,203; 0,403] (n=—) | 2,248 [1,915; 2,761] (n=—) |
-| B3 | 0,330 [0,215; 0,443] (n=—) | 2,153 [1,805; 2,688] (n=—) |
-| EP | 0,428 [0,313; 0,539] (n=—) | 1,843 [1,584; 2,219] (n=—) |
-| E | 0,704 [0,594; 0,803] (n=—) | 1,311 [1,187; 1,482] (n=—) |
+| B1 | 0,635 [0,541; 0,721] (n=—) | 1,413 [1,287; 1,580] (n=—) |
+| B3 | 0,642 [0,547; 0,729] (n=—) | 1,401 [1,277; 1,568] (n=—) |
+| EP | 0,689 [0,600; 0,770] (n=—) | 1,332 [1,226; 1,471] (n=—) |
+| E | 0,826 [0,751; 0,894] (n=—) | 1,162 [1,093; 1,249] (n=—) |
 
-n do painel: 5. Δ_N_eff = N_eff(B1) − N_eff(E): 0,937 [0,643; 1,386] (n=—). ρ̄_comportamento (Fleiss, contestáveis): — [—; —] (n=—); distância até ρ̄_erro(B1): — [—; —] (n=—).
-Painel homogêneo de contraste (conf3-contraste-mmlu), B1: ρ̄_erro 0,041 [-0,130; 0,253] (n=—); N_eff 4,291 [2,484; 10,403] (n=—) (n=5).
+n do painel: 5. Δ_N_eff = N_eff(B1) − N_eff(E): 0,251 [0,153; 0,385] (n=—). ρ̄_comportamento (Fleiss): não se aplica (0 perguntas contestáveis).
+Painel homogêneo de contraste (conf3-contraste-mmlu), B1: ρ̄_erro 0,848 [0,759; 0,924] (n=—); N_eff 1,138 [1,065; 1,239] (n=—) (n=5).
 
 Canal da confiança (exploratório, sem correção), mudança média de posto E − B3: maioria_concorda 0,102 [0,051; 0,158] (n=128), p <0,001; maioria_discorda 0,111 [0,016; 0,211] (n=63), p 0,092.
 
@@ -78,7 +78,7 @@ Dispersão (1 − fração da moda), E − B3 por pergunta: -0,080 [-0,104; -0,0
 | EP | 0,689 [0,600; 0,770] (n=—) | 1,332 [1,226; 1,471] (n=—) |
 | E | 0,826 [0,751; 0,894] (n=—) | 1,162 [1,093; 1,249] (n=—) |
 
-n do painel: 5. Δ_N_eff = N_eff(B1) − N_eff(E): 0,251 [0,153; 0,385] (n=—). ρ̄_comportamento (Fleiss, contestáveis): — [—; —] (n=—); distância até ρ̄_erro(B1): — [—; —] (n=—).
+n do painel: 5. Δ_N_eff = N_eff(B1) − N_eff(E): 0,251 [0,153; 0,385] (n=—). ρ̄_comportamento (Fleiss): não se aplica (0 perguntas contestáveis).
 Painel homogêneo de contraste (conf3-contraste-mmlu), B1: ρ̄_erro 0,848 [0,759; 0,924] (n=—); N_eff 1,138 [1,065; 1,239] (n=—) (n=5).
 
 Canal da confiança (exploratório, sem correção), mudança média de posto E − B3: maioria_concorda 0,052 [0,031; 0,075] (n=496), p <0,001; maioria_discorda 0,111 [0,016; 0,212] (n=63), p 0,092.

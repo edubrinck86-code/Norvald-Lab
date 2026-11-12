@@ -4,7 +4,13 @@ Duas variantes de exclusão, lado a lado (344-79 item 1):
 - `principal_sem_unanimes`: pergunta unânime em B1 fora da análise (registrado);
 - `alternativa_com_unanimes`: perguntas unânimes mantidas (desvio aprovado
   em 11/11/2026).
-A taxa de descarte sai como resultado. A regra 3 (seleção indireta) é
+A taxa de descarte sai como resultado.
+
+O filtro de unânimes vale só para o confirmatório e o exploratório (o critério
+A, criterios-1.2 regra 1). O ρ̄_erro, o N_eff e o contraste usam sempre TODAS
+as perguntas com gabarito, como o registro define ("on ground-truth items",
+gbx5m). Até 12/11/2026 o filtro também caía no ρ̄ da principal (desvio D7):
+tirar as unânimes tira justamente os acertos e erros em comum, e o ρ̄ caía. A regra 3 (seleção indireta) é
 variante de fora, tratada por quem chama (`MeasuresReport._variants`).
 """
 
@@ -41,17 +47,20 @@ class RegistrationReport:
 
     def build(self, table: ObservationTable, contrast_table: ObservationTable | None = None) -> dict:
         unanimous = UnanimousFilter()
+        # ρ̄ e contraste: tabela inteira, nas duas variantes (D7).
+        dependence = Dependence(self.bootstrap).compute(table)
+        contrast = None if contrast_table is None else self._contrast(contrast_table)
         return {
             "descarte_de_unanimes_em_b1": unanimous.discard_rate(table),
-            "principal_sem_unanimes": self._analysis(unanimous.without_unanimous(table), None if contrast_table is None else unanimous.without_unanimous(contrast_table)),
-            "alternativa_com_unanimes": self._analysis(table, contrast_table),
+            "principal_sem_unanimes": self._analysis(unanimous.without_unanimous(table), dependence, contrast),
+            "alternativa_com_unanimes": self._analysis(table, dependence, contrast),
         }
 
-    def _analysis(self, table: ObservationTable, contrast_table: ObservationTable | None) -> dict:
+    def _analysis(self, table: ObservationTable, dependence: dict, contrast: dict | None) -> dict:
         return {
             "confirmatorio": ConfirmatoryTests(self.bootstrap).compute(table),
-            "dependencia": Dependence(self.bootstrap).compute(table),
-            "painel_homogeneo_de_contraste": None if contrast_table is None else self._contrast(contrast_table),
+            "dependencia": dependence,
+            "painel_homogeneo_de_contraste": contrast,
             "exploratorio": {
                 "canal_da_confianca": ConfidenceChannel(self.bootstrap).compute(table),
                 "assimetria_por_par_de_modelos": PairAsymmetry().compute(table),
