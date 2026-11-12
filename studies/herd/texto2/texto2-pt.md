@@ -14,6 +14,8 @@ No mesmo experimento pré-registrado do texto 1 (OSF aw9vf e 5dpjr), cinco model
 
 O texto 1 mostrou quanto os modelos mudam de resposta quando veem os pares. Este texto trata da outra metade da pergunta do título do texto 1: quantos contribuem. Se dois modelos erram nas mesmas perguntas, o segundo acrescenta pouco ao primeiro, mesmo sem ter visto nada dele.
 
+Kim, Garg, Peng e Garg (2025) mediram isso em escala. Num leaderboard (HELM, 71 modelos, 14 042 perguntas), quando os dois modelos de um par erram, escolhem a mesma opção errada cerca de 60% das vezes; no do HuggingFace (349 modelos), 42%. Modelos mais precisos erram mais juntos, mesmo controlando empresa, arquitetura e tamanho. Aqui o painel é pequeno (5 modelos), mas medimos o que eles não medem: o efeito de os modelos se verem.
+
 A hipótese registrada (H3) tem duas partes:
 1. o painel heterogêneo vale menos que cinco já às cegas (ρ̄_erro(B1) > 0);
 2. a exposição reduz o número efetivo (Δ_N_eff = N_eff(B1) − N_eff(E) > 0).
@@ -152,6 +154,8 @@ Cada uma dessas perguntas conta como erro comum dos cinco e puxa o ρ̄ para cim
 
 O sinal das conclusões de 3.1 a 3.4 não muda sem as sete.
 
+O MMLU-Pro ampliou as perguntas de 4 para 10 opções com distratores gerados pelo GPT-4-Turbo. Os falsos negativos (distratores também corretos) foram procurados pelo Gemini-1.5-Pro e retirados por especialistas, e os próprios autores atribuem esses falsos negativos sobretudo à geração de distratores (Wang et al., 2024, §3.2). O Redux revisou a chave das 4 opções originais, não os distratores novos.
+
 ### 4.1b Os outros erros em comum (exploratório)
 
 Nas 140 perguntas do MMLU-Pro, o maior bloco de modelos errando na mesma opção em B1 tem 5 modelos em 7 perguntas (as de 4.1), 4 em 8 e 3 em 9. Lemos os raciocínios e as contribuições das 17 de 3 e 4, e cruzamos com o Redux as que vieram do MMLU original.
@@ -204,8 +208,15 @@ A empresa que serve o Gemma limitou a taxa de pedidos. No painel misto ficaram s
 - No MMLU-Pro, cinco modelos de cinco empresas valem cerca de 1,4 às cegas e 1,2 depois de se verem.
 - O painel misto fica abaixo do homogêneo (0,635 contra 0,848), mas longe de independente.
 - O banco novo dá o quadro oposto: erros quase independentes. Diferença de conteúdo (perguntas novas, fora de dados de treino prováveis) ou de dificuldade? Exploratório (`texto2/novidade_ou_facilidade.py`): no banco, a taxa de erro em B1 é de 5% (MMLU-Pro: 28%) e nenhuma pergunta tem mais de 2 dos 5 errando. O ρ̄ baixo do banco é compatível com facilidade, e o desenho não permite testar a novidade nele. Dentro do MMLU-Pro, as perguntas herdadas do MMLU original têm ρ̄_erro(B1) = 0,68 [0,57; 0,78] e erro de 33% (81 perguntas); as acrescentadas pelo MMLU-Pro, 0,51 [0,33; 0,67] e erro de 20% (59). Os intervalos se sobrepõem, a dificuldade difere e 5 das 16 perguntas originais com os cinco errando estão entre as de §4.1. Novidade e facilidade não se separam com estes dados; separá-las pede perguntas novas e difíceis.
+- **Confirmação em escala.** O ρ̄_erro(B1) = 0,635 do painel misto é compatível com Kim et al. (2025): modelos de empresas diferentes concordam no erro muito acima do acaso. Não encontramos, nessa literatura nem em outra, quem mostre que o erro coletivo se concentra nas opções acrescentadas pelo MMLU-Pro.
 - **Consequência para quem mede painéis com o MMLU-Pro.** Das 24 perguntas com 3 ou mais modelos na mesma opção errada, 11 convergem num distrator que o MMLU-Pro acrescentou às perguntas herdadas do MMLU, e que o Redux não revisou. O Redux confirma a chave original com 4 opções, não as 6 novas. Quem calcula correlação de erros ou N_eff com o MMLU-Pro conta esses casos como erro em comum. Os dados não dizem se o distrator também é correto ou se os modelos caíram juntos num distrator plausível. Nos dois casos, a origem do erro em comum está no conjunto de perguntas, e o ρ̄ mistura a dependência entre modelos com o ruído das opções acrescentadas. A sensibilidade sem as 7 de §4.1 tira só 4 desses distratores; os outros 7, de §4.1b, continuam no cálculo.
 - Ligação com o texto 1: a exposição que muda posições (H1, H4) é a mesma que aproxima os erros no MMLU-Pro.
+
+## Referências
+
+- Kim, E. M.; Garg, A.; Peng, K.; Garg, N. Correlated Errors in Large Language Models. ICML 2025 (PMLR 267), arXiv:2506.07962.
+- Wang, Y. et al. MMLU-Pro: A More Robust and Challenging Multi-Task Language Understanding Benchmark. arXiv:2406.01574, 2024.
+- Gema, A. P. et al. Are We Done with MMLU? (MMLU-Redux). arXiv:2406.04127, 2024.
 
 ## Apêndice A. Desvio D7
 
