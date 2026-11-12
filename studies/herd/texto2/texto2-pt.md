@@ -8,7 +8,7 @@ Eduardo Guedes · Pesquisador independente · ORCID 0009-0003-9960-3337
 
 Painéis de modelos de linguagem são usados como se cinco modelos fossem cinco opiniões. Se os modelos erram juntos, o painel vale menos. Medimos isso pela correlação média dos erros entre pares de modelos (ρ̄_erro) e pelo número efetivo de juízes, N_eff = n / (1 + (n − 1) ρ̄), com n = 5.
 
-No mesmo experimento pré-registrado do texto 1 (OSF aw9vf e 5dpjr), cinco modelos de cinco empresas responderam 140 perguntas do MMLU-Pro e 52 perguntas com gabarito de um banco novo, em condições pareadas. Respondendo às cegas (B1), o painel do MMLU-Pro teve ρ̄_erro = 0,635 [0,541; 0,721] e N_eff = 1,41 [1,29; 1,58]. Depois de ver as contribuições dos pares (E), ρ̄_erro = 0,826 e N_eff = 1,16: Δ_N_eff = 0,251 [0,153; 0,385]. No banco novo, os erros quase não se correlacionaram (ρ̄_erro = 0,031; N_eff = 4,45) e a exposição não os aproximou (Δ_N_eff = −1,60 [−4,49; −0,73]). Um painel homogêneo de controle, cinco cópias do Gemma, teve ρ̄_erro = 0,848 no MMLU-Pro, próximo do painel misto. Sete perguntas do MMLU-Pro em que os cinco modelos escolheram a mesma opção errada têm chave duvidosa; sem elas (análise exploratória), ρ̄_erro(B1) = 0,572 e N_eff = 1,52.
+No mesmo experimento pré-registrado do texto 1 (OSF aw9vf e 5dpjr), cinco modelos de cinco empresas responderam 140 perguntas do MMLU-Pro e 52 perguntas com gabarito de um banco novo, em condições pareadas. Respondendo às cegas (B1), o painel do MMLU-Pro teve ρ̄_erro = 0,635 [0,541; 0,721] e N_eff = 1,41 [1,29; 1,58]. Depois de ver as contribuições dos pares (E), ρ̄_erro = 0,826 e N_eff = 1,16: Δ_N_eff = 0,251 [0,153; 0,385]. No banco novo, os erros quase não se correlacionaram (ρ̄_erro = 0,031; N_eff = 4,45) e a exposição não os aproximou (Δ_N_eff = −1,60 [−4,49; −0,73]). Um painel homogêneo de controle, cinco cópias do Gemma, teve ρ̄_erro = 0,848 no MMLU-Pro, próximo do painel misto. Em sete perguntas, os cinco modelos escolheram a mesma opção errada; sem elas (análise exploratória), ρ̄_erro(B1) = 0,572 e N_eff = 1,52. Cruzando com o MMLU-Redux, das 14 perguntas herdadas do MMLU com 3 ou mais modelos na mesma opção errada, 11 convergem num distrator que o MMLU-Pro acrescentou e o Redux não revisou.
 
 ## 1. Introdução
 
@@ -107,21 +107,36 @@ Leitura, sem adjetivo:
 - Só 7% das respostas declaram algum fundamento além da decisão; em E, 1,8%. A justificativa costuma estar no texto da própria decisão.
 - Limite: palavras em comum não são raciocínio igual. A leitura de 4.1b mostra o mesmo caminho em erros reais que esta medida não separa. Ela só olha o que os pares veem, não o raciocínio interno.
 
+### 3.7 ρ̄_caminho no raciocínio interno (exploratório)
+
+O mesmo Jaccard de 3.6, agora sobre o raciocínio interno de cada modelo. Tiramos as palavras da pergunta, das opções e do vocabulário de formato (JSON, relação, bloco), e separamos os pares por resultado (`texto2/caminho_dos_raciocinios.py`).
+
+| MMLU-Pro | Os dois acertam | Os dois erram na mesma opção | Um certo, um errado | Erros diferentes |
+|---|---|---|---|---|
+| B1 | 0,129 (838 pares) | 0,130 (159) | 0,132 (203) | 0,124 (96) |
+| E | 0,111 (921) | 0,125 (208) | 0,104 (86) | 0,133 (42) |
+
+No banco, em B1: 0,133 quando os dois acertam (463 pares) e 0,118 quando um acerta e o outro erra (47).
+
+- A sobreposição é a mesma nos quatro grupos: por palavras, o raciocínio não separa acerto de erro, nem erro em comum de opções diferentes.
+- Ela varia por par de modelos, não por resultado. Em B1, Gemma × Qwen tem 0,178 quando os dois acertam e 0,208 quando erram juntos; Mistral × Muse, 0,096 e 0,090. A medida capta o estilo de escrita de cada modelo.
+- O passo que decide a resposta costuma ser uma frase (na m04145, "as concentrações estão perto de 1 M"), e some no meio do raciocínio longo. Medir o caminho pede extrair esse passo, por leitura ou por um modelo juiz.
+
 ## 4. Ressalvas
 
-### 4.1 Sete chaves duvidosas do MMLU-Pro
+### 4.1 Sete perguntas com os cinco na mesma opção errada
 
-Em sete perguntas, os cinco modelos do painel misto escolheram em B1 a mesma opção, diferente da chave. Lemos as sete. As chaves não foram editadas (344-79 item 3); só relatamos.
+Em sete perguntas, os cinco modelos do painel misto escolheram em B1 a mesma opção, diferente da chave. Lemos as sete e cruzamos as herdadas do MMLU original com o MMLU-Redux 2.0 (`texto2/redux_cruzamento.md`). As chaves não foram editadas (344-79 item 3); só relatamos.
 
-| Pergunta | Chave | Opção dos cinco | Leitura |
-|---|---|---|---|
-| m07756 | H | D | chave errada: a série diverge; a chave "0.0" vem do TheoremQA |
-| m07114 | G | F | distrator também correto |
-| m07045 | E | C | distrator também correto |
-| m04776 | H | C | ambígua |
-| m05049 | G | J | ambígua |
-| m02530 | C | B | ambígua |
-| m07001 | C | H | ambígua |
+| Pergunta | Origem | Chave | Opção dos cinco | Redux | Leitura |
+|---|---|---|---|---|---|
+| m07756 | TheoremQA | H | D | fora do Redux | chave errada: a série diverge; a chave "0.0" vem do TheoremQA |
+| m07114 | MMLU | G | F | chave ok | distrator acrescentado pelo Pro, não revisado (a nossa leitura o acha também correto) |
+| m07045 | MMLU | E | C | chave ok | distrator acrescentado pelo Pro, não revisado (a nossa leitura o acha também correto) |
+| m04776 | MMLU | H | C | chave ok | distrator acrescentado pelo Pro, não revisado |
+| m05049 | MMLU | G | J | chave ok | distrator acrescentado pelo Pro, não revisado |
+| m02530 | MMLU | C | B | ausente do Redux | ambígua (leitura nossa) |
+| m07001 | stemez | C | H | fora do Redux | ambígua (leitura nossa) |
 
 Cada uma dessas perguntas conta como erro comum dos cinco e puxa o ρ̄ para cima. **Sensibilidade exploratória** (fora do registro; `texto2/sensibilidade_sete_chaves.py`):
 
@@ -135,33 +150,43 @@ Cada uma dessas perguntas conta como erro comum dos cinco e puxa o ρ̄ para cim
 | | Δ_N_eff | 0,269 [0,172; 0,404] | 0,344 [0,214; 0,528] |
 | Contraste Gemma, MMLU-Pro | ρ̄_erro(B1) | 0,848 [0,759; 0,924] | 0,812 [0,701; 0,905] |
 
-O sinal das conclusões de 3.1 a 3.4 não muda sem as sete. O MMLU-Redux, que revisou chaves do MMLU, não foi usado.
+O sinal das conclusões de 3.1 a 3.4 não muda sem as sete.
 
-### 4.1b Leitura dos outros erros em comum (exploratório)
+### 4.1b Os outros erros em comum (exploratório)
 
-Nas 140 perguntas do MMLU-Pro, o maior bloco de modelos errando na mesma opção em B1 tem 5 modelos em 7 perguntas (as de 4.1), 4 em 8 e 3 em 9. Lemos os raciocínios e as contribuições das 17 perguntas de 3 e 4. É leitura nossa, sem conferência em fonte; a chave registrada não muda.
+Nas 140 perguntas do MMLU-Pro, o maior bloco de modelos errando na mesma opção em B1 tem 5 modelos em 7 perguntas (as de 4.1), 4 em 8 e 3 em 9. Lemos os raciocínios e as contribuições das 17 de 3 e 4, e cruzamos com o Redux as que vieram do MMLU original.
 
-| Pergunta | Chave → opção do bloco (n) | Como chegaram | Leitura |
-|---|---|---|---|
-| m01086 | C → H (4) | dolo transferido e Pinkerton; ninguém funde a instigação na conspiração | erro real, mesmo caminho |
-| m01566 | E → D (4) | "o vizinho não tem legitimidade" (fee simple determinable) | erro real ou chave discutível; mesmo caminho |
-| m02954 | F → H (3) | (1/4)^n ≈ 2/500 → n = 4, lido como 4 genes e não 4 pares | erro real, mesmo atalho |
-| m04145 | F → I (3) | "concentrações perto de 1 M", então E ≈ E° = 0,11 V; ignoram o 10⁻⁴ | erro real, mesmo atalho (o Qwen fez a conta) |
-| m06785 | B → H (3) | sintomas digestivos → anorexia; os que acertam passam pela B12 | erro real, mesmo caminho superficial |
-| m05198 | B → I (4) | "dependem dos Estados" | discutível |
-| m03165 | B → D (4) | ΔP = ΔV/C: queda pequena na veia | chave duvidosa (a D é a física correta) |
-| m04683 | D → F (4) | escalada (LBJ) × desescalada (Nixon) | chave duvidosa |
-| m05787 | G → D (4) | a zona 4 de Burgess | numeração ambígua |
-| m05018 | F → G (4) | as duas primeiras indicadas por grande partido | ambígua |
-| m02085 | B → A (4) | o MIQ mede valores, não interesses | ambígua (nenhum dos dois é de Holland) |
-| m01935 | H → I (3) | "without reserve" obriga a vender | ambígua (H e I dizem quase o mesmo) |
-| m05022 | B → H (3) | Copérnico é heliocêntrico | chave duvidosa (B = tradição cética) |
-| m05220 | G → B (3) | fase de vergonha | ambígua |
-| m05302 | I → H (3) | FIV com triagem de embriões | ambígua |
-| m07513 | A → B (3) | bens públicos e estabilização | ambígua |
-| m09169 | F → A (3) | "A é falsa sem interpretação" | mais de uma opção falsa |
+| Pergunta | Origem | Chave → opção do bloco (n) | Como chegaram | Redux | Leitura |
+|---|---|---|---|---|---|
+| m01086 | MMLU | C → H (4) | dolo transferido e Pinkerton; ninguém funde a instigação na conspiração | chave ok; H é original | erro dos modelos, mesmo caminho |
+| m05302 | MMLU | I → H (3) | FIV com triagem de embriões | chave ok; H é original | erro dos modelos |
+| m05787 | MMLU | G → D (4) | a zona 4 de Burgess | chave ok; D é original | erro dos modelos (nós líamos "numeração ambígua") |
+| m02954 | stemez | F → H (3) | (1/4)^n ≈ 2/500 → n = 4, lido como 4 genes e não 4 pares | fora do Redux | erro dos modelos, mesmo atalho (leitura nossa) |
+| m04145 | stemez | F → I (3) | "concentrações perto de 1 M", então E ≈ E° = 0,11 V; ignoram o 10⁻⁴ | fora do Redux | erro dos modelos, mesmo atalho (o Qwen fez a conta) |
+| m06785 | MMLU | B → H (3) | sintomas digestivos → anorexia; os que acertam passam pela B12 | ausente do Redux | erro dos modelos, mesmo caminho superficial (leitura nossa) |
+| m03165 | MMLU | B → D (4) | ΔP = ΔV/C: queda pequena na veia | chave ok | distrator acrescentado pelo Pro, não revisado |
+| m04683 | MMLU | D → F (4) | escalada (LBJ) × desescalada (Nixon) | chave ok | distrator acrescentado pelo Pro, não revisado |
+| m05018 | MMLU | F → G (4) | as duas primeiras indicadas por grande partido | chave ok | distrator acrescentado pelo Pro, não revisado |
+| m05022 | MMLU | B → H (3) | Copérnico é heliocêntrico | chave ok | distrator acrescentado pelo Pro, não revisado |
+| m05198 | MMLU | B → I (4) | "dependem dos Estados" | chave ok | distrator acrescentado pelo Pro, não revisado |
+| m05220 | MMLU | G → B (3) | fase de vergonha | chave ok | distrator acrescentado pelo Pro, não revisado |
+| m09169 | MMLU | F → A (3) | "A é falsa sem interpretação" | chave ok | distrator acrescentado pelo Pro, não revisado |
+| m01566 | MMLU | E → D (4) | "o vizinho não tem legitimidade" (fee simple determinable) | ausente do Redux | erro dos modelos ou chave discutível (leitura nossa) |
+| m02085 | MMLU | B → A (4) | o MIQ mede valores, não interesses | ausente do Redux | ambígua (leitura nossa) |
+| m01935 | MMLU | H → I (3) | "without reserve" obriga a vender | ausente do Redux | ambígua: H e I dizem quase o mesmo (leitura nossa) |
+| m07513 | stemez | A → B (3) | bens públicos e estabilização | fora do Redux | ambígua (leitura nossa) |
 
-Resumo da leitura: das 24 perguntas com 3 ou mais modelos errando juntos (7 + 17), 5 são erro real, com o mesmo caminho ou o mesmo atalho no bloco. As outras 19 têm chave duvidosa, ambígua ou discutível. Quando o erro é real, o caminho é o mesmo: parece erro aprendido, não coincidência.
+**As 24 perguntas com 3 ou mais modelos errando juntos (7 + 17), lado a lado:**
+
+| Classe | Perguntas | Base |
+|---|---|---|
+| Distrator acrescentado pelo MMLU-Pro, chave original ok | 11 | Redux |
+| Erro dos modelos, chave ok | 3 | Redux |
+| Erro dos modelos | 3 | leitura nossa, fora ou ausente do Redux |
+| Chave errada | 1 (m07756) | leitura nossa, TheoremQA |
+| Ambígua ou discutível | 6 | leitura nossa |
+
+Nos erros dos modelos que lemos, o bloco chega pelo mesmo caminho ou pelo mesmo atalho. A nossa leitura própria tinha marcado várias das 11 como "chave duvidosa"; o Redux diz que a chave original está certa. O que o Redux não revisou é o distrator que o MMLU-Pro acrescentou, e é nele que os modelos convergem.
 
 ### 4.2 Perda do Gemma (D5)
 
@@ -178,7 +203,8 @@ A empresa que serve o Gemma limitou a taxa de pedidos. No painel misto ficaram s
 *(a escrever depois da leitura do Eduardo; só os pontos)*
 - No MMLU-Pro, cinco modelos de cinco empresas valem cerca de 1,4 às cegas e 1,2 depois de se verem.
 - O painel misto fica abaixo do homogêneo (0,635 contra 0,848), mas longe de independente.
-- O banco novo dá o quadro oposto: erros quase independentes. Diferença de conteúdo (perguntas novas, fora de dados de treino prováveis) ou de dificuldade? Exploratório (`texto2/novidade_ou_facilidade.py`): no banco, a taxa de erro em B1 é de 5% (MMLU-Pro: 28%) e nenhuma pergunta tem mais de 2 dos 5 errando. O ρ̄ baixo do banco é compatível com facilidade, e o desenho não permite testar a novidade nele. Dentro do MMLU-Pro, as perguntas herdadas do MMLU original têm ρ̄_erro(B1) = 0,68 [0,57; 0,78] e erro de 33% (81 perguntas); as acrescentadas pelo MMLU-Pro, 0,51 [0,33; 0,67] e erro de 20% (59). Os intervalos se sobrepõem, a dificuldade difere e 5 das 16 perguntas originais com os cinco errando estão entre as chaves duvidosas (§4.1). Novidade e facilidade não se separam com estes dados; separá-las pede perguntas novas e difíceis.
+- O banco novo dá o quadro oposto: erros quase independentes. Diferença de conteúdo (perguntas novas, fora de dados de treino prováveis) ou de dificuldade? Exploratório (`texto2/novidade_ou_facilidade.py`): no banco, a taxa de erro em B1 é de 5% (MMLU-Pro: 28%) e nenhuma pergunta tem mais de 2 dos 5 errando. O ρ̄ baixo do banco é compatível com facilidade, e o desenho não permite testar a novidade nele. Dentro do MMLU-Pro, as perguntas herdadas do MMLU original têm ρ̄_erro(B1) = 0,68 [0,57; 0,78] e erro de 33% (81 perguntas); as acrescentadas pelo MMLU-Pro, 0,51 [0,33; 0,67] e erro de 20% (59). Os intervalos se sobrepõem, a dificuldade difere e 5 das 16 perguntas originais com os cinco errando estão entre as de §4.1. Novidade e facilidade não se separam com estes dados; separá-las pede perguntas novas e difíceis.
+- **Consequência para quem mede painéis com o MMLU-Pro.** Das 24 perguntas com 3 ou mais modelos na mesma opção errada, 11 convergem num distrator que o MMLU-Pro acrescentou às perguntas herdadas do MMLU, e que o Redux não revisou. O Redux confirma a chave original com 4 opções, não as 6 novas. Quem calcula correlação de erros ou N_eff com o MMLU-Pro conta esses casos como erro em comum. Os dados não dizem se o distrator também é correto ou se os modelos caíram juntos num distrator plausível. Nos dois casos, a origem do erro em comum está no conjunto de perguntas, e o ρ̄ mistura a dependência entre modelos com o ruído das opções acrescentadas. A sensibilidade sem as 7 de §4.1 tira só 4 desses distratores; os outros 7, de §4.1b, continuam no cálculo.
 - Ligação com o texto 1: a exposição que muda posições (H1, H4) é a mesma que aproxima os erros no MMLU-Pro.
 
 ## Apêndice A. Desvio D7
