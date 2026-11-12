@@ -2,7 +2,7 @@
 
 Eduardo Guedes · Pesquisador independente · ORCID 0009-0003-9960-3337
 
-> Rascunho do Opus, 12/11/2026. **Leitura pendente — proprietário.** Números de `studies/herd/resultados/conf2-*-medidas.md` depois do desvio D7 (Lab PR #25). Nada foi coletado de novo.
+> Texto aprovado em 12/11/2026. Números de `studies/herd/resultados/conf2-*-medidas.md` depois do desvio D7 (Lab PR #25). Nada foi coletado de novo.
 
 ## Resumo
 
@@ -222,13 +222,13 @@ A empresa que serve o Gemma limitou a taxa de pedidos. No painel misto ficaram s
 
 ## 5. Discussão
 
-*(a escrever depois da leitura do Eduardo; só os pontos)*
-- No MMLU-Pro, cinco modelos de cinco empresas valem cerca de 1,4 às cegas e 1,2 depois de se verem.
-- O painel misto fica abaixo do homogêneo (0,635 contra 0,848), mas longe de independente.
-- O banco novo dá o quadro oposto: erros quase independentes. Diferença de conteúdo (perguntas novas, fora de dados de treino prováveis) ou de dificuldade? Exploratório (`texto2/novidade_ou_facilidade.py`): no banco, a taxa de erro em B1 é de 5% (MMLU-Pro: 28%) e nenhuma pergunta tem mais de 2 dos 5 errando. O ρ̄ baixo do banco é compatível com facilidade, e o desenho não permite testar a novidade nele. Dentro do MMLU-Pro, as perguntas herdadas do MMLU original têm ρ̄_erro(B1) = 0,68 [0,57; 0,78] e erro de 33% (81 perguntas); as acrescentadas pelo MMLU-Pro, 0,51 [0,33; 0,67] e erro de 20% (59). Os intervalos se sobrepõem, a dificuldade difere e 5 das 16 perguntas originais com os cinco errando estão entre as de §4.1. Novidade e facilidade não se separam com estes dados; separá-las pede perguntas novas e difíceis.
-- **Confirmação em escala.** O ρ̄_erro(B1) = 0,635 do painel misto é compatível com Kim et al. (2025): modelos de empresas diferentes concordam no erro muito acima do acaso. Não encontramos, nessa literatura nem em outra, quem mostre que o erro coletivo se concentra nas opções acrescentadas pelo MMLU-Pro. Os autores do MMLU-Pro já sabiam que os distratores gerados podiam ser corretos e filtraram esses casos (Wang et al., 2024); o que acrescentamos é que o filtro deixou um resíduo, confirmado em pelo menos três perguntas (economia e física), e que esse resíduo infla o erro e a correlação de erros justamente onde se mede concordância entre modelos (§4.1).
-- **Consequência para quem mede painéis com o MMLU-Pro.** Das 24 perguntas com 3 ou mais modelos na mesma opção errada, 11 convergem num distrator que o MMLU-Pro acrescentou às perguntas herdadas do MMLU, e que o Redux não revisou. O Redux confirma a chave original com 4 opções, não as 6 novas. Quem calcula correlação de erros ou N_eff com o MMLU-Pro conta esses casos como erro em comum. Os dados não dizem se o distrator também é correto ou se os modelos caíram juntos num distrator plausível. Nos dois casos, a origem do erro em comum está no conjunto de perguntas, e o ρ̄ mistura a dependência entre modelos com o ruído das opções acrescentadas. A sensibilidade sem as 7 de §4.1 tira só 4 desses distratores; os outros 7, de §4.1b, continuam no cálculo.
-- Ligação com o texto 1: a exposição que muda posições (H1, H4) é a mesma que aproxima os erros no MMLU-Pro.
+No MMLU-Pro, cinco modelos de cinco empresas valem cerca de 1,4 juízes às cegas e 1,2 depois de se verem. O painel misto fica abaixo do homogêneo (ρ̄_erro de 0,635 contra 0,848), mas longe de ser independente. A exposição que muda posições no texto 1 (H1 e H4) é a mesma que, no MMLU-Pro, aproxima os erros.
+
+O banco novo mostra o quadro oposto: erros quase independentes. Pode ser diferença de conteúdo, porque são perguntas novas e provavelmente fora dos dados de treino, ou de dificuldade. Na análise exploratória (`texto2/novidade_ou_facilidade.py`), a taxa de erro em B1 é de 5% no banco e de 28% no MMLU-Pro, e nenhuma pergunta do banco tem mais de 2 dos 5 modelos errando. O ρ̄ baixo do banco é compatível com facilidade, e o desenho não permite testar a novidade nele. Dentro do MMLU-Pro, as perguntas herdadas do MMLU original têm ρ̄_erro(B1) = 0,68 [0,57; 0,78] e erro de 33% (81 perguntas); as acrescentadas pelo MMLU-Pro, 0,51 [0,33; 0,67] e erro de 20% (59). Os intervalos se sobrepõem, a dificuldade difere, e 5 das 16 perguntas originais com os cinco errando estão entre as de §4.1. Novidade e facilidade não se separam com estes dados; separá-las pede perguntas novas e difíceis.
+
+O ρ̄_erro(B1) = 0,635 do painel misto é compatível com Kim et al. (2025), que mostram em escala modelos de empresas diferentes concordando no erro muito acima do acaso. Não encontramos, nessa literatura nem em outra, quem mostre que o erro coletivo se concentra nas opções acrescentadas pelo MMLU-Pro. Os autores do MMLU-Pro já sabiam que os distratores gerados podiam ser corretos e filtraram esses casos (Wang et al., 2024). O que acrescentamos é que o filtro deixou um resíduo, confirmado em pelo menos três perguntas (economia e física), e que esse resíduo infla o erro e a correlação de erros justamente onde se mede concordância entre modelos (§4.1).
+
+Isso tem consequência para quem mede painéis com o MMLU-Pro. Das 24 perguntas com 3 ou mais modelos na mesma opção errada, 11 convergem num distrator que o MMLU-Pro acrescentou às perguntas herdadas do MMLU e que o Redux não revisou: o Redux confirma a chave original com 4 opções, não as 6 novas. Quem calcula correlação de erros ou N_eff com o MMLU-Pro conta esses casos como erro em comum. Os dados não dizem se o distrator também é correto ou se os modelos caíram juntos num distrator plausível. Nos dois casos, a origem do erro em comum está no conjunto de perguntas, e o ρ̄ mistura a dependência entre modelos com o ruído das opções acrescentadas. A sensibilidade sem as 7 de §4.1 tira só 4 desses distratores; os outros 7, de §4.1b, continuam no cálculo.
 
 ## Referências
 
