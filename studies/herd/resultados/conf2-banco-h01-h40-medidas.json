@@ -397,89 +397,89 @@
     },
     "dependencia": {
      "n_painel": 5,
-     "perguntas_com_gabarito": 11,
+     "perguntas_com_gabarito": 40,
      "rho_erro": {
       "B1": {
-       "estimativa": -0.27158205955693204,
+       "estimativa": 0.013389846064089106,
        "ic": [
-        -0.4919644357796907,
-        -0.23243741412943175
+        -0.086710996952412,
+        0.21990118866825956
        ],
        "n": null,
-       "n_perguntas": 11,
-       "replicas_validas": 19999
+       "n_perguntas": 40,
+       "replicas_validas": 19992
       },
       "B3": {
-       "estimativa": -0.23376671663859713,
+       "estimativa": 0.006791144059325141,
        "ic": [
-        -0.6666666666666666,
-        -0.11289135291706533
+        -0.10426867404613238,
+        0.19568694391565203
        ],
        "n": null,
-       "n_perguntas": 11,
-       "replicas_validas": 19981
+       "n_perguntas": 40,
+       "replicas_validas": 19889
       },
       "EP": {
-       "estimativa": -0.15932708268910895,
+       "estimativa": 0.06445347412741383,
        "ic": [
-        -0.38063917419903825,
-        0.004358605656667851
+        -0.07124774300858729,
+        0.22608177184030606
        ],
        "n": null,
-       "n_perguntas": 11,
-       "replicas_validas": 19998
+       "n_perguntas": 40,
+       "replicas_validas": 19961
       },
       "E": {
-       "estimativa": -0.23904572186687872,
+       "estimativa": -0.05638838744346009,
        "ic": [
-        -0.5590169943749475,
-        -0.14907119849998599
+        -0.1267731382092775,
+        -0.027777777777777776
        ],
        "n": null,
-       "n_perguntas": 11,
-       "replicas_validas": 12797
+       "n_perguntas": 40,
+       "replicas_validas": 12561
       }
      },
      "n_eff": {
       "B1": {
-       "estimativa": null,
+       "estimativa": 4.745816965532699,
        "ic": [
-        35.257254699117055,
-        1953.9822241884922
+        2.6601345726427685,
+        7.65513890507193
        ],
        "n": null,
-       "n_perguntas": 11,
-       "replicas_validas": 1854
+       "n_perguntas": 40,
+       "replicas_validas": 19992
       },
       "B3": {
-       "estimativa": 77.00229042832257,
+       "estimativa": 4.867769114776088,
        "ic": [
-        7.132613812938676,
-        1182.2432137472488
+        2.8046592278829854,
+        8.577428751416578
        ],
        "n": null,
-       "n_perguntas": 11,
-       "replicas_validas": 7978
+       "n_perguntas": 40,
+       "replicas_validas": 19889
       },
       "EP": {
-       "estimativa": 13.785814299038307,
+       "estimativa": 3.9751508660181343,
        "ic": [
-        4.797684233420933,
-        477.6000543576691
+        2.625599369553876,
+        6.9929186967415475
        ],
        "n": null,
-       "n_perguntas": 11,
-       "replicas_validas": 16517
+       "n_perguntas": 40,
+       "replicas_validas": 19961
       },
       "E": {
-       "estimativa": 114.11066843560499,
+       "estimativa": 6.45622431162266,
        "ic": [
-        8.333333333333334,
-        114.11066843560499
+        5.625,
+        10.14389218255747
        ],
        "n": null,
-       "n_perguntas": 11,
-       "replicas_validas": 5738
+       "n_perguntas": 40,
+       "replicas_validas": 12561
       }
      },
      "pares_sem_correlacao_definida": {
@@ -494,36 +494,36 @@
        "google/gemma-4-31b-it × mistralai/mistral-small-2603": null,
        "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": null,
        "google/gemma-4-31b-it × qwen/qwen3.8-27b": null,
-       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": -0.23904572186687872,
-       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.28867513459481287,
-       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": -0.19364916731037085,
-       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.3105295017040594,
-       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": -0.03857583749052298,
-       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": -0.5590169943749475
+       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": -0.05337605126836238,
+       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.060522753266880246,
+       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": -0.04559607525875532,
+       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.12598815766974242,
+       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.22147019900891646,
+       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": -0.1076244005001263
       },
       "B3": {
        "google/gemma-4-31b-it × meta/muse-glimmer-30b": null,
        "google/gemma-4-31b-it × mistralai/mistral-small-2603": null,
        "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": null,
        "google/gemma-4-31b-it × qwen/qwen3.8-27b": null,
-       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": -0.21821789023599236,
-       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.28867513459481287,
-       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": -0.14907119849998599,
-       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.5345224838248488,
-       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.2182178902359924,
-       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": -0.43033148291193524
+       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": -0.046829290579084706,
+       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.060522753266880246,
+       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": -0.03673591791853225,
+       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.09759000729485331,
+       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.36913583036771336,
+       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": -0.086710996952412
       },
       "EP": {
        "google/gemma-4-31b-it × meta/muse-glimmer-30b": null,
        "google/gemma-4-31b-it × mistralai/mistral-small-2603": null,
        "google/gemma-4-31b-it × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": null,
        "google/gemma-4-31b-it × qwen/qwen3.8-27b": null,
-       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": -0.28867513459481287,
-       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.1336306209562122,
-       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": -0.2222222222222222,
-       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.4629100498862757,
-       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.24056261216234406,
-       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": -0.3563483225498992
+       "meta/muse-glimmer-30b × mistralai/mistral-small-2603": -0.06532553344640132,
+       "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 0.305887645160749,
+       "meta/muse-glimmer-30b × qwen/qwen3.8-27b": -0.05263157894736842,
+       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.0949157995752499,
+       "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": 0.3701780228629408,
+       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": -0.07647191129018725
       },
       "E": {
        "google/gemma-4-31b-it × meta/muse-glimmer-30b": null,
@@ -533,20 +533,20 @@
        "meta/muse-glimmer-30b × mistralai/mistral-small-2603": null,
        "meta/muse-glimmer-30b × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": null,
        "meta/muse-glimmer-30b × qwen/qwen3.8-27b": null,
-       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.23904572186687872,
+       "mistralai/mistral-small-2603 × nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": -0.05638838744346009,
        "mistralai/mistral-small-2603 × qwen/qwen3.8-27b": null,
        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free × qwen/qwen3.8-27b": null
       }
      },
      "delta_n_eff_B1_menos_E": {
-      "estimativa": null,
+      "estimativa": -1.7104073460899611,
       "ic": [
-       -70.64056906141116,
-       2150.628862740633
+       -6.0207230482977305,
+       -0.5519538094873413
       ],
       "n": null,
-      "n_perguntas": 11,
-      "replicas_validas": 900
+      "n_perguntas": 40,
+      "replicas_validas": 12561
      },
      "rho_comportamento": {
       "medida": "kappa de Fleiss de B1 nas contestáveis (descritivo; fora da tabela de N_eff)",
@@ -558,7 +558,7 @@
         null
        ],
        "n": null,
-       "n_perguntas": 11,
+       "n_perguntas": 40,
        "replicas_validas": 0
       },
       "concordancia_observada_P": {
@@ -568,7 +568,7 @@
         null
        ],
        "n": null,
-       "n_perguntas": 11,
+       "n_perguntas": 40,
        "replicas_validas": 0
       },
       "leitura": "teto candidato, não piso (344-75, retratação declarada)"
@@ -581,7 +581,7 @@
        null
       ],
       "n": null,
-      "n_perguntas": 11,
+      "n_perguntas": 40,
       "replicas_validas": 0
      },
      "varredura_analitica": {
@@ -689,28 +689,28 @@
       ],
       "ancoras_empiricas": {
        "rho_erro_B1": {
-        "rho": -0.27158205955693204,
-        "n=4": null,
-        "n=5": null,
-        "n=8": null,
-        "n=inf": null
+        "rho": 0.013389846064089106,
+        "n=4": 3.8455269579915643,
+        "n=5": 4.745816965532699,
+        "n=8": 7.31442666990073,
+        "n=inf": 74.68345754040816
        },
        "rho_erro_B3": {
-        "rho": -0.23376671663859713,
-        "n=4": null,
-        "n=5": null,
-        "n=8": null,
-        "n=inf": null
+        "rho": 0.006791144059325141,
+        "n=4": 3.9201334274864896,
+        "n=5": 4.867769114776088,
+        "n=8": 7.6369543975807295,
+        "n=inf": 147.25059448957904
        },
        "rho_erro_EP": {
-        "rho": -0.15932708268910895,
-        "n=4": null,
-        "n=5": null,
-        "n=8": null,
-        "n=inf": null
+        "rho": 0.06445347412741383,
+        "n=4": 3.351879218530655,
+        "n=5": 3.9751508660181343,
+        "n=8": 5.512776718725787,
+        "n=inf": 15.51506747368134
        },
        "rho_erro_E": {
-        "rho": -0.23904572186687872,
+        "rho": -0.05638838744346009,
         "n=4": null,
         "n=5": null,
         "n=8": null,
@@ -2691,7 +2691,7 @@
   }
  },
  "schema": "norvald.lab.herd.measures.v1",
- "gerado_em": "2026-11-12T15:52:13.238960+00:00",
+ "gerado_em": "2026-11-12T18:03:44.912833+00:00",
  "rodadas": [
   "conf2-banco"
  ],

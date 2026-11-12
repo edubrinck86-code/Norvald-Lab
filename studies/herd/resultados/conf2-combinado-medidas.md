@@ -1,6 +1,6 @@
 # Medidas do Δ_herd — conf2-banco, conf2-mmlu
 
-Gerado em 2026-11-12T15:58:26.778304+00:00. Bootstrap por pergunta, 20000 réplicas, seed 20261111, IC 95% percentil.
+Gerado em 2026-11-12T17:58:26.213997+00:00. Bootstrap por pergunta, 20000 réplicas, seed 20261111, IC 95% percentil.
 Tabela: 5510 linhas, 224 perguntas (192 com gabarito), 3 seleções indiretas.
 
 ## Registro aw9vf (confirmatório)
@@ -35,12 +35,12 @@ Dispersão (1 − fração da moda), E − B3 por pergunta: -0,165 [-0,198; -0,1
 
 | Dependência (erros, gabarito) | ρ̄_erro | N_eff |
 |---|---|---|
-| B1 | 0,289 [0,190; 0,379] (n=—) | 2,319 [1,987; 2,841] (n=—) |
-| B3 | 0,323 [0,214; 0,428] (n=—) | 2,181 [1,844; 2,693] (n=—) |
-| EP | 0,408 [0,302; 0,513] (n=—) | 1,899 [1,638; 2,265] (n=—) |
-| E | 0,691 [0,587; 0,786] (n=—) | 1,329 [1,207; 1,493] (n=—) |
+| B1 | 0,615 [0,520; 0,699] (n=—) | 1,445 [1,318; 1,624] (n=—) |
+| B3 | 0,629 [0,533; 0,712] (n=—) | 1,422 [1,299; 1,596] (n=—) |
+| EP | 0,669 [0,576; 0,750] (n=—) | 1,360 [1,251; 1,514] (n=—) |
+| E | 0,814 [0,737; 0,879] (n=—) | 1,175 [1,107; 1,266] (n=—) |
 
-n do painel: 5. Δ_N_eff = N_eff(B1) − N_eff(E): 0,990 [0,692; 1,453] (n=—). ρ̄_comportamento (Fleiss, contestáveis): 0,203 [0,076; 0,280] (n=—); distância até ρ̄_erro(B1): -0,086 [-0,245; 0,035] (n=—).
+n do painel: 5. Δ_N_eff = N_eff(B1) − N_eff(E): 0,269 [0,172; 0,404] (n=—). ρ̄_comportamento (Fleiss, contestáveis): 0,511 [0,346; 0,650] (n=—); distância até ρ̄_erro(B1): -0,104 [-0,292; 0,061] (n=—).
 
 Canal da confiança (exploratório, sem correção), mudança média de posto E − B3: maioria_concorda 0,099 [0,057; 0,144] (n=203), p <0,001; maioria_discorda 0,129 [0,043; 0,218] (n=101), p 0,011.
 

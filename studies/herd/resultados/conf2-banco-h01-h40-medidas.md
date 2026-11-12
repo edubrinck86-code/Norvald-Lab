@@ -1,6 +1,6 @@
 # Medidas do Δ_herd — conf2-banco
 
-Gerado em 2026-11-12T15:52:13.238960+00:00. Bootstrap por pergunta, 20000 réplicas, seed 20261111, IC 95% percentil.
+Gerado em 2026-11-12T18:03:44.912833+00:00. Bootstrap por pergunta, 20000 réplicas, seed 20261111, IC 95% percentil.
 Tabela: 994 linhas, 40 perguntas (40 com gabarito), 0 seleções indiretas.
 
 ## Registro aw9vf (confirmatório)
@@ -35,12 +35,12 @@ Dispersão (1 − fração da moda), E − B3 por pergunta: -0,123 [-0,186; -0,0
 
 | Dependência (erros, gabarito) | ρ̄_erro | N_eff |
 |---|---|---|
-| B1 | -0,272 [-0,492; -0,232] (n=—) | — [35,257; 1953,982] (n=—) |
-| B3 | -0,234 [-0,667; -0,113] (n=—) | 77,002 [7,133; 1182,243] (n=—) |
-| EP | -0,159 [-0,381; 0,004] (n=—) | 13,786 [4,798; 477,600] (n=—) |
-| E | -0,239 [-0,559; -0,149] (n=—) | 114,111 [8,333; 114,111] (n=—) |
+| B1 | 0,013 [-0,087; 0,220] (n=—) | 4,746 [2,660; 7,655] (n=—) |
+| B3 | 0,007 [-0,104; 0,196] (n=—) | 4,868 [2,805; 8,577] (n=—) |
+| EP | 0,064 [-0,071; 0,226] (n=—) | 3,975 [2,626; 6,993] (n=—) |
+| E | -0,056 [-0,127; -0,028] (n=—) | 6,456 [5,625; 10,144] (n=—) |
 
-n do painel: 5. Δ_N_eff = N_eff(B1) − N_eff(E): — [-70,641; 2150,629] (n=—). ρ̄_comportamento (Fleiss, contestáveis): — [—; —] (n=—); distância até ρ̄_erro(B1): — [—; —] (n=—).
+n do painel: 5. Δ_N_eff = N_eff(B1) − N_eff(E): -1,710 [-6,021; -0,552] (n=—). ρ̄_comportamento (Fleiss): não se aplica (0 perguntas contestáveis).
 
 Canal da confiança (exploratório, sem correção), mudança média de posto E − B3: maioria_concorda 0,029 [0,000; 0,091] (n=35), p 1,000; maioria_discorda 0,250 [0,000; 0,545] (n=12), p 0,250.
 
@@ -77,7 +77,7 @@ Dispersão (1 − fração da moda), E − B3 por pergunta: -0,034 [-0,061; -0,0
 | EP | 0,064 [-0,071; 0,226] (n=—) | 3,975 [2,626; 6,993] (n=—) |
 | E | -0,056 [-0,127; -0,028] (n=—) | 6,456 [5,625; 10,144] (n=—) |
 
-n do painel: 5. Δ_N_eff = N_eff(B1) − N_eff(E): -1,710 [-6,021; -0,552] (n=—). ρ̄_comportamento (Fleiss, contestáveis): — [—; —] (n=—); distância até ρ̄_erro(B1): — [—; —] (n=—).
+n do painel: 5. Δ_N_eff = N_eff(B1) − N_eff(E): -1,710 [-6,021; -0,552] (n=—). ρ̄_comportamento (Fleiss): não se aplica (0 perguntas contestáveis).
 
 Canal da confiança (exploratório, sem correção), mudança média de posto E − B3: maioria_concorda 0,017 [0,000; 0,038] (n=177), p 0,250; maioria_discorda 0,250 [0,000; 0,556] (n=12), p 0,250.
 
