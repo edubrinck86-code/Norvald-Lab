@@ -90,6 +90,23 @@ No banco, os cinco Gemma acertaram as 52 perguntas em B1; sem erro, a correlaç�
 
 Com o ρ̄_erro(B1) do MMLU-Pro (0,635), o teto com infinitos modelos seria 1,58; com 8 modelos, 1,47. Acrescentar modelos do mesmo tipo quase não muda o número efetivo.
 
+### 3.6 ρ̄_caminho: os fundamentos se sobrepõem? (exploratório)
+
+Sobreposição de Jaccard entre as palavras de conteúdo dos fundamentos declarados no CONTRIBUTION, por par de modelos e pergunta. Tiramos as palavras da pergunta e das opções, para que repetir o enunciado não conte (`texto2/caminho_dos_fundamentos.py`).
+
+| Bloco, condição | Acerto em comum | Erro em comum (mesma opção) | Opções diferentes | Respostas com fundamento além da decisão |
+|---|---|---|---|---|
+| MMLU-Pro, B1 | 0,105 (727 pares) | 0,059 (143) | 0,052 (273) | 7,0% |
+| MMLU-Pro, E | 0,190 (805) | 0,113 (190) | 0,068 (113) | 1,8% |
+| Banco, B1 | 0,072 (389) | 0,000 (2) | 0,024 (42) | 5,4% |
+| Banco, E | 0,105 (395) | — | 0,052 (15) | 2,0% |
+
+Leitura, sem adjetivo:
+- Em B1, o erro em comum tem sobreposição de fundamentos próxima à de opções diferentes (0,059 contra 0,052), e abaixo da do acerto em comum (0,105).
+- Em E, a sobreposição sobe nos três grupos; no acerto em comum, quase dobra (0,105 → 0,190).
+- Só 7% das respostas declaram algum fundamento além da decisão; em E, 1,8%. A justificativa costuma estar no texto da própria decisão.
+- Limite: palavras em comum não são raciocínio igual. A leitura de 4.1b mostra o mesmo caminho em erros reais que esta medida não separa. Ela só olha o que os pares veem, não o raciocínio interno.
+
 ## 4. Ressalvas
 
 ### 4.1 Sete chaves duvidosas do MMLU-Pro
@@ -119,6 +136,32 @@ Cada uma dessas perguntas conta como erro comum dos cinco e puxa o ρ̄ para cim
 | Contraste Gemma, MMLU-Pro | ρ̄_erro(B1) | 0,848 [0,759; 0,924] | 0,812 [0,701; 0,905] |
 
 O sinal das conclusões de 3.1 a 3.4 não muda sem as sete. O MMLU-Redux, que revisou chaves do MMLU, não foi usado.
+
+### 4.1b Leitura dos outros erros em comum (exploratório)
+
+Nas 140 perguntas do MMLU-Pro, o maior bloco de modelos errando na mesma opção em B1 tem 5 modelos em 7 perguntas (as de 4.1), 4 em 8 e 3 em 9. Lemos os raciocínios e as contribuições das 17 perguntas de 3 e 4. É leitura nossa, sem conferência em fonte; a chave registrada não muda.
+
+| Pergunta | Chave → opção do bloco (n) | Como chegaram | Leitura |
+|---|---|---|---|
+| m01086 | C → H (4) | dolo transferido e Pinkerton; ninguém funde a instigação na conspiração | erro real, mesmo caminho |
+| m01566 | E → D (4) | "o vizinho não tem legitimidade" (fee simple determinable) | erro real ou chave discutível; mesmo caminho |
+| m02954 | F → H (3) | (1/4)^n ≈ 2/500 → n = 4, lido como 4 genes e não 4 pares | erro real, mesmo atalho |
+| m04145 | F → I (3) | "concentrações perto de 1 M", então E ≈ E° = 0,11 V; ignoram o 10⁻⁴ | erro real, mesmo atalho (o Qwen fez a conta) |
+| m06785 | B → H (3) | sintomas digestivos → anorexia; os que acertam passam pela B12 | erro real, mesmo caminho superficial |
+| m05198 | B → I (4) | "dependem dos Estados" | discutível |
+| m03165 | B → D (4) | ΔP = ΔV/C: queda pequena na veia | chave duvidosa (a D é a física correta) |
+| m04683 | D → F (4) | escalada (LBJ) × desescalada (Nixon) | chave duvidosa |
+| m05787 | G → D (4) | a zona 4 de Burgess | numeração ambígua |
+| m05018 | F → G (4) | as duas primeiras indicadas por grande partido | ambígua |
+| m02085 | B → A (4) | o MIQ mede valores, não interesses | ambígua (nenhum dos dois é de Holland) |
+| m01935 | H → I (3) | "without reserve" obriga a vender | ambígua (H e I dizem quase o mesmo) |
+| m05022 | B → H (3) | Copérnico é heliocêntrico | chave duvidosa (B = tradição cética) |
+| m05220 | G → B (3) | fase de vergonha | ambígua |
+| m05302 | I → H (3) | FIV com triagem de embriões | ambígua |
+| m07513 | A → B (3) | bens públicos e estabilização | ambígua |
+| m09169 | F → A (3) | "A é falsa sem interpretação" | mais de uma opção falsa |
+
+Resumo da leitura: das 24 perguntas com 3 ou mais modelos errando juntos (7 + 17), 5 são erro real, com o mesmo caminho ou o mesmo atalho no bloco. As outras 19 têm chave duvidosa, ambígua ou discutível. Quando o erro é real, o caminho é o mesmo: parece erro aprendido, não coincidência.
 
 ### 4.2 Perda do Gemma (D5)
 

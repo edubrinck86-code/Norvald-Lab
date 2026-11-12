@@ -1,0 +1,58 @@
+{
+ "mmlu|B1": {
+  "acerto_em_comum": {
+   "pares": 727,
+   "jaccard_medio": 0.105
+  },
+  "erro_em_comum": {
+   "pares": 143,
+   "jaccard_medio": 0.059
+  },
+  "opcoes_diferentes": {
+   "pares": 273,
+   "jaccard_medio": 0.052
+  },
+  "respostas_com_fundamento_alem_da_decisao": 0.07
+ },
+ "mmlu|E": {
+  "acerto_em_comum": {
+   "pares": 805,
+   "jaccard_medio": 0.19
+  },
+  "erro_em_comum": {
+   "pares": 190,
+   "jaccard_medio": 0.113
+  },
+  "opcoes_diferentes": {
+   "pares": 113,
+   "jaccard_medio": 0.068
+  },
+  "respostas_com_fundamento_alem_da_decisao": 0.018
+ },
+ "banco|B1": {
+  "acerto_em_comum": {
+   "pares": 389,
+   "jaccard_medio": 0.072
+  },
+  "erro_em_comum": {
+   "pares": 2,
+   "jaccard_medio": 0.0
+  },
+  "opcoes_diferentes": {
+   "pares": 42,
+   "jaccard_medio": 0.024
+  },
+  "respostas_com_fundamento_alem_da_decisao": 0.054
+ },
+ "banco|E": {
+  "acerto_em_comum": {
+   "pares": 395,
+   "jaccard_medio": 0.105
+  },
+  "opcoes_diferentes": {
+   "pares": 15,
+   "jaccard_medio": 0.052
+  },
+  "respostas_com_fundamento_alem_da_decisao": 0.02
+ }
+}
