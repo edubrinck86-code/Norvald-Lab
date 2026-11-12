@@ -17,6 +17,7 @@ from norvald_lab.application.arof.corpus import fingerprint_payload
 from norvald_lab.application.arof.dataset import ExperimentManifest
 from norvald_lab.application.arof.exposed_context import seed_peer_contributions
 from norvald_lab.application.arof.outcome_extract import rows_from_raw, write_csv
+from norvald_lab.application.arof.outcome_extract import RELACOES_DE_FUNDAMENTO
 from norvald_lab.application.arof.outcome_validation import validation_from_payload
 from norvald_lab.application.arof.peer_order import PEER_ORDER_METHOD, draw_peer_order, reorder_by_author
 from norvald_lab.application.arof.prior_contribution import PriorContribution
@@ -60,7 +61,7 @@ def _utc():
     return datetime.now(timezone.utc).isoformat()
 
 
-def _has_valid_contribution(observation) -> bool:
+def _has_valid_contribution(observation, require_grounds: bool = False) -> bool:
     """Se a execução trouxe uma contribuição com opção selecionada aceita pelo validador.
 
     Reaproveita as leituras que o Lab já usa para recusar uma origem incompleta
@@ -74,7 +75,15 @@ def _has_valid_contribution(observation) -> bool:
     content = (payload.get("result") or {}).get("content") or ""
     if not content.strip():
         return False
-    return bool(validation_from_payload(payload, response=content, grounding_relations=()).option_accepted)
+    # 12/11/2026 (achado do PR #16): contribuição com ZERO fundamentos (derived_from,
+    # evidenced_by, documents) passava como válida. A regra mora só neste portão da coleta
+    # (nova tentativa), nunca no validador compartilhado nem nas medidas: as coletas conf2-*
+    # foram validadas e analisadas com a regra antiga e seguem assim. Opt-in por spec
+    # (budget.require_grounds), então spec e fingerprint antigos não mudam.
+    outcome = validation_from_payload(payload, response=content, grounding_relations=RELACOES_DE_FUNDAMENTO if require_grounds else ())
+    if require_grounds and not outcome.grounding_targets_accepted:
+        return False
+    return bool(outcome.option_accepted)
 
 
 @dataclass(frozen=True)
@@ -329,7 +338,7 @@ class ExperimentRunner:
                     emit("execution.completed" if error is None else "execution.failed", output)
                     if cancelled:
                         raise asyncio.CancelledError
-                    if _has_valid_contribution(observation):
+                    if _has_valid_contribution(observation, budget.get("require_grounds", False)):
                         break
         tasks = [asyncio.create_task(execute(s)) for s in prepared.requests_json]
         aborted = False

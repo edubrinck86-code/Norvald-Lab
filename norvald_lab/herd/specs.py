@@ -46,6 +46,7 @@ def blind_spec(question: Mapping[str, Any], panel: Mapping[str, Any], *, run_id:
     language = {"language": panel["language"]} if "language" in panel else {}
     # Só entra quando o painel declara: painéis anteriores seguem gerando o mesmo spec.
     attempts = {"max_agent_attempts": panel["max_agent_attempts"]} if "max_agent_attempts" in panel else {}
+    grounds = {"require_grounds": panel["require_grounds"]} if "require_grounds" in panel else {}
     return language | {
         "schema_version": "norvald.lab.spec.v1",
         "experiment_id": experiment_id(run_id, question["id"], condition_id),
@@ -57,5 +58,5 @@ def blind_spec(question: Mapping[str, Any], panel: Mapping[str, Any], *, run_id:
         "working_context": {"question": "", "items": [{"id": o["id"], "type": "option", "content": o["content"]} for o in question["options"]], "relations": []},
         "repetitions": 1,
         "condition": {"id": condition_id, "exposure": "blind", "tools": "off"},
-        "budget": {"max_concurrency": len(participants), "max_concurrency_per_provider": panel.get("max_concurrency_per_provider", 2), "timeout_seconds": panel.get("timeout_seconds", 300)} | attempts,
+        "budget": {"max_concurrency": len(participants), "max_concurrency_per_provider": panel.get("max_concurrency_per_provider", 2), "timeout_seconds": panel.get("timeout_seconds", 300)} | attempts | grounds,
     }
