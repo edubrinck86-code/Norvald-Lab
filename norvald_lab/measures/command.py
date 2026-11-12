@@ -14,6 +14,7 @@ from typing import Sequence
 from norvald_lab.measures.bootstrap import ClusteredBootstrap
 from norvald_lab.measures.markdown_summary import render_markdown
 from norvald_lab.measures.observation_loader import ObservationLoader
+from norvald_lab.measures.observation_table import ObservationTable
 from norvald_lab.measures.question_catalog import QuestionCatalog
 from norvald_lab.measures.reasons.same_answer_reasons import SameAnswerReasons
 from norvald_lab.measures.report_builder import MeasuresReport
@@ -23,10 +24,13 @@ DEFAULT_BANKS = (STUDY / "bank.en.json", STUDY / "mmlu-pro" / "bank.json")
 DEFAULT_ANSWERS = (STUDY / "answers.json", STUDY / "mmlu-pro" / "answers.json")
 
 
-def run_measures(root: Path, *, runs: Sequence[str], out: Path, seed: int, reps: int, bank_paths: Sequence[Path] = (), answer_paths: Sequence[Path] = (), threshold: float | None = None, contrast_run: str | None = None) -> int:
+def run_measures(root: Path, *, runs: Sequence[str], out: Path, seed: int, reps: int, bank_paths: Sequence[Path] = (), answer_paths: Sequence[Path] = (), threshold: float | None = None, contrast_run: str | None = None, question_prefix: str | None = None) -> int:
     catalog = QuestionCatalog.from_files(root, [*runs, *([contrast_run] if contrast_run else [])], bank_paths or DEFAULT_BANKS, answer_paths or DEFAULT_ANSWERS)
     loader = ObservationLoader(root, catalog)
     table = loader.load(runs)
+    if question_prefix:
+        # OSF 5dpjr: h01–h40 (escritos com auxílio de IA) também relatados sozinhos. 12/11/2026.
+        table = ObservationTable(tuple(r for r in table.rows if r.question_id.startswith(question_prefix)), table.questions, table.runs)
     if not table.rows:
         raise ValueError("Nenhuma observação encontrada para as rodadas: " + ", ".join(runs))
     # Painel homogêneo de contraste (aw9vf, 344-83 item 2): rodada à parte, nunca misturada à principal.

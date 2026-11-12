@@ -181,6 +181,60 @@
        -0.1958041958041958
       ]
      },
+     "delta_position": {
+      "definicao": "rate(EP) − rate(B3)",
+      "estrita": {
+       "estimativa": 0.04285714285714286,
+       "ic": [
+        0.014388489208633094,
+        0.07586206896551724
+       ],
+       "n": 140,
+       "n_perguntas": 30,
+       "replicas_validas": 20000
+      },
+      "permissiva": {
+       "estimativa": 0.04285714285714286,
+       "ic": [
+        0.014388489208633094,
+        0.07586206896551724
+       ],
+       "n": 140,
+       "n_perguntas": 30,
+       "replicas_validas": 20000
+      },
+      "intervalo_entre_leituras": [
+       0.04285714285714286,
+       0.04285714285714286
+      ]
+     },
+     "delta_justification": {
+      "definicao": "rate(E) − rate(EP)",
+      "estrita": {
+       "estimativa": 0.1223021582733813,
+       "ic": [
+        0.0661764705882353,
+        0.1791044776119403
+       ],
+       "n": 139,
+       "n_perguntas": 30,
+       "replicas_validas": 20000
+      },
+      "permissiva": {
+       "estimativa": 0.1223021582733813,
+       "ic": [
+        0.0661764705882353,
+        0.1791044776119403
+       ],
+       "n": 139,
+       "n_perguntas": 30,
+       "replicas_validas": 20000
+      },
+      "intervalo_entre_leituras": [
+       0.1223021582733813,
+       0.1223021582733813
+      ]
+     },
      "mcnemar": {
       "mcnemar_E_vs_B3": {
        "estrita": {
@@ -208,6 +262,34 @@
         "evento_so_em_B3": 0,
         "evento_so_em_B2": 28,
         "p_bruto": 7.450580596923828e-09
+       }
+      },
+      "mcnemar_EP_vs_B3": {
+       "estrita": {
+        "n_pares": 140,
+        "evento_so_em_EP": 6,
+        "evento_so_em_B3": 0,
+        "p_bruto": 0.03125
+       },
+       "permissiva": {
+        "n_pares": 140,
+        "evento_so_em_EP": 6,
+        "evento_so_em_B3": 0,
+        "p_bruto": 0.03125
+       }
+      },
+      "mcnemar_E_vs_EP": {
+       "estrita": {
+        "n_pares": 139,
+        "evento_so_em_E": 19,
+        "evento_so_em_EP": 2,
+        "p_bruto": 0.00022125244140625
+       },
+       "permissiva": {
+        "n_pares": 139,
+        "evento_so_em_E": 19,
+        "evento_so_em_EP": 2,
+        "p_bruto": 0.00022125244140625
        }
       }
      },
@@ -261,34 +343,54 @@
        "mcnemar_E_vs_B3": {
         "descricao": "McNemar exato, E contra B3 (Δ_herd)",
         "p_bruto": 2.384185791015625e-07,
-        "p_holm": 4.76837158203125e-07
+        "p_holm": 9.5367431640625e-07
        },
        "mcnemar_B3_vs_B2": {
         "descricao": "McNemar exato, B3 contra B2 (Δ_self)",
         "p_bruto": 7.450580596923828e-09,
-        "p_holm": 2.2351741790771484e-08
+        "p_holm": 3.725290298461914e-08
        },
        "wilcoxon_dispersao_E_vs_B3": {
         "descricao": "Wilcoxon pareado, mudança de dispersão por pergunta, E contra B3",
         "p_bruto": 3.0517578125e-05,
-        "p_holm": 3.0517578125e-05
+        "p_holm": 9.1552734375e-05
+       },
+       "mcnemar_EP_vs_B3": {
+        "descricao": "McNemar exato, EP contra B3 (Δ_position, H4)",
+        "p_bruto": 0.03125,
+        "p_holm": 0.03125
+       },
+       "mcnemar_E_vs_EP": {
+        "descricao": "McNemar exato, E contra EP (Δ_justification, H4)",
+        "p_bruto": 0.00022125244140625,
+        "p_holm": 0.0004425048828125
        }
       },
       "permissiva": {
        "mcnemar_E_vs_B3": {
         "descricao": "McNemar exato, E contra B3 (Δ_herd)",
         "p_bruto": 2.384185791015625e-07,
-        "p_holm": 4.76837158203125e-07
+        "p_holm": 9.5367431640625e-07
        },
        "mcnemar_B3_vs_B2": {
         "descricao": "McNemar exato, B3 contra B2 (Δ_self)",
         "p_bruto": 7.450580596923828e-09,
-        "p_holm": 2.2351741790771484e-08
+        "p_holm": 3.725290298461914e-08
        },
        "wilcoxon_dispersao_E_vs_B3": {
         "descricao": "Wilcoxon pareado, mudança de dispersão por pergunta, E contra B3",
         "p_bruto": 3.0517578125e-05,
-        "p_holm": 3.0517578125e-05
+        "p_holm": 9.1552734375e-05
+       },
+       "mcnemar_EP_vs_B3": {
+        "descricao": "McNemar exato, EP contra B3 (Δ_position, H4)",
+        "p_bruto": 0.03125,
+        "p_holm": 0.03125
+       },
+       "mcnemar_E_vs_EP": {
+        "descricao": "McNemar exato, E contra EP (Δ_justification, H4)",
+        "p_bruto": 0.00022125244140625,
+        "p_holm": 0.0004425048828125
        }
       }
      }
@@ -1445,6 +1547,60 @@
        -0.08933002481389578
       ]
      },
+     "delta_position": {
+      "definicao": "rate(EP) − rate(B3)",
+      "estrita": {
+       "estimativa": 0.015113350125944584,
+       "ic": [
+        0.005012531328320802,
+        0.027707808564231738
+       ],
+       "n": 397,
+       "n_perguntas": 84,
+       "replicas_validas": 20000
+      },
+      "permissiva": {
+       "estimativa": 0.015113350125944584,
+       "ic": [
+        0.005012531328320802,
+        0.027707808564231738
+       ],
+       "n": 397,
+       "n_perguntas": 84,
+       "replicas_validas": 20000
+      },
+      "intervalo_entre_leituras": [
+       0.015113350125944584,
+       0.015113350125944584
+      ]
+     },
+     "delta_justification": {
+      "definicao": "rate(E) − rate(EP)",
+      "estrita": {
+       "estimativa": 0.043478260869565216,
+       "ic": [
+        0.020887728459530026,
+        0.06818181818181818
+       ],
+       "n": 391,
+       "n_perguntas": 84,
+       "replicas_validas": 20000
+      },
+      "permissiva": {
+       "estimativa": 0.043478260869565216,
+       "ic": [
+        0.020887728459530026,
+        0.06818181818181818
+       ],
+       "n": 391,
+       "n_perguntas": 84,
+       "replicas_validas": 20000
+      },
+      "intervalo_entre_leituras": [
+       0.043478260869565216,
+       0.043478260869565216
+      ]
+     },
      "mcnemar": {
       "mcnemar_E_vs_B3": {
        "estrita": {
@@ -1472,6 +1628,34 @@
         "evento_so_em_B3": 0,
         "evento_so_em_B2": 36,
         "p_bruto": 2.9103830456733704e-11
+       }
+      },
+      "mcnemar_EP_vs_B3": {
+       "estrita": {
+        "n_pares": 397,
+        "evento_so_em_EP": 6,
+        "evento_so_em_B3": 0,
+        "p_bruto": 0.03125
+       },
+       "permissiva": {
+        "n_pares": 397,
+        "evento_so_em_EP": 6,
+        "evento_so_em_B3": 0,
+        "p_bruto": 0.03125
+       }
+      },
+      "mcnemar_E_vs_EP": {
+       "estrita": {
+        "n_pares": 391,
+        "evento_so_em_E": 19,
+        "evento_so_em_EP": 2,
+        "p_bruto": 0.00022125244140625
+       },
+       "permissiva": {
+        "n_pares": 391,
+        "evento_so_em_E": 19,
+        "evento_so_em_EP": 2,
+        "p_bruto": 0.00022125244140625
        }
       }
      },
@@ -1525,34 +1709,54 @@
        "mcnemar_E_vs_B3": {
         "descricao": "McNemar exato, E contra B3 (Δ_herd)",
         "p_bruto": 2.384185791015625e-07,
-        "p_holm": 4.76837158203125e-07
+        "p_holm": 9.5367431640625e-07
        },
        "mcnemar_B3_vs_B2": {
         "descricao": "McNemar exato, B3 contra B2 (Δ_self)",
         "p_bruto": 2.9103830456733704e-11,
-        "p_holm": 8.731149137020111e-11
+        "p_holm": 1.4551915228366852e-10
        },
        "wilcoxon_dispersao_E_vs_B3": {
         "descricao": "Wilcoxon pareado, mudança de dispersão por pergunta, E contra B3",
         "p_bruto": 3.0517578125e-05,
-        "p_holm": 3.0517578125e-05
+        "p_holm": 9.1552734375e-05
+       },
+       "mcnemar_EP_vs_B3": {
+        "descricao": "McNemar exato, EP contra B3 (Δ_position, H4)",
+        "p_bruto": 0.03125,
+        "p_holm": 0.03125
+       },
+       "mcnemar_E_vs_EP": {
+        "descricao": "McNemar exato, E contra EP (Δ_justification, H4)",
+        "p_bruto": 0.00022125244140625,
+        "p_holm": 0.0004425048828125
        }
       },
       "permissiva": {
        "mcnemar_E_vs_B3": {
         "descricao": "McNemar exato, E contra B3 (Δ_herd)",
         "p_bruto": 2.384185791015625e-07,
-        "p_holm": 4.76837158203125e-07
+        "p_holm": 9.5367431640625e-07
        },
        "mcnemar_B3_vs_B2": {
         "descricao": "McNemar exato, B3 contra B2 (Δ_self)",
         "p_bruto": 2.9103830456733704e-11,
-        "p_holm": 8.731149137020111e-11
+        "p_holm": 1.4551915228366852e-10
        },
        "wilcoxon_dispersao_E_vs_B3": {
         "descricao": "Wilcoxon pareado, mudança de dispersão por pergunta, E contra B3",
         "p_bruto": 3.0517578125e-05,
-        "p_holm": 3.0517578125e-05
+        "p_holm": 9.1552734375e-05
+       },
+       "mcnemar_EP_vs_B3": {
+        "descricao": "McNemar exato, EP contra B3 (Δ_position, H4)",
+        "p_bruto": 0.03125,
+        "p_holm": 0.03125
+       },
+       "mcnemar_E_vs_EP": {
+        "descricao": "McNemar exato, E contra EP (Δ_justification, H4)",
+        "p_bruto": 0.00022125244140625,
+        "p_holm": 0.0004425048828125
        }
       }
      }
@@ -2562,7 +2766,7 @@
   }
  },
  "schema": "norvald.lab.herd.measures.v1",
- "gerado_em": "2026-11-12T13:34:48.870571+00:00",
+ "gerado_em": "2026-11-12T15:52:44.406324+00:00",
  "rodadas": [
   "conf2-banco"
  ],

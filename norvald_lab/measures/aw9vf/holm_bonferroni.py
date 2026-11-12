@@ -1,4 +1,4 @@
-"""Holm–Bonferroni sobre os três testes confirmatórios (344-77).
+"""Holm–Bonferroni sobre os testes confirmatórios (344-77; cinco desde o OSF 5dpjr).
 
 Ordena os p crescentes; p_ajustado(i) = max até i de min(1, (m − i + 1) · p(i)),
 com i de 1 a m. O ajustado nunca é menor que o bruto e nunca decresce.

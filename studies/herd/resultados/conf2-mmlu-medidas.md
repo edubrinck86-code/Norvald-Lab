@@ -1,11 +1,11 @@
 # Medidas do Δ_herd — conf2-mmlu
 
-Gerado em 2026-11-12T13:36:52.118612+00:00. Bootstrap por pergunta, 20000 réplicas, seed 20261111, IC 95% percentil.
+Gerado em 2026-11-12T15:56:47.376397+00:00. Bootstrap por pergunta, 20000 réplicas, seed 20261111, IC 95% percentil.
 Tabela: 3422 linhas, 140 perguntas (140 com gabarito), 3 seleções indiretas.
 
 ## Registro aw9vf (confirmatório)
 
-Pré-registro OSF aw9vf (29/09/2026). Descarte de unânimes em B1: 79 de 140 perguntas (0,56). new_grounds nas duas leituras (estrita / permissiva), relatado como intervalo; testes bilaterais, alfa 0,05; Holm sobre os três testes confirmatórios.
+Pré-registro OSF aw9vf (29/09/2026). Descarte de unânimes em B1: 79 de 140 perguntas (0,56). new_grounds nas duas leituras (estrita / permissiva), relatado como intervalo; testes bilaterais, alfa 0,05; Holm sobre os cinco testes confirmatórios (aw9vf mais os dois do H4, OSF 5dpjr).
 
 ### Principal (registrada): perguntas unânimes em B1 excluídas
 
@@ -20,12 +20,16 @@ Pré-registro OSF aw9vf (29/09/2026). Descarte de unânimes em B1: 79 de 140 per
 |---|---|---|---|
 | delta_self = rate(B3) − rate(B2) | -0,211 [-0,268; -0,156] (n=270) | -0,211 [-0,268; -0,156] (n=270) | [-0,211; -0,211] |
 | delta_herd = rate(E) − rate(B3) | 0,186 [0,142; 0,232] (n=274) | 0,186 [0,142; 0,232] (n=274) | [0,186; 0,186] |
+| delta_position = rate(EP) − rate(B3) | 0,032 [0,007; 0,059] (n=279) | 0,032 [0,007; 0,059] (n=279) | [0,032; 0,032] |
+| delta_justification = rate(E) − rate(EP) | 0,149 [0,106; 0,193] (n=282) | 0,149 [0,106; 0,193] (n=282) | [0,149; 0,149] |
 
 | Teste | p bruto (estrita) | p Holm (estrita) | p bruto (permissiva) | p Holm (permissiva) |
 |---|---|---|---|---|
 | McNemar exato, E contra B3 (Δ_herd) | <0,001 | <0,001 | <0,001 | <0,001 |
 | McNemar exato, B3 contra B2 (Δ_self) | <0,001 | <0,001 | <0,001 | <0,001 |
 | Wilcoxon pareado, mudança de dispersão por pergunta, E contra B3 | <0,001 | <0,001 | <0,001 | <0,001 |
+| McNemar exato, EP contra B3 (Δ_position, H4) | 0,049 | 0,049 | 0,049 | 0,049 |
+| McNemar exato, E contra EP (Δ_justification, H4) | <0,001 | <0,001 | <0,001 | <0,001 |
 
 Dispersão (1 − fração da moda), E − B3 por pergunta: -0,180 [-0,222; -0,140] (n=61); 61 perguntas, 39 com mudança; p exato.
 
@@ -54,12 +58,16 @@ Canal da confiança (exploratório, sem correção), mudança média de posto E 
 |---|---|---|---|
 | delta_self = rate(B3) − rate(B2) | -0,109 [-0,139; -0,080] (n=635) | -0,109 [-0,139; -0,080] (n=635) | [-0,109; -0,109] |
 | delta_herd = rate(E) − rate(B3) | 0,077 [0,054; 0,103] (n=646) | 0,077 [0,054; 0,103] (n=646) | [0,077; 0,077] |
+| delta_position = rate(EP) − rate(B3) | 0,012 [0,000; 0,025] (n=648) | 0,012 [0,000; 0,025] (n=648) | [0,012; 0,012] |
+| delta_justification = rate(E) − rate(EP) | 0,064 [0,043; 0,087] (n=655) | 0,064 [0,043; 0,087] (n=655) | [0,064; 0,064] |
 
 | Teste | p bruto (estrita) | p Holm (estrita) | p bruto (permissiva) | p Holm (permissiva) |
 |---|---|---|---|---|
 | McNemar exato, E contra B3 (Δ_herd) | <0,001 | <0,001 | <0,001 | <0,001 |
 | McNemar exato, B3 contra B2 (Δ_self) | <0,001 | <0,001 | <0,001 | <0,001 |
 | Wilcoxon pareado, mudança de dispersão por pergunta, E contra B3 | <0,001 | <0,001 | <0,001 | <0,001 |
+| McNemar exato, EP contra B3 (Δ_position, H4) | 0,096 | 0,096 | 0,096 | 0,096 |
+| McNemar exato, E contra EP (Δ_justification, H4) | <0,001 | <0,001 | <0,001 | <0,001 |
 
 Dispersão (1 − fração da moda), E − B3 por pergunta: -0,080 [-0,104; -0,058] (n=140); 140 perguntas, 40 com mudança; p exato.
 

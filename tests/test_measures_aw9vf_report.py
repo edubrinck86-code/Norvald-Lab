@@ -66,12 +66,31 @@ def test_mcnemar_wilcoxon_and_holm_on_the_tiny_table():
     wilcoxon = result["wilcoxon_dispersao"]
     assert (wilcoxon["perguntas"], wilcoxon["nao_nulas"], wilcoxon["p_bruto"], wilcoxon["metodo_p"]) == (2, 2, 1.0, "exato")
     assert wilcoxon["mudanca_media_E_menos_B3"]["estimativa"] == 0.0
-    # Holm estrita: 0,25 · 3 = 0,75; os dois p = 1 ficam em 1.
+    # Holm estrita sobre os CINCO testes do 5dpjr (contrato mudou de propósito em 12/11/2026;
+    # antes eram três e o ajustado era 0,75): 0,25 · 5 = 1,25, limitado a 1.
     holm = result["holm_bonferroni"]["estrita"]
-    assert holm["mcnemar_E_vs_B3"]["p_bruto"] == 0.25 and holm["mcnemar_E_vs_B3"]["p_holm"] == 0.75
+    assert set(holm) == {"mcnemar_E_vs_B3", "mcnemar_B3_vs_B2", "wilcoxon_dispersao_E_vs_B3", "mcnemar_EP_vs_B3", "mcnemar_E_vs_EP"}
+    assert holm["mcnemar_E_vs_B3"]["p_bruto"] == 0.25 and holm["mcnemar_E_vs_B3"]["p_holm"] == 1.0
     assert holm["mcnemar_B3_vs_B2"]["p_holm"] == 1.0 and holm["wilcoxon_dispersao_E_vs_B3"]["p_holm"] == 1.0
-    assert result["holm_bonferroni"]["permissiva"]["mcnemar_E_vs_B3"]["p_holm"] == 1.0  # 0,5 · 3 = 1,5, limitado a 1
+    assert result["holm_bonferroni"]["permissiva"]["mcnemar_E_vs_B3"]["p_holm"] == 1.0  # 0,5 · 5, limitado a 1
     assert all(entry["p_holm"] >= entry["p_bruto"] for entry in holm.values())
+
+
+def test_h4_tests_position_and_justification_hand_computed():
+    """H4 (OSF 5dpjr): EP contra B3 e E contra EP. Faltavam até 12/11/2026."""
+    rows = _rows("q1", "B1", "aabb") + _rows("q1", "B3", "aabb") + _rows("q1", "B2", "aabb")
+    rows += _rows("q1", "EP", "babb") + _rows("q1", "E", "bbab")
+    result = ConfirmatoryTests(BOOT).compute(rows_table(rows))
+    # EP: só p1 muda (1/4). E: p1, p2 e p3 mudam (3/4). B3: ninguém.
+    assert result["delta_position"]["estrita"]["estimativa"] == 1 / 4
+    assert result["delta_justification"]["estrita"]["estimativa"] == 2 / 4
+    ep = result["mcnemar"]["mcnemar_EP_vs_B3"]["estrita"]
+    assert (ep["evento_so_em_EP"], ep["evento_so_em_B3"], ep["p_bruto"]) == (1, 0, 1.0)
+    just = result["mcnemar"]["mcnemar_E_vs_EP"]["estrita"]
+    assert (just["evento_so_em_E"], just["evento_so_em_EP"], just["p_bruto"]) == (2, 0, 0.5)
+    # Holm sobre os cinco: o menor p (E contra B3, 3 só em E: 0,25) vira 0,25 · 5 = 1,25 -> 1.
+    holm = result["holm_bonferroni"]["estrita"]
+    assert len(holm) == 5 and holm["mcnemar_E_vs_B3"]["p_holm"] == 1.0
 
 
 def test_unanimous_items_are_a_labelled_variant():
