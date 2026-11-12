@@ -1,0 +1,65 @@
+{
+ "mmlu": {
+  "perguntas_por_condicao": {
+   "B1": {
+    "todos_certos": 72,
+    "divididos": 46,
+    "todos_errados": 22
+   },
+   "B3": {
+    "todos_certos": 74,
+    "divididos": 45,
+    "todos_errados": 21
+   },
+   "E": {
+    "todos_certos": 92,
+    "divididos": 21,
+    "todos_errados": 27
+   }
+  },
+  "transicoes": {
+   "B3->E": {
+    "certo->certo": 457,
+    "errado->certo": 34,
+    "errado->errado": 145,
+    "certo->errado": 11
+   },
+   "B1->E": {
+    "certo->certo": 470,
+    "errado->certo": 33,
+    "errado->errado": 150,
+    "certo->errado": 11
+   }
+  }
+ },
+ "banco": {
+  "perguntas_por_condicao": {
+   "B1": {
+    "todos_certos": 41,
+    "divididos": 11
+   },
+   "B3": {
+    "todos_certos": 42,
+    "divididos": 10
+   },
+   "E": {
+    "todos_certos": 47,
+    "divididos": 5
+   }
+  },
+  "transicoes": {
+   "B3->E": {
+    "certo->certo": 234,
+    "errado->certo": 8,
+    "certo->errado": 2,
+    "errado->errado": 3
+   },
+   "B1->E": {
+    "certo->certo": 235,
+    "errado->certo": 10,
+    "certo->errado": 2,
+    "errado->errado": 3
+   }
+  }
+ }
+}
