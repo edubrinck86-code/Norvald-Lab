@@ -28,7 +28,7 @@ def derive_spec(root, source_id, new_id, exposure, condition_id=None):
     read_verified_records(root, source_id, allow_incomplete=True)
     spec = _read(root / "experiments" / source_id / "spec.json")
     spec["experiment_id"] = new_id
-    spec["condition"].update(id=condition_id or {"self": "B3", "stance": "EP", "self_letter": "B3L"}.get(exposure, "E"), exposure=exposure, prior_experiment=source_id)
+    spec["condition"].update(id=condition_id or {"self": "B3", "stance": "EP", "self_letter": "B3L", "self_text": "B3T"}.get(exposure, "E"), exposure=exposure, prior_experiment=source_id)
     return spec
 
 
@@ -61,7 +61,7 @@ def main(argv=None):
     derive = commands.add_parser("derive", help="Prepara uma condição a partir de uma rodada cega")
     derive.add_argument("source_id")
     derive.add_argument("experiment_id")
-    derive.add_argument("--exposure", choices=["self", "exposed", "stance", "self_letter"], required=True)
+    derive.add_argument("--exposure", choices=["self", "exposed", "stance", "self_letter", "self_text"], required=True)
     derive.add_argument("--output", type=Path, required=True)
     herd = commands.add_parser("herd", help="Coleta do Δ_herd em lote: B1/B2 e depois B3/EP/E, na ordem do protocolo")
     herd.add_argument("--bank", type=Path, required=True)
