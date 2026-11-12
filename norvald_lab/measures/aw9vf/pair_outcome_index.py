@@ -16,13 +16,14 @@ SECOND_WAVE = ("B2", "B3", "EP", "E")
 
 
 class PairOutcomeIndex:
-    def __init__(self, table: ObservationTable):
+    def __init__(self, table: ObservationTable, conditions: tuple[str, ...] = SECOND_WAVE):
         grounds = NewGrounds()
         self.table = table
         self._pairs: dict[tuple[tuple[str, str, str], str, str], PairOutcome] = {}
         for unit, by_condition in table.by_question_unit.items():
             b1 = eligible_b1(table, unit)
-            for condition in SECOND_WAVE:
+            # `conditions` só muda para análises exploratórias (ex.: B3L, 12/11/2026); o padrão é o registrado.
+            for condition in conditions:
                 for pid, row in by_condition.get(condition, {}).items():
                     if pid not in b1 or row.option is None:
                         continue
