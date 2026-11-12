@@ -66,7 +66,7 @@ O desenho, os modelos, as condições e as perguntas são os do texto 1 (§3). A
 | Combinado | 0,269 [0,172; 0,404] |
 | h01–h40 | −1,710 [−6,021; −0,552] |
 
-No MMLU-Pro e no combinado, o intervalo fica acima de zero: compatível com a parte 2 do H3. No banco, fica abaixo de zero: em E, os erros que restam ficam espalhados entre modelos diferentes (ρ̄ levemente negativo), e o N_eff passa de 5. Um N_eff acima de n só significa erros anticorrelacionados; não é "mais juízes que modelos".
+No MMLU-Pro e no combinado, o intervalo fica acima de zero: compatível com a parte 2 do H3. No banco, fica abaixo de zero: em E, os erros que restam ficam espalhados entre modelos diferentes (ρ̄ levemente negativo), e o N_eff passa de 5. Um N_eff acima de n só significa erros anticorrelacionados; não é "mais juízes que modelos". O ρ̄ de E no banco vem de muito poucos erros: depois da exposição quase todos convergem para a resposta certa, e o phi com tão poucos erros por modelo é instável. O Δ negativo do banco não deve ser lido como "a exposição torna o painel mais independente".
 
 ### 3.3 Correlação por par de modelos (MMLU-Pro, B1)
 
@@ -135,7 +135,7 @@ A empresa que serve o Gemma limitou a taxa de pedidos. No painel misto ficaram s
 *(a escrever depois da leitura do Eduardo; só os pontos)*
 - No MMLU-Pro, cinco modelos de cinco empresas valem cerca de 1,4 às cegas e 1,2 depois de se verem.
 - O painel misto fica abaixo do homogêneo (0,635 contra 0,848), mas longe de independente.
-- O banco novo dá o quadro oposto: erros quase independentes. Diferença de conteúdo (perguntas novas, fora de dados de treino prováveis) ou de dificuldade? Não separamos aqui.
+- O banco novo dá o quadro oposto: erros quase independentes. Diferença de conteúdo (perguntas novas, fora de dados de treino prováveis) ou de dificuldade? Exploratório (`texto2/novidade_ou_facilidade.py`): no banco, a taxa de erro em B1 é de 5% (MMLU-Pro: 28%) e nenhuma pergunta tem mais de 2 dos 5 errando. O ρ̄ baixo do banco é compatível com facilidade, e o desenho não permite testar a novidade nele. Dentro do MMLU-Pro, as perguntas herdadas do MMLU original têm ρ̄_erro(B1) = 0,68 [0,57; 0,78] e erro de 33% (81 perguntas); as acrescentadas pelo MMLU-Pro, 0,51 [0,33; 0,67] e erro de 20% (59). Os intervalos se sobrepõem, a dificuldade difere e 5 das 16 perguntas originais com os cinco errando estão entre as chaves duvidosas (§4.1). Novidade e facilidade não se separam com estes dados; separá-las pede perguntas novas e difíceis.
 - Ligação com o texto 1: a exposição que muda posições (H1, H4) é a mesma que aproxima os erros no MMLU-Pro.
 
 ## Apêndice A. Desvio D7
