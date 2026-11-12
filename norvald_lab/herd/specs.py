@@ -33,6 +33,8 @@ def participants_for(panel: Mapping[str, Any]) -> list[dict[str, Any]]:
             "reasoning_effort": panel.get("reasoning_effort", "default"),
             "sampling_with_reasoning": bool(panel.get("sampling_with_reasoning", False)),
             "sampling": copy.deepcopy(panel["sampling"]),
+            # Só entra quando o painel fixa: specs antigos seguem idênticos.
+            **({"upstream_provider": slot["upstream_provider"]} if slot.get("upstream_provider") else {}),
         })
     return out
 

@@ -29,6 +29,10 @@ class ExecutionRequest:
     user_message: Optional[str] = None
     attachments: List["AttachmentPayload"] = field(default_factory=list)
     reasoning_effort: str = "off"
+    # Empresa que serve o modelo atrás de um roteador (OpenRouter). 11/11/2026: na
+    # coleta confirmatória do Δ_herd, as "5 cópias" do Gemma vieram de KT e NextBit
+    # na mesma pergunta; sem fixar, cópias deixam de ser cópias. None = roteamento livre.
+    upstream_provider: Optional[str] = None
     # Modelo opcionalmente resolvido pela camada de apresentação.
     # Quando ausente, o AgentRegistry continua sendo a fonte padrão.
     model: Optional[str] = None

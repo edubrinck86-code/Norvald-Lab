@@ -559,6 +559,7 @@ class OpenAICompatibleProvider(LLMProvider):
         if request.tool_exchanges:
             payload["messages"].extend(self._tool_messages(request))
         self._apply_reasoning(payload, request, model)
+        _apply_routing(payload, request)
         if stream:
             payload["stream"] = True
             if self._catalog_kind not in {"mistral", "cohere", "zai"}:
@@ -574,6 +575,7 @@ class OpenAICompatibleProvider(LLMProvider):
         if request.tool_exchanges:
             payload["messages"].extend(self._tool_messages(request))
         self._apply_reasoning(payload, request, model)
+        _apply_routing(payload, request)
         started = time.monotonic()
         try:
             response = await self._client.post(f"{self._base_url}/chat/completions", json=payload, headers=self._headers())
@@ -592,6 +594,7 @@ class OpenAICompatibleProvider(LLMProvider):
             raise RuntimeError(f"Falha de rede ao chamar {self._label}: {exc}") from exc
         duration = time.monotonic() - started
         message = raw.get("choices", [{}])[0].get("message", {})
+        _check_routing(request, raw.get("provider"))
         content, content_reasoning = _content_text(message.get("content", "") or "")
         reasoning = (
             message.get("reasoning")
@@ -690,8 +693,23 @@ class OpenAICompatibleProvider(LLMProvider):
             raise
         except httpx.HTTPError as exc:
             raise RuntimeError(f"Falha de rede ao chamar {self._label} (stream): {exc}") from exc
+        _check_routing(request, routed_provider)
         tool_calls = [ToolCall(call_id=item["id"], name=item["name"], arguments=_safe_json(item["arguments"])) for _, item in sorted(chamadas.items()) if item["name"]]
         return ExecutionResult(content="".join(text_parts), tokens=input_tokens + output_tokens, input_tokens=input_tokens, output_tokens=output_tokens, duration_seconds=time.monotonic() - started, provider=self._label, model=model, metadata={"raw_usage": {"prompt_tokens": input_tokens, "completion_tokens": output_tokens}, **metrics.as_dict(output_tokens), "request_id": generation_id, "service_tier": service_tier, "provider_operational": {**response_operational, "provider": routed_provider, "service_tier": service_tier}, "attachment_results": [r.to_dict() for r in attachment_results]}, reasoning="".join(reasoning_parts) or None, tool_calls=tool_calls)
+
+
+def _apply_routing(payload: dict, request) -> None:
+    """Fixa a empresa que serve o modelo (OpenRouter `provider.order`), sem plano B."""
+    upstream = getattr(request, "upstream_provider", None)
+    if upstream:
+        payload["provider"] = {"order": [upstream], "allow_fallbacks": False}
+
+
+def _check_routing(request, served_by) -> None:
+    """Recusa a resposta servida por outra empresa: o dado não seria do modelo fixado."""
+    upstream = getattr(request, "upstream_provider", None)
+    if upstream and served_by and str(served_by).lower() != upstream.lower():
+        raise RuntimeError(f"Fornecedor fixado {upstream}, mas a resposta veio de {served_by}.")
 
 
 def _system_message(request, model: str) -> dict:
