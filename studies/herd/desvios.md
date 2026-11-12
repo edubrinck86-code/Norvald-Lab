@@ -88,7 +88,7 @@ Horários em Brasília (UTC−3). O registro completo das rodadas, com início, 
 
 **Causa:** no `RegistrationReport`, a dependência era calculada dentro de cada variante, sobre a tabela já filtrada. Tirar as unânimes tira justamente os acertos e os erros em comum, e o ρ̄ cai (no banco ficou negativo).
 
-**O que mudou:** o ρ̄, o N_eff e o contraste passam a usar todas as perguntas com gabarito nas duas variantes (Lab PR #PRNUM). O confirmatório e o exploratório continuam com o filtro. Nenhum dado foi coletado de novo.
+**O que mudou:** o ρ̄, o N_eff e o contraste passam a usar todas as perguntas com gabarito nas duas variantes (Lab PR #25). O confirmatório e o exploratório continuam com o filtro. Nenhum dado foi coletado de novo.
 
 **Efeito (ρ̄_erro em B1, antes → depois; perguntas com gabarito entre parênteses):**
 
