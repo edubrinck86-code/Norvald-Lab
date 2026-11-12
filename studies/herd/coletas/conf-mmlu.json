@@ -1,0 +1,23 @@
+{
+ "run_id": "conf-mmlu",
+ "inicio_utc": "2026-11-12T00:11:21.246429+00:00",
+ "inicio_brasilia": "11/11/2026 21:11:21",
+ "fim_utc": "2026-11-12T00:13:48.041675+00:00",
+ "fim_brasilia": "11/11/2026 21:13:48",
+ "duracao_min": 2.4,
+ "experimentos_fechados": {
+  "B1": 3,
+  "B2": 2
+ },
+ "experimentos_abertos": [
+  "conf-mmlu-m03377-b2"
+ ],
+ "chamadas": 30,
+ "segundas_tentativas": 1,
+ "falhas_da_1a_tentativa_por_modelo": {
+  "mistral-small-2603": 1
+ },
+ "tokens_de_saida": 19497,
+ "custo_usd": 0.0192,
+ "registrado_em_utc": "2026-11-12T13:34:14.679202+00:00"
+}

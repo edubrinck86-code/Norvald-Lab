@@ -1,0 +1,28 @@
+{
+ "run_id": "conf2-mmlu",
+ "inicio_utc": "2026-11-12T00:21:38.387870+00:00",
+ "inicio_brasilia": "11/11/2026 21:21:38",
+ "fim_utc": "2026-11-12T13:22:27.104856+00:00",
+ "fim_brasilia": "12/11/2026 10:22:27",
+ "duracao_min": 780.8,
+ "experimentos_fechados": {
+  "B1": 140,
+  "B2": 140,
+  "B3": 140,
+  "E": 140,
+  "EP": 140
+ },
+ "experimentos_abertos": [],
+ "chamadas": 3719,
+ "segundas_tentativas": 297,
+ "falhas_da_1a_tentativa_por_modelo": {
+  "nemotron-3-nano-omni-30b-a3b-reasoning:free": 47,
+  "gemma-4-31b-it": 134,
+  "mistral-small-2603": 65,
+  "muse-glimmer-30b": 33,
+  "qwen3.8-27b": 18
+ },
+ "tokens_de_saida": 3642345,
+ "custo_usd": 3.7568,
+ "registrado_em_utc": "2026-11-12T13:34:21.027661+00:00"
+}

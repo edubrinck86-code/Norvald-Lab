@@ -1,0 +1,20 @@
+{
+ "run_id": "conf3-contraste-banco",
+ "inicio_utc": "2026-11-12T04:53:14.054066+00:00",
+ "inicio_brasilia": "12/11/2026 01:53:14",
+ "fim_utc": "2026-11-12T05:25:07.403548+00:00",
+ "fim_brasilia": "12/11/2026 02:25:07",
+ "duracao_min": 31.9,
+ "experimentos_fechados": {
+  "B1": 84
+ },
+ "experimentos_abertos": [],
+ "chamadas": 427,
+ "segundas_tentativas": 7,
+ "falhas_da_1a_tentativa_por_modelo": {
+  "gemma-4-31b-it": 7
+ },
+ "tokens_de_saida": 177294,
+ "custo_usd": 0.1743,
+ "registrado_em_utc": "2026-11-12T13:34:21.971113+00:00"
+}

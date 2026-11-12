@@ -1,0 +1,20 @@
+{
+ "run_id": "conf-contraste-mmlu",
+ "inicio_utc": "2026-11-12T00:11:21.327380+00:00",
+ "inicio_brasilia": "11/11/2026 21:11:21",
+ "fim_utc": "2026-11-12T00:13:23.397017+00:00",
+ "fim_brasilia": "11/11/2026 21:13:23",
+ "duracao_min": 2.0,
+ "experimentos_fechados": {
+  "B1": 3
+ },
+ "experimentos_abertos": [
+  "conf-contraste-mmlu-m02912-b1"
+ ],
+ "chamadas": 18,
+ "segundas_tentativas": 0,
+ "falhas_da_1a_tentativa_por_modelo": {},
+ "tokens_de_saida": 10031,
+ "custo_usd": 0.0101,
+ "registrado_em_utc": "2026-11-12T13:34:14.736111+00:00"
+}

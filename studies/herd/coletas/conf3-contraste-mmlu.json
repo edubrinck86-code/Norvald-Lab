@@ -1,0 +1,20 @@
+{
+ "run_id": "conf3-contraste-mmlu",
+ "inicio_utc": "2026-11-12T05:25:09.759210+00:00",
+ "inicio_brasilia": "12/11/2026 02:25:09",
+ "fim_utc": "2026-11-12T09:27:37.903215+00:00",
+ "fim_brasilia": "12/11/2026 06:27:37",
+ "duracao_min": 242.5,
+ "experimentos_fechados": {
+  "B1": 140
+ },
+ "experimentos_abertos": [],
+ "chamadas": 764,
+ "segundas_tentativas": 64,
+ "falhas_da_1a_tentativa_por_modelo": {
+  "gemma-4-31b-it": 64
+ },
+ "tokens_de_saida": 1010722,
+ "custo_usd": 0.66,
+ "registrado_em_utc": "2026-11-12T13:34:23.302951+00:00"
+}
