@@ -24,7 +24,7 @@ class RegistrationMarkdown:
         lines = [
             "## Registro aw9vf (confirmatório)", "",
             f"Pré-registro OSF aw9vf (29/09/2026). Descarte de unânimes em B1: {discard['perguntas_unanimes_em_b1']} de {discard['perguntas_com_b1']} perguntas ({number(discard['taxa_de_descarte'], 2)}). "
-            "new_grounds nas duas leituras (estrita / permissiva), relatado como intervalo; testes bilaterais, alfa 0,05; Holm sobre os três testes confirmatórios.", "",
+            "new_grounds nas duas leituras (estrita / permissiva), relatado como intervalo; testes bilaterais, alfa 0,05; Holm sobre os cinco testes confirmatórios (aw9vf mais os dois do H4, OSF 5dpjr).", "",
         ]
         for key, title in VARIANTS:
             lines += self._variant(title, data[key])
@@ -38,7 +38,7 @@ class RegistrationMarkdown:
             low, high = rate["intervalo_entre_leituras"]
             lines.append(f"| {condition} | {interval(rate['estrita'])} | {interval(rate['permissiva'])} | [{number(low)}; {number(high)}] | {confirmatory['n_pares_por_condicao'][condition]} |")
         lines += ["", "| Contraste | Estrita | Permissiva | Intervalo entre leituras |", "|---|---|---|---|"]
-        for name in ("delta_self", "delta_herd"):
+        for name in ("delta_self", "delta_herd", "delta_position", "delta_justification"):
             delta = confirmatory[name]
             low, high = delta["intervalo_entre_leituras"]
             lines.append(f"| {name} = {delta['definicao']} | {interval(delta['estrita'])} | {interval(delta['permissiva'])} | [{number(low)}; {number(high)}] |")
@@ -52,10 +52,15 @@ class RegistrationMarkdown:
         for condition, rho in dependence["rho_erro"].items():
             lines.append(f"| {condition} | {interval(rho)} | {interval(dependence['n_eff'][condition])} |")
         lines += ["", f"n do painel: {dependence['n_painel']}. Δ_N_eff = N_eff(B1) − N_eff(E): {interval(dependence.get('delta_n_eff_B1_menos_E'))}. "
-                  f"ρ̄_comportamento (Fleiss, contestáveis): {interval(dependence['rho_comportamento']['kappa'])}; distância até ρ̄_erro(B1): {interval(dependence.get('distancia_comportamento_menos_erro'))}."]
+                  + (f"ρ̄_comportamento (Fleiss, contestáveis): {interval(dependence['rho_comportamento']['kappa'])}; distância até ρ̄_erro(B1): {interval(dependence.get('distancia_comportamento_menos_erro'))}."
+                     # 12/11/2026: o MMLU-Pro não tem contestáveis e o "—" parecia defeito; o motivo vai escrito.
+                     if dependence["rho_comportamento"].get("contestaveis", 0) else "ρ̄_comportamento (Fleiss): não se aplica (0 perguntas contestáveis).")]
         contrast = data.get("painel_homogeneo_de_contraste")
         if contrast:
-            lines += [f"Painel homogêneo de contraste ({', '.join(contrast['rodadas'])}), B1: ρ̄_erro {interval(contrast['rho_erro_B1'])}; N_eff {interval(contrast['n_eff_B1'])} (n={contrast['n_painel']})."]
+            undefined = contrast["rho_erro_B1"].get("estimativa") is None
+            # 12/11/2026: 5 × Gemma acertou tudo no banco; sem erro a correlação é indefinida, e o "—" não dizia por quê.
+            why = f" Indefinido: sem variância de erro ({contrast['perguntas_com_gabarito']} perguntas com gabarito; {contrast['pares_sem_correlacao_definida']} pares sem correlação definida)." if undefined else ""
+            lines += [f"Painel homogêneo de contraste ({', '.join(contrast['rodadas'])}), B1: ρ̄_erro {interval(contrast['rho_erro_B1'])}; N_eff {interval(contrast['n_eff_B1'])} (n={contrast['n_painel']}).{why}"]
         groups = data["exploratorio"]["canal_da_confianca"]["grupos"]
         lines += ["", "Canal da confiança (exploratório, sem correção), mudança média de posto E − B3: " + "; ".join(
             f"{name} {interval(groups[name]['mudanca_media_E_menos_B3'])}, p {_p(groups[name]['p_bruto_sem_correcao'])}" for name in ("maioria_concorda", "maioria_discorda")) + ".", ""]

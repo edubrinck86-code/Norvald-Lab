@@ -1,4 +1,9 @@
-"""Os três testes confirmatórios do aw9vf e as taxas que os alimentam (344-62, 344-66, 344-71, 344-77).
+"""Os cinco testes confirmatórios do registro e as taxas que os alimentam.
+
+Os três primeiros vêm do aw9vf (344-62, 344-66, 344-71, 344-77); o 4 e o 5
+vêm do registro da coleta, OSF 5dpjr (11/11/2026), para o H4. Até 12/11/2026
+só os três primeiros eram calculados e o Holm corria sobre três; o 5dpjr manda
+Holm sobre os cinco. Achado ao conferir o texto 1 contra o registro.
 
 - rate(c) = changed_position E NÃO new_grounds, por condição c em {B2, B3, EP, E},
   sobre os pares válidos de c; nas duas leituras de new_grounds (estrita e
@@ -7,10 +12,11 @@
   os pares válidos nas DUAS condições do contraste (é o mesmo conjunto do
   McNemar), então podem diferir da subtração das taxas marginais quando falta
   par numa das condições.
-- McNemar exato bilateral: E contra B3 (Δ_herd) e B3 contra B2 (Δ_self).
+- McNemar exato bilateral: E contra B3 (Δ_herd), B3 contra B2 (Δ_self),
+  EP contra B3 (Δ_position) e E contra EP (Δ_justification).
 - Wilcoxon pareado bilateral na mudança de dispersão por pergunta, E contra
   B3, sobre os participantes elegíveis com posição válida nas duas condições.
-- Holm–Bonferroni sobre esses três, por leitura; p bruto e corrigido.
+- Holm–Bonferroni sobre os cinco, por leitura; p bruto e corrigido.
 - Tamanho de efeito: diferença de proporções (e diferença média da dispersão)
   com IC bootstrap por pergunta (ClusteredBootstrap).
 """
@@ -33,8 +39,10 @@ from norvald_lab.measures.statistic import Statistic
 CONTRASTS = {
     "delta_herd": ("E", "B3", "rate(E) − rate(B3)"),
     "delta_self": ("B3", "B2", "rate(B3) − rate(B2)"),
+    "delta_position": ("EP", "B3", "rate(EP) − rate(B3)"),
+    "delta_justification": ("E", "EP", "rate(E) − rate(EP)"),
 }
-TESTS = {"mcnemar_E_vs_B3": "McNemar exato, E contra B3 (Δ_herd)", "mcnemar_B3_vs_B2": "McNemar exato, B3 contra B2 (Δ_self)", "wilcoxon_dispersao_E_vs_B3": "Wilcoxon pareado, mudança de dispersão por pergunta, E contra B3"}
+TESTS = {"mcnemar_E_vs_B3": "McNemar exato, E contra B3 (Δ_herd)", "mcnemar_B3_vs_B2": "McNemar exato, B3 contra B2 (Δ_self)", "wilcoxon_dispersao_E_vs_B3": "Wilcoxon pareado, mudança de dispersão por pergunta, E contra B3", "mcnemar_EP_vs_B3": "McNemar exato, EP contra B3 (Δ_position, H4)", "mcnemar_E_vs_EP": "McNemar exato, E contra EP (Δ_justification, H4)"}
 
 
 def _delta(prefix: str) -> Statistic:
