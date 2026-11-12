@@ -71,4 +71,6 @@ Cada desvio é declarado em `studies/formato/desvios.md`, com data, motivo e efe
 
 - **Código:** uma exposição nova no Lab, `self_text`, que entrega ao participante o texto da própria resposta de B1 em vez da contribuição estruturada.
 - **Teste:** um teste automático garante que o conteúdo mostrado em B3T e em B3 é o mesmo e que muda só a forma.
-- **Ordem:** um PR no Lab antes da coleta, e só depois o registro no OSF.
+- **Código:** a exposição `self_text` entrou pelo Lab PR #26. O PR #27 fez o texto sair no idioma da rodada, depois que a preparação a seco mostrou português dentro de prompts em inglês.
+- **Análise:** o código de análise foi escrito antes da coleta, em `studies/formato/medidas.py`.
+- **Ordem:** primeiro os PRs no Lab, depois o registro no OSF e só então a coleta.

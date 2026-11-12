@@ -73,6 +73,7 @@ Any deviation is declared in `studies/formato/desvios.md` with date, reason and 
 
 ## 10. Implementation
 
-- **Code:** the exposure `self_text` (B3T) and `render_own_text`, merged in Lab PR #26 (commit 8bc7142).
+- **Code:** the exposure `self_text` (B3T) and `render_own_text`, merged in Lab PR #26 (commit 8bc7142). Lab PR #27 (commit b836785) renders the B3T text in the round's language: a dry run before registration showed Portuguese text inside English prompts.
+- **Analysis code, written before collection:** `studies/formato/medidas.py` (H1 and H2 exactly as in §4).
 - **Test:** `tests/test_self_text.py` checks that every content item, confidence and chosen option of B3 appears in the B3T text, with no author structure and nothing from peers.
 - **Repository:** https://github.com/edubrinck86-code/Norvald-Lab
