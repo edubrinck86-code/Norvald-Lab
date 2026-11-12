@@ -222,7 +222,7 @@ class ExperimentRunner:
                     if exposure == "self_text":
                         # Estudo do formato (12/11/2026): B3T mostra o mesmo conteúdo de B3, a própria contribuição de B1
                         # inteira, mas em texto corrido e não como itens e relações. Muda só a forma; ver render_own_text.
-                        own_previous_answer = {"text": render_own_text(own_snapshot, participant["id"])}
+                        own_previous_answer = {"text": render_own_text(own_snapshot, participant["id"], language)}
                     seed_audits.append({"repetition_index": index, "participant_id": participant["id"], "peer_order": [], **asdict(audit)})
                 # A projeção é integral, sem seleção semântica ou truncamento silencioso.
                 projection = {"question": wc.question, "items": [item.to_dict() for item in wc.active_items()], "relations": [rel.to_dict() for rel in wc.relations]}
