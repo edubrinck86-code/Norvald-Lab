@@ -1,0 +1,22 @@
+{
+ "run_id": "conf2-contraste-banco",
+ "inicio_utc": "2026-11-12T00:21:38.387648+00:00",
+ "inicio_brasilia": "11/11/2026 21:21:38",
+ "fim_utc": "2026-11-12T00:57:49.508032+00:00",
+ "fim_brasilia": "11/11/2026 21:57:49",
+ "duracao_min": 36.2,
+ "experimentos_fechados": {
+  "B1": 57
+ },
+ "experimentos_abertos": [
+  "conf2-contraste-banco-h14-b1"
+ ],
+ "chamadas": 367,
+ "segundas_tentativas": 80,
+ "falhas_da_1a_tentativa_por_modelo": {
+  "gemma-4-31b-it": 80
+ },
+ "tokens_de_saida": 110076,
+ "custo_usd": 0.1038,
+ "registrado_em_utc": "2026-11-12T13:34:21.231682+00:00"
+}

@@ -46,7 +46,7 @@
     "max_tokens": 8192
   },
   "max_agent_attempts": 2,
-  "max_concurrency_per_provider": 5,
+  "max_concurrency_per_provider": 2,
   "timeout_seconds": 300,
   "instructions": "Choose exactly one of the options present in the Working Context. Declare one item of type decision and one selects relation linking that decision to the id of the chosen option. Justify your choice in at most three sentences.",
   "sampling_with_reasoning": true

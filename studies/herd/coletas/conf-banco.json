@@ -1,0 +1,21 @@
+{
+ "run_id": "conf-banco",
+ "inicio_utc": "2026-11-12T00:11:21.175717+00:00",
+ "inicio_brasilia": "11/11/2026 21:11:21",
+ "fim_utc": "2026-11-12T00:14:01.606186+00:00",
+ "fim_brasilia": "11/11/2026 21:14:01",
+ "duracao_min": 2.7,
+ "experimentos_fechados": {
+  "B1": 3,
+  "B2": 2
+ },
+ "experimentos_abertos": [
+  "conf-banco-q03-b2"
+ ],
+ "chamadas": 27,
+ "segundas_tentativas": 0,
+ "falhas_da_1a_tentativa_por_modelo": {},
+ "tokens_de_saida": 14452,
+ "custo_usd": 0.0159,
+ "registrado_em_utc": "2026-11-12T13:34:14.636231+00:00"
+}
