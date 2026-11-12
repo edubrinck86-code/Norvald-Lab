@@ -1,9 +1,9 @@
 """Executa a coleta do Δ_herd em lote, na ordem do protocolo, retomável.
 
 Um experimento que já existe não é refeito: o Lab proíbe reutilizar id.
-Se B1 de uma pergunta não terminou completo, B3, EP e E dela são pulados e
-registrados como bloqueados, porque a exposição exige resposta válida de
-todos (runner.prepare recusa). Nada é descartado em silêncio: o resumo
+Se B1 de uma pergunta está ausente, inacabado ou abortado, B3, EP e E dela
+são pulados e registrados como bloqueados. Se B1 terminou "incomplete", as
+derivadas rodam sem o participante que não contribuiu (344-79, item 2). Nada é descartado em silêncio: o resumo
 diz o que rodou, o que já existia e o que ficou bloqueado, e por quê.
 """
 
@@ -65,7 +65,8 @@ class HerdBatch:
                 continue
             if step.derived:
                 origin = self._status(experiment_id(self.run_id, step.question_id, "B1"))
-                if origin != "complete":
+                # "incomplete" segue: quem ficou sem contribuição sai só daquela pergunta (344-79, item 2; 12/11/2026).
+                if origin not in {"complete", "incomplete"}:
                     report.blocked.append((expid, f"B1 {origin or 'ausente'}"))
                     continue
             if on_step:

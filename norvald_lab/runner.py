@@ -114,9 +114,10 @@ class ExperimentRunner:
                 raise ValueError(f"Âncora documental duplicada no contexto: {anchor}")
             base.add(ContextItem(id=anchor, type="evidence", content=doc["title"], source_type="document", source_id=doc["id"], source_location=doc["source"]))
         prior_by_run = {}
+        excluded = {}  # repetição -> participantes fora da exposição (344-79, item 2)
         if exposure != "blind":
             source_id = condition["prior_experiment"]
-            records = read_verified_records(self.root, source_id)
+            records = read_verified_records(self.root, source_id, allow_incomplete=True)
             source_spec = json.loads((self.root / "experiments" / source_id / "spec.json").read_text())
             if source_spec["condition"]["exposure"] != "blind":
                 raise ValueError("A origem deve ser uma condição cega.")
@@ -130,9 +131,27 @@ class ExperimentRunner:
                 previous = prior_by_run.get(key)
                 if previous is None or raw["attempt_index"] > previous["attempt_index"]:
                     prior_by_run[key] = raw
-            expected = {(i, p["id"]) for i in range(1, spec["repetitions"] + 1) for p in spec["participants"]}
-            if set(prior_by_run) != expected or any(raw.get("error") or not (raw.get("result") or {}).get("content") for raw in prior_by_run.values()):
-                raise ValueError("A origem não possui resposta válida de todos os participantes em cada repetição.")
+            # Registro aw9vf (344-79, item 2), corrigido em 12/11/2026: na coleta conf2 o Lab recusava a
+            # pergunta inteira quando um participante não tinha contribuição em B1, e perdeu ~28 perguntas.
+            # O registro diz que esse participante não entra no WC, ninguém o vê, e só ele sai da análise
+            # de exposição daquela pergunta; os demais seguem. A exclusão fica gravada por pergunta.
+            for index in range(1, spec["repetitions"] + 1):
+                for participant in spec["participants"]:
+                    raw = prior_by_run.get((index, participant["id"]))
+                    reason = None
+                    if raw is None:
+                        reason = "sem registro em B1"
+                    elif raw.get("error") or not (raw.get("result") or {}).get("content"):
+                        reason = "falha ou resposta vazia em B1"
+                    else:
+                        _, authors, _ = seed_peer_contributions(WorkingContext.from_dict(base.to_dict()), [PriorContribution(raw["participant_id"], raw["result"]["content"])])
+                        if raw["participant_id"] not in authors:
+                            reason = "contribuição de B1 não entrou no WC: " + check_contribution(raw["result"]["content"], raw["participant_id"], base)["message"]
+                    if reason:
+                        excluded.setdefault(index, []).append({"participant_id": participant["id"], "reason": reason, **({"observation_id": raw["observation_id"]} if raw else {})})
+                        prior_by_run.pop((index, participant["id"]), None)
+                if not any(key[0] == index for key in prior_by_run):
+                    raise ValueError(f"A origem não possui nenhuma contribuição válida na repetição {index}.")
         corpus_hash = fingerprint_payload(spec["documents"])
         language = spec.get("language", "pt-BR")
         texts = texts_for(language)
@@ -154,8 +173,9 @@ class ExperimentRunner:
             return frozen_contexts[visibility_key]
 
         for index in range(1, spec["repetitions"] + 1):
-            for participant in spec["participants"]:
-                everyone = [prior_by_run[(index, p["id"])] for p in spec["participants"]] if exposure != "blind" else []
+            out = {item["participant_id"] for item in excluded.get(index, [])}
+            for participant in [p for p in spec["participants"] if p["id"] not in out]:
+                everyone = [prior_by_run[(index, p["id"])] for p in spec["participants"] if p["id"] not in out] if exposure != "blind" else []
                 # Em B3 e EP o participante só vê a própria contribuição inteira; em E, a de todos.
                 visible = [raw for raw in everyone if exposure == "exposed" or (exposure in {"self", "stance"} and raw["participant_id"] == participant["id"])]
                 # TESE-002 §4.1: em E (e em EP, que usa a mesma ordem) a ordem dos pares é sorteada por execução e gravada (ver peer_order.py).
@@ -207,6 +227,8 @@ class ExperimentRunner:
                     "reasoning_exposure_mode": "unknown", "can_modify_deliberation_artifacts": False,
                     "library_corpus_fingerprint": corpus_hash, "library_corpus_item_count": len(spec["documents"]), "library_corpus_algorithm": "sha256-canonical-json-v1",
                     **({"prompt_language": language} if language != "pt-BR" else {}),
+                    # Só aparece quando há exclusão: as derivadas completas mantêm a impressão digital de antes.
+                    **({"excluded_from_exposure": excluded[index]} if excluded.get(index) else {}),
                     "research_anchor_ids": ["evidence-" + d["id"] for d in spec["documents"]], "attached_evidence_mode": "lab_inline_full", "tool_phase": "lab_frozen_corpus", "tool_limits_explicit": condition.get("max_tool_calls") is not None or condition.get("max_tool_iterations") is not None,
                 }
                 prepared_requests.append({"agent_id": participant["id"], "instructions": instructions, "shared_instructions": shared, "wave_instructions": texts["wc_header"] + "\n" + context, "user_message": spec["task"]["objective"], "reasoning_effort": participant["reasoning_effort"], **({"upstream_provider": participant["upstream_provider"]} if participant.get("upstream_provider") else {}), "sampling": sampling.as_dict(), "allow_tools": condition["tools"] == "corpus", "max_tool_calls": condition.get("max_tool_calls"), "max_tool_iterations": condition.get("max_tool_iterations"), "context": {"objective": spec["task"]["objective"], "working_context": context, "metadata": metadata}})
@@ -298,7 +320,7 @@ class ExperimentRunner:
                     if result is not None:
                         result.metadata = redact(result.metadata)
                     observation = build_raw_observation(request=request, attempt_index=attempt, started_at=started, requested_provider_kind=spec["providers"][participant["provider"]]["kind"], requested_model=participant["model"], available_tool_names=[d.name for d in runtime.definitions()] if request.allow_tools else [], result=result, error=error)
-                    observation = replace(observation, error=redact(observation.error), request=observation.request | {"boundary": "norvald_lab_execution", "studio_metadata": observation.request["studio_metadata"] | {k: metadata[k] for k in LAB_RAW_METADATA_KEYS}})
+                    observation = replace(observation, error=redact(observation.error), request=observation.request | {"boundary": "norvald_lab_execution", "studio_metadata": observation.request["studio_metadata"] | {k: metadata[k] for k in LAB_RAW_METADATA_KEYS} | ({"excluded_from_exposure": metadata["excluded_from_exposure"]} if "excluded_from_exposure" in metadata else {})})
                     sink.record(observation)
                     output = {"participant_id": participant["id"], "run_id": metadata["run_id"], "ok": error is None, "error": redact(str(error)) if error else None, "provider": participant["provider"], "model": participant["model"], "reasoning_captured": bool(result and result.reasoning), "input_tokens": result.input_tokens if result else None, "output_tokens": result.output_tokens if result else None}
                     if max_attempts > 1:

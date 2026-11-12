@@ -138,14 +138,17 @@ async def test_answer_without_valid_option_is_retried_and_source_loading_uses_at
 
 
 @pytest.mark.asyncio
-async def test_two_failures_with_two_attempts_leave_experiment_incomplete_and_block_derived(tmp_path):
+async def test_two_failures_with_two_attempts_leave_experiment_incomplete_and_exclude_victim(tmp_path):
     provider = FlakyProvider(bad=2)
     runner, result = await collect(tmp_path, "b1", provider)
     assert result["status"] == "incomplete" and result["failures"] == 1 and result["executed"] == 3
     assert sum(1 for r in raws(tmp_path, "b1") if r["participant_id"] == VICTIM) == 2
     assert provider.calls[VICTIM] == 2  # no máximo duas, nunca uma terceira
-    with pytest.raises(ValueError):
-        derive_spec(tmp_path, "b1", "b3", "self")
+    # Contrato mudou em 12/11/2026 (aw9vf 344-79, item 2): a derivada segue sem a vítima, que fica registrada.
+    prepared = runner.prepare(derive_spec(tmp_path, "b1", "b3", "self"))
+    requests = [json.loads(r) for r in prepared.requests_json]
+    assert VICTIM not in {r["agent_id"] for r in requests} and len(requests) == 2
+    assert requests[0]["context"]["metadata"]["excluded_from_exposure"][0]["participant_id"] == VICTIM
 
 
 @pytest.mark.asyncio

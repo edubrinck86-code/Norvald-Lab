@@ -54,9 +54,16 @@ def verify_experiment(root: Path, experiment_id: str) -> dict:
     return {"experiment_id": experiment_id, "valid": not problems, "status": completion["status"], "records": len(replay.records), "issues": problems}
 
 
-def read_verified_records(root: Path, experiment_id: str):
+def read_verified_records(root: Path, experiment_id: str, *, allow_incomplete: bool = False):
+    """Lê os registros de uma origem íntegra.
+
+    allow_incomplete (12/11/2026, registro aw9vf 344-79 item 2): uma origem cega
+    "incomplete" (algum participante falhou) ainda serve à exposição, sem quem falhou.
+    Origem abortada ou adulterada continua recusada.
+    """
     check = verify_experiment(root, experiment_id)
-    if not check["valid"] or check["status"] != "complete":
+    accepted = {"complete", "incomplete"} if allow_incomplete else {"complete"}
+    if not check["valid"] or check["status"] not in accepted:
         raise ValueError("Origem precisa estar completa e íntegra: " + str(check))
     directory = root / "experiments" / experiment_id
     completion = json.loads((directory / "completion.json").read_text())

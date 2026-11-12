@@ -100,11 +100,56 @@ async def test_origin_diagnostic_identifies_participant_and_repetition_without_m
         assert {c['code'] for c in checks if c['participant_id'] == 'analista-3'} == {'unclosed_block'}
         assert {c['run_id'] for c in checks} == {'r0001', 'r0002'}
         assert all(c['usable'] for c in checks if c['participant_id'] == 'analista-1')
-        refused = client.post('/api/derive', json={'source_id': 'source-format', 'experiment_id': 'derived-format', 'exposure': 'exposed'})
-        assert refused.status_code == 422
-        message = refused.json()['detail']
-        assert 'Analista 2' in message and 'Analista 3' in message and 'repetição 1' in message
-        assert 'CONTRIBUTION' in message and 'permanece salva' in message
+        # Contrato mudou de propósito em 12/11/2026 (registro aw9vf, 344-79, item 2): quem não contribuiu
+        # em B1 sai só daquela pergunta; o Lab não recusa mais a derivação inteira.
+        accepted = client.post('/api/derive', json={'source_id': 'source-format', 'experiment_id': 'derived-format', 'exposure': 'exposed'})
+        assert accepted.status_code == 200
+    prepared = runner.prepare(derive_spec(tmp_path, 'source-format', 'derived-format', 'exposed'))
+    requests = [json.loads(r) for r in prepared.requests_json]
+    assert {r['agent_id'] for r in requests} == {'analista-1'} and len(requests) == 2
+    for r in requests:
+        meta = r['context']['metadata']
+        out = {e['participant_id']: e['reason'] for e in meta['excluded_from_exposure']}
+        assert set(out) == {'analista-2', 'analista-3'} and all('CONTRIBUTION' in reason for reason in out.values())
+        assert 'Analista 2' not in r['wave_instructions'] and len(meta['source_observation_ids']) == 1
     assert not (tmp_path / 'experiments/derived-format').exists()
     assert before == {str(p): p.read_bytes() for p in (tmp_path / 'experiments').rglob('*') if p.is_file()}
     assert verify_experiment(tmp_path, 'source-format')['valid']
+
+
+@pytest.mark.asyncio
+async def test_derivation_refused_when_no_participant_contributed(tmp_path):
+    class Silent(DemoProvider):
+        async def execute(self, request, model):
+            return ExecutionResult(content='Sem bloco.', tokens=0, duration_seconds=0, provider='demo', model=model)
+    spec = demo_spec('source-silent')
+    registry = AgentRegistry()
+    registry.register_provider('simulador', Silent(), kind='demo')
+    for p in spec['participants']:
+        registry.register_agent(p['id'], 'simulador', p['model'])
+    runner = ExperimentRunner(tmp_path)
+    await runner.run(runner.prepare(spec), registry=registry, monitor_capacity=False)
+    with pytest.raises(ValueError, match='nenhuma contribuição válida'):
+        runner.prepare(derive_spec(tmp_path, 'source-silent', 'derived-silent', 'exposed'))
+
+
+@pytest.mark.asyncio
+async def test_incomplete_origin_derives_without_the_failed_participant(tmp_path):
+    # conf2 (12/11/2026): falha de transporte em B1 deixava a origem "incomplete" e a pergunta se perdia.
+    class Failing(DemoProvider):
+        async def execute(self, request, model):
+            if request.agent_id == 'analista-2':
+                raise RuntimeError('fornecedor fora do ar')
+            return await super().execute(request, model)
+    spec = demo_spec('source-failed')
+    registry = AgentRegistry()
+    registry.register_provider('simulador', Failing(), kind='demo')
+    for p in spec['participants']:
+        registry.register_agent(p['id'], 'simulador', p['model'])
+    runner = ExperimentRunner(tmp_path)
+    result = await runner.run(runner.prepare(spec), registry=registry, monitor_capacity=False)
+    assert result['status'] == 'incomplete'
+    prepared = runner.prepare(derive_spec(tmp_path, 'source-failed', 'derived-failed', 'self'))
+    requests = [json.loads(r) for r in prepared.requests_json]
+    assert {r['agent_id'] for r in requests} == {'analista-1', 'analista-3'}
+    assert requests[0]['context']['metadata']['excluded_from_exposure'][0] | {'observation_id': None} == {'participant_id': 'analista-2', 'reason': 'falha ou resposta vazia em B1', 'observation_id': None}
