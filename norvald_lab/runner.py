@@ -177,7 +177,9 @@ class ExperimentRunner:
             for participant in [p for p in spec["participants"] if p["id"] not in out]:
                 everyone = [prior_by_run[(index, p["id"])] for p in spec["participants"] if p["id"] not in out] if exposure != "blind" else []
                 # Em B3 e EP o participante só vê a própria contribuição inteira; em E, a de todos.
+                # Em B3L (self_letter) ele não vê a contribuição: só a opção que escolheu (abaixo).
                 visible = [raw for raw in everyone if exposure == "exposed" or (exposure in {"self", "stance"} and raw["participant_id"] == participant["id"])]
+                own_raw = [raw for raw in everyone if raw["participant_id"] == participant["id"]] if exposure == "self_letter" else []
                 # TESE-002 §4.1: em E (e em EP, que usa a mesma ordem) a ordem dos pares é sorteada por execução e gravada (ver peer_order.py).
                 shows_peers = exposure in {"exposed", "stance"}
                 peer_order = draw_peer_order([raw["participant_id"] for raw in everyone], experiment_id=spec["experiment_id"], repetition_index=index, participant_id=participant["id"]) if shows_peers else []
@@ -200,10 +202,20 @@ class ExperimentRunner:
                                     chosen[rel["author_id"]].append(rel["target_id"])
                         peer_positions = [{"author_id": author, "selects": chosen.get(author, [])} for author in peer_order if author != participant["id"]]
                     seed_audits.append({"repetition_index": index, "participant_id": participant["id"], "peer_order": peer_order, **asdict(audit)})
+                own_previous_answer = None
+                if own_raw:
+                    # Controle exploratório B3L (12/11/2026): reproduz o de Hao et al. (2026, Tabela 30), que mostra
+                    # só a letra da resposta anterior. A opção sai pelo mesmo caminho validado de B3 (seed), e
+                    # nenhum texto, fundamento ou confiança da contribuição chega ao prompt.
+                    own_snapshot, audit = seed(own_raw, index)
+                    own_previous_answer = {"selects": [rel["target_id"] for rel in own_snapshot["relations"] if rel["relation_type"] == "selects" and rel["target_id"] in option_ids and rel["author_id"] == participant["id"]]}
+                    seed_audits.append({"repetition_index": index, "participant_id": participant["id"], "peer_order": [], **asdict(audit)})
                 # A projeção é integral, sem seleção semântica ou truncamento silencioso.
                 projection = {"question": wc.question, "items": [item.to_dict() for item in wc.active_items()], "relations": [rel.to_dict() for rel in wc.relations]}
                 if peer_positions is not None:
                     projection["peer_positions"] = peer_positions
+                if own_previous_answer is not None:
+                    projection["own_previous_answer"] = own_previous_answer
                 context = _json(projection)
                 round_number = 1 if exposure == "blind" else 2
                 evidence = texts["corpus_header"] + "\n" + _json(spec["documents"])
@@ -222,7 +234,7 @@ class ExperimentRunner:
                     "round": round_number, "repetition_index": index, "participant_id": participant["id"], "participant_name": participant["name"], "participant_role": participant["role"],
                     "task_id": spec["task"]["id"], "task_label": spec["task"]["id"],
                     "peer_exposure_mode": exposure if exposure in {"exposed", "stance"} else "blind", "lab_exposure_mode": exposure,
-                    "source_experiment_id": condition.get("prior_experiment"), "source_observation_ids": [raw["observation_id"] for raw in (everyone if exposure == "stance" else visible)],
+                    "source_experiment_id": condition.get("prior_experiment"), "source_observation_ids": [raw["observation_id"] for raw in (everyone if exposure == "stance" else own_raw if exposure == "self_letter" else visible)],
                     "peer_order": peer_order, "peer_order_method": PEER_ORDER_METHOD if shows_peers else None,
                     "reasoning_exposure_mode": "unknown", "can_modify_deliberation_artifacts": False,
                     "library_corpus_fingerprint": corpus_hash, "library_corpus_item_count": len(spec["documents"]), "library_corpus_algorithm": "sha256-canonical-json-v1",

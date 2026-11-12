@@ -120,8 +120,8 @@ def validate_spec(payload: dict) -> dict:
     condition = spec.setdefault("condition", {})
     _keys(condition, "id exposure prior_experiment tools max_tool_calls max_tool_iterations", "condition")
     identifier(condition.setdefault("id", "B1"), "condition.id")
-    if condition.setdefault("exposure", "blind") not in {"blind", "self", "exposed", "stance"}:
-        raise ValueError("exposure deve ser blind, self, exposed ou stance.")
+    if condition.setdefault("exposure", "blind") not in {"blind", "self", "exposed", "stance", "self_letter"}:
+        raise ValueError("exposure deve ser blind, self, exposed, stance ou self_letter.")
     if condition["exposure"] == "blind" and condition.get("prior_experiment"):
         raise ValueError("Condição cega não recebe respostas anteriores.")
     if condition["exposure"] != "blind":
