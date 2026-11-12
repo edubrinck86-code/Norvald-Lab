@@ -68,7 +68,20 @@ Horários em Brasília (UTC−3). O registro completo das rodadas, com início, 
 - O desequilíbrio vem do fornecedor e não deve ser lido como característica do modelo.
 - No contraste homogêneo (5 × Gemma), a perda reduz a amostra, e o ρ̄ do contraste é lido com essa ressalva.
 
-## Pendências declaradas
+## D6. Os cinco testes confirmatórios, e não três (12/11/2026, à tarde)
 
-- **Contraste do banco:** as medidas do painel de contraste no banco próprio saíram vazias ("—"). A causa está em investigação. Nenhuma conclusão sobre o contraste do banco será tirada antes disso.
-- **Concordância de Fleiss:** a leitura principal do MMLU-Pro saiu vazia ("—"). Está em investigação, junto com o item anterior.
+**O registro (5dpjr):** cinco testes confirmatórios, com Holm-Bonferroni sobre os cinco: McNemar E contra B3, McNemar B3 contra B2, Wilcoxon da dispersão, McNemar EP contra B3 (Δ_position) e McNemar E contra EP (Δ_justification), estes dois para o H4. Análise por bloco e combinada; h01–h40 também à parte.
+
+**O que foi publicado antes (Lab PR #19, 12/11, manhã):** os resultados `conf2-*-medidas` com só os três testes do aw9vf e Holm sobre três. O H4 não tinha sido testado, nem havia a análise combinada ou a de h01–h40.
+
+**Causa:** o código das medidas seguia o aw9vf e não foi atualizado pelo 5dpjr. Achado ao conferir o texto contra o registro, antes de qualquer resultado publicado em artigo.
+
+**O que mudou:** o Lab passou a calcular os cinco testes, com Holm sobre os cinco (Lab PR #21). Nenhum dado foi coletado de novo; só a análise foi refeita.
+
+**Efeito:** nenhuma conclusão do H1 e do H2 muda. Com Holm sobre cinco, os cinco testes ficam abaixo de 0,05 no banco, no MMLU-Pro e no combinado. No h01–h40 sozinho, só H1 e H2 passam (amostra pequena). Os números estão em `resultados/conf2-*-medidas.md`.
+
+## Pendências resolvidas (12/11/2026)
+
+- **Contraste do banco:** não é defeito. Os cinco Gemma acertaram as 52 perguntas com gabarito em B1; sem nenhum erro, a correlação de erros é indefinida. O contraste é lido só no MMLU-Pro.
+- **Concordância de Fleiss no MMLU-Pro:** não se aplica, por desenho. Ela é calculada só nas perguntas contestáveis, e o MMLU-Pro não tem nenhuma.
+- O relatório passou a escrever esses motivos no lugar do "—" (Lab PR #21).
