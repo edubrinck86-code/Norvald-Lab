@@ -25,7 +25,7 @@ def demo_spec(experiment_id):
 def derive_spec(root, source_id, new_id, exposure, condition_id=None):
     identifier(source_id)
     identifier(new_id)
-    read_verified_records(root, source_id)
+    read_verified_records(root, source_id, allow_incomplete=True)
     spec = _read(root / "experiments" / source_id / "spec.json")
     spec["experiment_id"] = new_id
     spec["condition"].update(id=condition_id or {"self": "B3", "stance": "EP"}.get(exposure, "E"), exposure=exposure, prior_experiment=source_id)

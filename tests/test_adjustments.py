@@ -77,8 +77,14 @@ async def test_adjustment_calls_only_one_participant_and_preserves_original_and_
     assert original == {str(p): p.read_bytes() for p in (tmp_path / 'experiments').rglob('*') if p.is_file()}
     assert verify_experiment(tmp_path, 'source')['valid']
     with TestClient(create_app(tmp_path, allow_live=True)) as client:
-        refused = client.post('/api/derive', json={'source_id': 'source', 'experiment_id': 'derived', 'exposure': 'exposed'})
-        assert refused.status_code == 422  # repair is not silently treated as a blind sample
+        # 12/11/2026 (344-79, item 2): a derivação segue sem o participante truncado, e o reparo
+        # continua fora: nunca vira amostra cega.
+        derived = client.post('/api/derive', json={'source_id': 'source', 'experiment_id': 'derived', 'exposure': 'exposed'})
+        assert derived.status_code == 200
+    from norvald_lab.cli import derive_spec
+    prepared = ExperimentRunner(tmp_path).prepare(derive_spec(tmp_path, 'source', 'derived', 'exposed'))
+    assert record['participant_id'] not in {json.loads(r)['agent_id'] for r in prepared.requests_json}
+    assert all(VALID not in r for r in prepared.requests_json)
     # A damaged adjustment is blocked independently of the valid source.
     (store.directory('source') / saved['id'] / 'result.json').write_text('{}')
     assert next(a for a in store.list('source') if a['id'] == saved['id'])['status'] == 'altered'

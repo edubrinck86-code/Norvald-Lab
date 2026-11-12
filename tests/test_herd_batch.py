@@ -127,3 +127,16 @@ async def test_english_batch_runs_end_to_end_in_demo(tmp_path):
     for path in tmp_path.rglob("*.json"):
         text = path.read_text(encoding="utf-8")
         assert "Reconsidere" not in text and "Você é" not in text
+
+
+@pytest.mark.asyncio
+async def test_derived_conditions_run_when_b1_incomplete(tmp_path, monkeypatch):
+    # 12/11/2026, conf2: B1 "incomplete" bloqueava a pergunta inteira; o registro (344-79, item 2) manda seguir.
+    runner = ExperimentRunner(tmp_path)
+    batch = HerdBatch(runner, BANK, PANEL, run_id="piloto")
+    real = batch._status
+    monkeypatch.setattr(batch, "_status", lambda expid: "incomplete" if expid == "piloto-q01-b1" and real(expid) else real(expid))
+    await batch.run(["q01"], allow_live=False, blind_first_only=True)
+    report = await batch.run(["q01"], allow_live=False)
+    assert not report.blocked
+    assert {"piloto-q01-b3", "piloto-q01-ep", "piloto-q01-e"} <= {expid for expid, _ in report.ran}
