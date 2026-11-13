@@ -101,6 +101,10 @@ A H3 mostra que essa estabilidade não teve custo de correção. O que o formato
 
 O resultado não diz que o formato estruturado torna o modelo mais correto. O acerto final foi igual nos dois formatos (seção 3.4). O ganho é de consistência.
 
+## Declaração de interesse
+
+O formato estruturado usado nas condições B3 e B3R foi desenvolvido pelo autor em software próprio. O código que gera as condições (B3, B3T e B3R) está público no repositório indicado abaixo, e a descrição da seção 2 basta para reproduzi-las.
+
 ## Referências
 
 - Guedes, E. (2026). Δ_herd: efeito manada num painel heterogêneo de LLMs (texto 1). OSF gbx5m; registros aw9vf e 5dpjr.
