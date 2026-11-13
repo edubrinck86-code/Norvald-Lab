@@ -6,7 +6,7 @@ Leitura pendente — proprietário. Publicar só com a aprovação do texto fina
 
 **Title:** Added options that are also correct: question_id 7045, 7114, 9169 and 3165 (and more)
 
-Hi, and thanks for MMLU-Pro. While analysing a panel of five open models (Gemma 4 31B, Nemotron 3 Nano 30B, Mistral Small 2603, Qwen 3.8 27B, Muse Glimmer 30B), we found inherited MMLU questions in which an option added by MMLU-Pro is also correct. Below are four of them: three confirmed and one probable. We found more, listed at the end. In each case the original key is fine (MMLU-Redux 2.0 marks it "ok"), but the added option is correct too, and most of the panel chose it.
+Hi, and thanks for MMLU-Pro. While analysing a panel of five open models (Gemma 4 31B, Nemotron 3 Nano 30B, Mistral Small 2603, Qwen 3.8 27B, Muse Glimmer 30B), we found inherited MMLU questions in which an option added by MMLU-Pro is also correct. Below are four of them: three confirmed and one probable. We found more; see the note after them. In each case the original key is fine (MMLU-Redux 2.0 marks it "ok"), but the added option is correct too, and most of the panel chose it.
 
 **question_id 7045** (high_school_microeconomics), "A monopsonist is identified by one of the following:"
 - Key: E, "A wage payment lower than the marginal revenue product of labor."
