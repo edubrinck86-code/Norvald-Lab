@@ -2,13 +2,13 @@
 
 Eduardo Guedes · Pesquisador independente · ORCID 0009-0003-9960-3337
 
-> Rascunho de 12/11/2026. Leitura pendente — proprietário. Números de `studies/formato/resultados.md` (saída de `medidas.py`, sem edição). Pré-registro: OSF gzvk5, registro 46erj. Desvios em `studies/formato/desvios.md`.
+> Texto aprovado em 12/11/2026. Números de `studies/formato/resultados.md` (saída de `medidas.py`, sem edição). Pré-registro: OSF gzvk5, registro 46erj. Desvios em `studies/formato/desvios.md`.
 
 ## Resumo
 
 No estudo Δ_herd (OSF gbx5m), modelos que reveem a própria resposta anterior quase não mudam de opção (B3: 2,1%), enquanto modelos que veem só a letra escolhida mudam bem mais (B3L: 16,3%). As duas condições diferem em duas coisas: no conteúdo (o B3 mostra o raciocínio declarado) e no formato (o B3 o mostra como itens e relações estruturados). Para separar as duas, criamos uma condição nova, B3T, com o mesmo conteúdo do B3 apresentado em texto corrido, e uma réplica do B3 coletada no mesmo dia (B3R) como controle de deriva. O painel e as perguntas são os mesmos do Δ_herd: cinco modelos de cinco empresas e as 91 perguntas não unânimes (30 de um banco novo e 61 do MMLU-Pro).
 
-A hipótese confirmatória se sustentou. Os modelos mudaram de opção em 10,3% [7,5; 13,3] das vezes no B3T e em 3,9% [2,3; 5,8] no B3R: diferença de 6,5 pontos [3,7; 9,3], McNemar pareado p = 6,2 × 10⁻⁵, com 431 pares. O efeito vem do MMLU-Pro (13,6% × 4,5%, p = 6,9 × 10⁻⁵). No banco novo, mais fácil, não houve diferença detectável (4,1% × 2,7%, p = 0,69). A ordem descritiva esperada se confirmou: B3R ≤ B3T ≤ B3L. As mudanças a mais do B3T foram, na maior parte, troca de um erro por outro erro (20, contra 4 no B3R). O saldo de correção foi parecido (+6 no B3T, +5 no B3R). Em reconsideração, o formato estruturado deixou os modelos mais estáveis sem reduzir a correção.
+A hipótese confirmatória se sustentou. Os modelos mudaram de opção em 10,3% [7,5; 13,3] das vezes no B3T e em 3,9% [2,3; 5,8] no B3R: diferença de 6,5 pontos [3,7; 9,3], McNemar pareado p = 0,00006, com 431 pares. O efeito vem do MMLU-Pro (13,6% × 4,5%, p = 0,00007). No banco novo, mais fácil, não houve diferença detectável (4,1% × 2,7%, p = 0,69). A ordem descritiva esperada se confirmou: B3R ≤ B3T ≤ B3L. As mudanças a mais do B3T foram, na maior parte, troca de um erro por outro erro (20, contra 4 no B3R). O saldo de correção foi parecido (+6 no B3T, +5 no B3R). Em reconsideração, o formato estruturado deixou os modelos mais estáveis sem reduzir a correção.
 
 ## 1. Introdução
 
@@ -50,8 +50,8 @@ O texto do B3T é gerado no idioma da rodada (Lab PR #27). Um teste automático 
 
 | | B3R (estruturado) | B3T (texto corrido) | Diferença B3T − B3R | McNemar p |
 |---|---|---|---|---|
-| Combinado (H1) | 3,9% [2,3; 5,8] | 10,3% [7,5; 13,3] | 6,5 [3,7; 9,3] | 6,2 × 10⁻⁵ |
-| MMLU-Pro | 4,5% [2,4; 7,1] | 13,6% [9,9; 17,4] | 9,2 [5,5; 12,9] | 6,9 × 10⁻⁵ |
+| Combinado (H1) | 3,9% [2,3; 5,8] | 10,3% [7,5; 13,3] | 6,5 [3,7; 9,3] | 0,00006 |
+| MMLU-Pro | 4,5% [2,4; 7,1] | 13,6% [9,9; 17,4] | 9,2 [5,5; 12,9] | 0,00007 |
 | Banco novo | 2,7% [0,7; 5,5] | 4,1% [1,3; 8,1] | 1,4 [−2,0; 4,7] | 0,69 |
 
 A H1 se confirma. Com o mesmo conteúdo, os modelos mudaram de opção cerca de 2,6 vezes mais quando a resposta anterior veio em texto corrido. A leitura "estrita" (mudou sem fundamento novo) dá números iguais ou quase iguais (`resultados.md`).
