@@ -20,7 +20,7 @@ Hi, and thanks for MMLU-Pro. While analysing a panel of five open models (Gemma 
 - Key: F, "Lines in the infrared, visible, and ultraviolet regions of the spectrum reveal primarily the nuclear structure of the sample."
 - Also not correct: A, "All spectra are essentially the same for all elements." Each element has its own spectrum, so A is false as well. Three of five models chose A.
 
-**Why it matters.** In our panel, these questions make models look as if they share an error when they are choosing a defensible answer. This inflates both the measured error rate and the measured error correlation between models. In our sample, of the 14 questions from the original MMLU where three or more models chose the same non-key option, 11 converge on an option added by MMLU-Pro. We confirmed the three above; the others may deserve a look.
+**Why it matters.** In our panel, these questions make models look as if they share an error when they are choosing a defensible answer. This inflates both the measured error rate and the measured error correlation between models. In our sample, of the 14 questions from the original MMLU where three or more models chose the same non-key option, 11 converge on an option added by MMLU-Pro. We confirmed the three above; the others may deserve a look. This is the same kind of issue as two of the cases in #55 (an added option that makes the key non-unique), on different items.
 
 Details, data and code (preregistered study, CC BY 4.0): https://osf.io/gbx5m/ (text 2, section 4.1b) and https://github.com/edubrinck86-code/Norvald-Lab
 
