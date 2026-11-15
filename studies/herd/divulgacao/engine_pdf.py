@@ -2,11 +2,12 @@
 Números: texto 3 (OSF gzvk5) e registros do Lab; ver engine-uma-pagina.md."""
 import matplotlib
 matplotlib.use("Agg")
+matplotlib.rcParams["font.family"] = "serif"
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, Rectangle
 
-NAVY, CYAN, GREY, LIGHT, INK = "#0F172A", "#38BDF8", "#64748B", "#F1F5F9", "#1E293B"
-fig = plt.figure(figsize=(8.27, 11.69))
+NAVY, CYAN, GREY, LIGHT, INK = "#2B2724", "#B08D57", "#6E655C", "#F3EEE4", "#2B2724"  # 15/11: clássico (grafite quente, dourado envelhecido, creme), pedido dele
+fig = plt.figure(figsize=(8.27, 11.69), facecolor="#FBF8F2")
 ax = fig.add_axes([0, 0, 1, 1]); ax.set_xlim(0, 100); ax.set_ylim(0, 141.4); ax.axis("off")
 
 def t(x, y, s, **k): ax.text(x, y, s, va="top", **k)
@@ -15,7 +16,7 @@ def t(x, y, s, **k): ax.text(x, y, s, va="top", **k)
 ax.add_patch(Rectangle((0, 112), 100, 29.4, color=NAVY))
 t(7, 136, "NORVALD", color=CYAN, fontsize=11, weight="bold")
 t(7, 131, "Engine Documental", color="white", fontsize=30, weight="bold")
-t(7, 122.5, "Estabilidade comprovada para a IA da sua empresa.", color="#CBD5E1", fontsize=14)
+t(7, 122.5, "Estabilidade comprovada para a IA da sua empresa.", color="#E6DCCB", fontsize=14)
 
 # Dor
 t(7, 107, "Sua IA muda de resposta sem motivo?", color=INK, fontsize=16, weight="bold")
@@ -29,7 +30,7 @@ ax.add_patch(FancyBboxPatch((7, 64), 86, 22, boxstyle="round,pad=0,rounding_size
 t(11, 83, "62%", color=CYAN, fontsize=54, weight="bold")
 t(11, 69.5, "menos mudanças de resposta", color=INK, fontsize=12, weight="bold")
 # barras 1 em 10 x 1 em 25
-for i, (lab, v, c) in enumerate([("Sem a engine: 1 a cada 10 revisões", 10.3, "#94A3B8"),
+for i, (lab, v, c) in enumerate([("Sem a engine: 1 a cada 10 revisões", 10.3, "#BDB3A6"),
                                  ("Com a engine: 1 a cada 25", 3.9, CYAN)]):
     y = 82.5 - i * 7.5
     t(50, y, lab, color=INK, fontsize=9.5)
@@ -63,5 +64,5 @@ ax.add_patch(Rectangle((0, 0), 100, 9, color=NAVY))
 t(7, 6.2, "Comece com um diagnóstico: onde sua IA oscila e quanto isso custa.", color="white", fontsize=10, weight="bold")
 t(7, 2.8, "Eduardo Guedes · Norvald   [contato]", color=CYAN, fontsize=9.5)
 
-fig.savefig("engine-documental-norvald.pdf")
-fig.savefig("engine-documental-norvald.png", dpi=110)
+fig.savefig("engine-documental-norvald.pdf", facecolor=fig.get_facecolor())
+fig.savefig("engine-documental-norvald.png", dpi=110, facecolor=fig.get_facecolor())
