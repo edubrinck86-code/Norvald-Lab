@@ -18,11 +18,11 @@ t(7, 136, "NORVALD", color=CYAN, fontsize=11, weight="bold")
 t(7, 131, "Engine Documental", color="white", fontsize=30, weight="bold")
 t(7, 122.5, "Estabilidade comprovada para a IA da sua empresa.", color="#E6DCCB", fontsize=14)
 
-# Dor
-t(7, 107, "Sua IA muda de resposta sem motivo?", color=INK, fontsize=16, weight="bold")
-t(7, 101.5, "Você pede para ela revisar e ela troca uma resposta certa por outra. Ou responde\n"
-            "diferente à mesma pergunta. Cada mudança à toa é retrabalho e perda de confiança.\n"
-            "Quase sempre o problema não é o modelo: é a informação chegando solta e sem ordem.",
+# Para quem (no topo, pedido dele em 15/11: mais importante que a dor)
+t(7, 107, "Para quem serve", color=INK, fontsize=16, weight="bold")
+t(7, 101.5, "Empresas em que a IA trabalha em etapas ou revisa o próprio trabalho:\n"
+            "atendimento, análise de documentos e contratos, produção de conteúdo,\n"
+            "agentes que decidem.",
   color=GREY, fontsize=10.5, linespacing=1.5)
 
 # Dois números em destaque (15/11, pedido dele): resultado e volume de prova
@@ -50,10 +50,10 @@ for i, (big, small) in enumerate(cols):
     t(x + 3, 41, big, color=CYAN, fontsize=22, weight="bold")
     t(x + 3, 34, small, color="white", fontsize=9, linespacing=1.4)
 
-# Para quem
-t(7, 22, "Para quem serve", color=INK, fontsize=12, weight="bold")
-t(7, 18, "Sistemas em que a IA trabalha em etapas ou revisa o próprio trabalho: atendimento,\n"
-         "análise de documentos e contratos, produção de conteúdo, agentes que decidem.",
+# Dor (desceu para o fim, 15/11)
+t(7, 22, "Sua IA muda de resposta sem motivo?", color=INK, fontsize=12, weight="bold")
+t(7, 18, "Você pede para ela revisar e ela troca uma resposta certa por outra. Quase sempre\n"
+         "o problema não é o modelo: é a informação chegando solta e sem ordem.",
   color=GREY, fontsize=10, linespacing=1.5)
 
 # Rodapé
