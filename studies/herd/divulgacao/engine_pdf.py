@@ -45,7 +45,7 @@ t(7, 53, "A engine organiza a informação antes de entregá-la à IA: cada dado
 
 # Provas em 3 colunas
 cols = [("30+", "modelos de IA testados,\nde empresas diferentes"),
-        ("~10 mil", "respostas registradas\nno laboratório"),
+        ("10.649", "respostas registradas\nno laboratório"),
         ("3", "sistemas em produção\ne 3 pesquisas publicadas")]
 for i, (big, small) in enumerate(cols):
     x = 7 + i * 29.5
