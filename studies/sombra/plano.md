@@ -17,6 +17,23 @@ Contraste entre dois blocos: **antigas** (MMLU herdado pelo MMLU-Pro, muito publ
 
 Controle de dificuldade: comparar perguntas com taxa de acerto parecida nos dois blocos (estratificação). Sem isso, "antiga" e "fácil" se confundem (limite do texto 2, §5).
 
+## Desenho principal: clássico × sorteado (decidido em 15/11)
+
+O mesmo problema em duas versões:
+- **Clássico:** o enunciado publicado (livro, MMLU, GPQA), com os números originais. Está na internet e, provavelmente, no treino.
+- **Sorteado:** a mesma estrutura, com números, nomes e contexto sorteados por programa. A pergunta exata nunca existiu.
+
+Se o raciocínio revela a memória, ele é curto e "alto" no clássico e longo no sorteado, com a mesma estrutura. A diferença dentro do par isola a memória da dificuldade.
+
+**Gerador por programa, não por memória.** O Opus escreve o gerador (estrutura, faixas dos parâmetros, regras dos distratores). O conteúdo concreto vem do sorteio, com seed registrada, e o gabarito vem do cálculo. Nenhuma pergunta é escrita à mão pelo Opus: uma pergunta "inventada" por um LLM sairia da memória de treino, que é o que a tese mede (conversa de 15/11).
+- **Distratores por regra:** erros típicos calculados (sinal trocado, fórmula vizinha, unidade errada).
+- **Dois níveis de dificuldade** por um botão: mais etapas, mais variáveis, mais restrições.
+- **Áreas:** física, química, finanças, probabilidade, lógica e combinatória (problemas com solução única, verificada por programa).
+- **Limite:** não cobre humanas nem direito, onde não há gabarito calculável. Essas áreas ficam fora do desenho principal; se entrarem, será com banco externo (HLE privado) ou especialista.
+- **Piloto:** uma amostra pequena antes, para calibrar a faixa em que o painel erra entre 30% e 60%. Entra no registro como piloto e não vira dado.
+
+Os blocos externos (SuperGPQA, GPQA Diamond) passam a ser opcionais, como réplica.
+
 ## Filtro de gabarito, decidido antes de ver os dados
 
 Ficam fora do bloco antigo:
@@ -38,7 +55,7 @@ Motivo: sem o filtro, "memória em comum" pode ser só "todos acertaram e o gaba
 
 ## Decisões em aberto (do Eduardo)
 
-1. De onde vem o bloco novo e difícil: criar nós mesmos ou usar um banco publicado depois do corte de treino dos modelos.
+1. ~~De onde vem o bloco novo e difícil~~: gerador por programa, pares clássico × sorteado (15/11). Falta escolher os problemas clássicos de origem.
 2. Bloco antigo: reaproveitar o conf2-mmlu (mais barato, já visto, vira análise de dados existentes) ou coletar de novo.
 3. Se o Hao entra como comparação.
 
