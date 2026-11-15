@@ -105,3 +105,11 @@ Recomendação do Opus: reaproveitar o conf2-mmlu como bloco antigo, declarando 
 - **B0 entra no desenho (decisão do Eduardo, 15/11):** resposta sem raciocínio (só a letra), em clássico × sorteado. Replica o Zero-CoT no nosso painel e dá a âncora de memória pura. Condições: B0, B1 e B2.
 - **Crítica do Eduardo à validação deles (15/11):** a versão isomórfica só é aceita quando dois LLMs juízes (o4-mini e Gemini-2.5-flash) concordam. Pelo texto 2, juízes de LLM têm erros correlacionados: dois juízes valem bem menos que dois (N_eff ≈ 1,2 a 1,4 no MMLU-Pro). A concordância deles é uma validação mais fraca do que parece. A nossa versão sorteada não depende de juiz.
 - **Diferença de lente:** eles olham só o acerto. Nós olhamos o acerto **e o erro**: a mesma opção errada entre empresas, a confiança e o caminho quando o modelo erra.
+
+## Piloto (15/11/2026, rodada sp-piloto, não é dado)
+
+5 pares do nível "difícil" (fórmula de uma etapa), B1, painel misto. Custo: US$ 0,057.
+- Clássico: acerto perto de 100%. Sorteado: perto de 90%. Confiança "alta" em quase tudo, nos dois lados.
+- O tamanho do raciocínio varia demais entre modelos para 5 pares mostrarem algo.
+
+**Conclusão:** fácil demais, fora da faixa de 30% a 60% de erro. O nível de uma etapa fica só como controle "fácil". Antes da coleta, é preciso montar moldes de várias etapas (encadear duas ou três fórmulas) e buscar clássicos difíceis (OpenStax, SciBench), e repetir o piloto.
