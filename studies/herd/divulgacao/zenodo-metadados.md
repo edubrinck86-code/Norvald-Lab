@@ -17,3 +17,11 @@ Comum aos três:
 | 3 | studies/formato/texto3-en.pdf | Does the Format of a Model's Own Previous Answer Anchor Reconsideration? Structured Items vs Plain Text in an LLM Panel | OSF 46erj |
 
 Resumo: o Abstract de cada texto-en.md, sem alteração.
+
+## Publicados (15/11/2026)
+
+| Texto | DOI |
+|---|---|
+| 1 | 10.5281/zenodo.24265239 |
+| 2 | 10.5281/zenodo.24265355 |
+| 3 | 10.5281/zenodo.24265357 |
