@@ -6,6 +6,10 @@ Rascunho de plano, 15/11/2026. Leitura pendente — proprietário. Ainda sem OSF
 
 O raciocínio de um LLM não cria o erro em comum entre modelos; ele mostra a memória em comum (os pesos, os dados de treino) que causa esse erro (reenquadramento do AROF, 12/11). Se isso vale, o raciocínio deve ter outra cara quando a pergunta está na memória e quando não está.
 
+## Por que a memória é comum (fundamento, do Eduardo, 15/11)
+
+A origem é a mesma para todas as LLMs: a mesma arquitetura (o transformer), a mesma base de dados (a internet, os benchmarks publicados) e, por cima disso, a cópia entre modelos (dados sintéticos, destilação, feedback de IA, como no Constitutional AI da Anthropic, nos dados sintéticos do Llama 3 e na série Phi). Que existe memória em comum entre empresas não está em discussão. O que a tese mede é quanto dela aparece no raciocínio, e de que forma.
+
 ## Hipóteses (a registrar)
 
 Contraste entre dois blocos: **antigas** (MMLU herdado pelo MMLU-Pro, muito publicado) e **novas e difíceis** (fora da internet).
