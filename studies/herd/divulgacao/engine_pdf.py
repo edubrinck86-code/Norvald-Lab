@@ -62,7 +62,7 @@ t(7, 18, "Sistemas em que a IA trabalha em etapas ou revisa o próprio trabalho:
 # Rodapé
 ax.add_patch(Rectangle((0, 0), 100, 9, color=NAVY))
 t(7, 6.2, "Comece com um diagnóstico: onde sua IA oscila e quanto isso custa.", color="white", fontsize=10, weight="bold")
-t(7, 2.8, "Eduardo Guedes · Norvald   [contato]", color=CYAN, fontsize=9.5)
+t(7, 2.8, "Eduardo Guedes · Norvald   ·   contato@norvald.com.br", color=CYAN, fontsize=9.5)
 
 fig.savefig("engine-documental-norvald.pdf", facecolor=fig.get_facecolor())
 fig.savefig("engine-documental-norvald.png", dpi=110, facecolor=fig.get_facecolor())
