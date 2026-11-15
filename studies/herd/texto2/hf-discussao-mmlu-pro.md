@@ -36,3 +36,17 @@ Hi, and thanks for MMLU-Pro. While analysing a panel of five open models (Gemma 
 - Code: https://github.com/edubrinck86-code/Norvald-Lab
 
 Eduardo Guedes, independent researcher (ORCID 0009-0003-9960-3337)
+
+---
+
+## Complemento (rascunho de 15/11/2026, publicar só com o "pode" do Eduardo)
+
+Two more items, found while recomputing calculation questions for a follow-up study. Here the key itself does not match the question:
+
+**question_id 833** (theoremQA-Finance), "A debt of $25,000 is to be amortized over 7 years at 7% interest. What value of monthly payments will achieve this?"
+- Key: H, 4638.83. This is the **annual** payment: 25000 × 0.07 / (1 − 1.07⁻⁷) ≈ 4638.83.
+- The monthly payment would be about $377 (r = 0.07/12, n = 84), which is not among the options.
+
+**question_id 10700** (theoremQA-EECS), one-hour 1920×1080 YUV 4:2:2 video, 8 bits per component, 30 fps, "storage requirement ... in Gbytes".
+- 1920 × 1080 × 2 bytes × 30 × 3600 ≈ 447.9 × 10⁹ bytes.
+- Key: C, 417, which is the value in GiB (2³⁰ bytes). In GB (10⁹ bytes) it would be about 448, not among the options.
