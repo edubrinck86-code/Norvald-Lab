@@ -43,11 +43,10 @@ t(7, 53, "A engine organiza a informação antes de entregá-la à IA: cada dado
 
 # Provas em 3 colunas
 cols = [("30+", "modelos de IA testados,\nde empresas diferentes"),
-        ("3", "sistemas da Norvald\nusando a engine"),
         ("3", "pesquisas publicadas,\ncom dados abertos")]
 for i, (big, small) in enumerate(cols):
-    x = 7 + i * 29.5
-    ax.add_patch(FancyBboxPatch((x, 27), 26.5, 16, boxstyle="round,pad=0,rounding_size=1.5", color=NAVY))
+    x = 7 + i * 44.5
+    ax.add_patch(FancyBboxPatch((x, 27), 41.5, 16, boxstyle="round,pad=0,rounding_size=1.5", color=NAVY))
     t(x + 3, 41, big, color=CYAN, fontsize=22, weight="bold")
     t(x + 3, 34, small, color="white", fontsize=9, linespacing=1.4)
 
