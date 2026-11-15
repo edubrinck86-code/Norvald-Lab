@@ -31,7 +31,7 @@ Muitos trabalhos validam resultados com "dois juízes concordaram" ou "o painel 
 ## Declarado de saída
 
 - A coleta foi feita com um software meu (Norvald Lab). O código das análises e os dados estão abertos.
-- Achamos gabaritos com defeito no MMLU-Pro que inflam o erro em comum; estão na discussão #57 do dataset e a análise sem eles está no texto (a correlação cai de 0,64 para 0,57, e a conclusão não muda).
+- Achamos gabaritos com defeito no MMLU-Pro que inflam o erro em comum; estão na discussão #57 do dataset. Sem as 7 perguntas suspeitas, a correlação cai de 0,64 para 0,57 e a conclusão não muda.
 
 ## Links
 
