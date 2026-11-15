@@ -16,7 +16,7 @@ Foi isso que eu medi. A mesma tarefa, com os mesmos modelos, com e sem a Engine 
 • **62% menos mudanças de resposta.** Sem a engine, a IA mudou de ideia em 1 de cada 10 revisões. Com ela, em 1 de cada 25. E o acerto não caiu.
 • **De 19,6% para 2,9%** quando a IA revê o próprio trabalho completo, organizado, em vez de só a escolha anterior.
 
-São mais de 10.649 respostas coletadas, com modelos de cinco empresas diferentes, em três pesquisas publicadas com dados abertos.
+São 10.649 respostas coletadas, com modelos de cinco empresas diferentes, em três pesquisas publicadas com dados abertos.
 
 A engine não deixa a IA mais inteligente. Deixa ela confiável.
 
