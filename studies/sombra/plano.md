@@ -84,3 +84,18 @@ Recomendação do Opus: reaproveitar o conf2-mmlu como bloco antigo, declarando 
   - MemLens (2509.20909): amostras contaminadas travam na resposta cedo e com confiança alta, um sinal medido por dentro do modelo.
 
 **Lacuna, pela busca:** ninguém isola a memória de treino como causa do erro e do caminho em comum **entre empresas**, medido por fora (sem pesos, sem juiz), com pares clássico × sorteado. É a contribuição a declarar. O MemLens é o paralelo interno da hipótese "alta = memória" e deve ser citado como tal.
+
+## Leitura completa (15/11): Kim et al. e Zero-CoT
+
+**Kim et al. (2506.07962), ICML 2025**
+- A métrica é a concordância quando os dois erram (a mesma opção errada). O acaso com 10 opções é cerca de 0,12, e eles acham 0,42 no HuggingFace e 0,6 no HELM.
+- Mesma empresa soma pouco: +0,022 no HELM. Modelos mais precisos têm erros mais correlacionados, o que bate com o Sonnet (erra menos e erra mais junto).
+- Não testa a memória nem olha o raciocínio.
+- **Adotar a métrica deles ao lado do ρ̄_erro**, para comparar direto.
+
+**Zero-CoT (2605.21856)**
+- Força a resposta sem raciocínio e compara o original com uma versão isomórfica. Com raciocínio, a diferença entre contaminado e limpo encolhe; sem raciocínio, ela abre.
+- A versão isomórfica deles é gerada pelo o3-mini e aceita por dois juízes. A nossa é gerada por programa, sem juiz.
+- Não mede o tamanho do raciocínio nem a confiança por item.
+- **Implicação:** no acerto, o raciocínio esconde a memória. Na nossa hipótese, ele deixa rastro no tamanho, na confiança e no caminho. As duas podem ser verdade ao mesmo tempo, e isso entra na discussão.
+- **Condição candidata:** B0, uma resposta sem raciocínio (só a letra), em clássico × sorteado. Ela replica o Zero-CoT no nosso painel e dá a âncora de memória pura.
