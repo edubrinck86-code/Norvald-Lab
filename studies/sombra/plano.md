@@ -98,4 +98,6 @@ Recomendação do Opus: reaproveitar o conf2-mmlu como bloco antigo, declarando 
 - A versão isomórfica deles é gerada pelo o3-mini e aceita por dois juízes. A nossa é gerada por programa, sem juiz.
 - Não mede o tamanho do raciocínio nem a confiança por item.
 - **Implicação:** no acerto, o raciocínio esconde a memória. Na nossa hipótese, ele deixa rastro no tamanho, na confiança e no caminho. As duas podem ser verdade ao mesmo tempo, e isso entra na discussão.
-- **Condição candidata:** B0, uma resposta sem raciocínio (só a letra), em clássico × sorteado. Ela replica o Zero-CoT no nosso painel e dá a âncora de memória pura.
+- **B0 entra no desenho (decisão do Eduardo, 15/11):** resposta sem raciocínio (só a letra), em clássico × sorteado. Replica o Zero-CoT no nosso painel e dá a âncora de memória pura. Condições: B0, B1 e B2.
+- **Crítica do Eduardo à validação deles (15/11):** a versão isomórfica só é aceita quando dois LLMs juízes (o4-mini e Gemini-2.5-flash) concordam. Pelo texto 2, juízes de LLM têm erros correlacionados: dois juízes valem bem menos que dois (N_eff ≈ 1,2 a 1,4 no MMLU-Pro). A concordância deles é uma validação mais fraca do que parece. A nossa versão sorteada não depende de juiz.
+- **Diferença de lente:** eles olham só o acerto. Nós olhamos o acerto **e o erro**: a mesma opção errada entre empresas, a confiança e o caminho quando o modelo erra.
