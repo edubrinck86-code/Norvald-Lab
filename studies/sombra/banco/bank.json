@@ -1,0 +1,2097 @@
+{
+ "schema": "sombra.bank.v1",
+ "seed": 20261115,
+ "questions": [
+  {
+   "id": "c-m00119",
+   "kind": "gabarito",
+   "category": "business",
+   "versao": "classico",
+   "par": "m00119",
+   "question": "Paul Murphy wants to have $10,000 in his account after 10 years. If interest is compounded annually at 4%, how much should Mr. Murphy invest now?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$7,000.00"
+    },
+    {
+     "id": "option-b",
+     "content": "$8,000.00"
+    },
+    {
+     "id": "option-c",
+     "content": "$6,500.00"
+    },
+    {
+     "id": "option-d",
+     "content": "$6,000.00"
+    },
+    {
+     "id": "option-e",
+     "content": "$7,500.00"
+    },
+    {
+     "id": "option-f",
+     "content": "$6,756.00"
+    },
+    {
+     "id": "option-g",
+     "content": "$6,300.00"
+    },
+    {
+     "id": "option-h",
+     "content": "$7,800.00"
+    },
+    {
+     "id": "option-i",
+     "content": "$7,250.00"
+    },
+    {
+     "id": "option-j",
+     "content": "$6,900.00"
+    }
+   ]
+  },
+  {
+   "id": "s-m00119",
+   "kind": "gabarito",
+   "category": "business",
+   "versao": "sorteado",
+   "par": "m00119",
+   "parametros": {
+    "fv": 19000.0,
+    "n": 12.0,
+    "r": 7.4
+   },
+   "question": "Elena Petrova wants to have $19,000 in the account after 12 years. If interest is compounded annually at 7.4%, how much should Elena Petrova invest now?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$4,033.41"
+    },
+    {
+     "id": "option-b",
+     "content": "$8,066.82"
+    },
+    {
+     "id": "option-c",
+     "content": "$7,260.14"
+    },
+    {
+     "id": "option-d",
+     "content": "$10,063.56"
+    },
+    {
+     "id": "option-e",
+     "content": "$8,663.76"
+    },
+    {
+     "id": "option-f",
+     "content": "$6,453.45"
+    },
+    {
+     "id": "option-g",
+     "content": "$8,873.50"
+    },
+    {
+     "id": "option-h",
+     "content": "$9,276.84"
+    },
+    {
+     "id": "option-i",
+     "content": "$6,050.11"
+    },
+    {
+     "id": "option-j",
+     "content": "$7,552.41"
+    }
+   ]
+  },
+  {
+   "id": "c-m00186",
+   "kind": "gabarito",
+   "category": "business",
+   "versao": "classico",
+   "par": "m00186",
+   "question": "A television sells for $226.50. The markup is 30% based on the cost. Find the cost.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$190.20"
+    },
+    {
+     "id": "option-b",
+     "content": "$152.35"
+    },
+    {
+     "id": "option-c",
+     "content": "$198.75"
+    },
+    {
+     "id": "option-d",
+     "content": "$174.23"
+    },
+    {
+     "id": "option-e",
+     "content": "$210.00"
+    },
+    {
+     "id": "option-f",
+     "content": "$158.90"
+    },
+    {
+     "id": "option-g",
+     "content": "$165.35"
+    },
+    {
+     "id": "option-h",
+     "content": "$145.00"
+    },
+    {
+     "id": "option-i",
+     "content": "$200.50"
+    },
+    {
+     "id": "option-j",
+     "content": "$180.40"
+    }
+   ]
+  },
+  {
+   "id": "s-m00186",
+   "kind": "gabarito",
+   "category": "business",
+   "versao": "sorteado",
+   "par": "m00186",
+   "parametros": {
+    "preco": 800.51,
+    "m": 26.0
+   },
+   "question": "A television sells for $800.51. The markup is 26% based on the cost. Find the cost.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$508.26"
+    },
+    {
+     "id": "option-b",
+     "content": "$635.33"
+    },
+    {
+     "id": "option-c",
+     "content": "$571.79"
+    },
+    {
+     "id": "option-d",
+     "content": "$730.62"
+    },
+    {
+     "id": "option-e",
+     "content": "$698.86"
+    },
+    {
+     "id": "option-f",
+     "content": "$317.66"
+    },
+    {
+     "id": "option-g",
+     "content": "$476.49"
+    },
+    {
+     "id": "option-h",
+     "content": "$592.38"
+    },
+    {
+     "id": "option-i",
+     "content": "$794.16"
+    },
+    {
+     "id": "option-j",
+     "content": "$519.25"
+    }
+   ]
+  },
+  {
+   "id": "c-m00231",
+   "kind": "gabarito",
+   "category": "business",
+   "versao": "classico",
+   "par": "m00231",
+   "question": "Mr. Stone decides to take a loan from his bank to purchase a new car. If he borrows $4,000 for ninety days at 6 percent discount, how much will he actually receive?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$3,760"
+    },
+    {
+     "id": "option-b",
+     "content": "$4,060"
+    },
+    {
+     "id": "option-c",
+     "content": "$4,120"
+    },
+    {
+     "id": "option-d",
+     "content": "$3,880"
+    },
+    {
+     "id": "option-e",
+     "content": "$3,800"
+    },
+    {
+     "id": "option-f",
+     "content": "$3,860"
+    },
+    {
+     "id": "option-g",
+     "content": "$3,960"
+    },
+    {
+     "id": "option-h",
+     "content": "$3,900"
+    },
+    {
+     "id": "option-i",
+     "content": "$4,000"
+    },
+    {
+     "id": "option-j",
+     "content": "$3,940"
+    }
+   ]
+  },
+  {
+   "id": "s-m00231",
+   "kind": "gabarito",
+   "category": "business",
+   "versao": "sorteado",
+   "par": "m00231",
+   "parametros": {
+    "c": 7900.0,
+    "d": 80.0,
+    "r": 9.0
+   },
+   "question": "Daniel Okafor decides to take a loan from the bank to purchase a new car. If he borrows $7,900 for 80 days at 9 percent discount, how much will be actually received?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$6,967.80"
+    },
+    {
+     "id": "option-b",
+     "content": "$8,058.00"
+    },
+    {
+     "id": "option-c",
+     "content": "$7,189.00"
+    },
+    {
+     "id": "option-d",
+     "content": "$5,806.50"
+    },
+    {
+     "id": "option-e",
+     "content": "$8,516.20"
+    },
+    {
+     "id": "option-f",
+     "content": "$3,871.00"
+    },
+    {
+     "id": "option-g",
+     "content": "$7,744.16"
+    },
+    {
+     "id": "option-h",
+     "content": "$8,903.30"
+    },
+    {
+     "id": "option-i",
+     "content": "$6,193.60"
+    },
+    {
+     "id": "option-j",
+     "content": "$7,742.00"
+    }
+   ]
+  },
+  {
+   "id": "c-m00252",
+   "kind": "gabarito",
+   "category": "business",
+   "versao": "classico",
+   "par": "m00252",
+   "question": "A bicycle selling for $82 can be purchased on the installment plan with no down-payment, but a 10% per year finance charge. How much should each of the monthly payments be to pay off the bicycle in six months?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$15.85"
+    },
+    {
+     "id": "option-b",
+     "content": "$13.65"
+    },
+    {
+     "id": "option-c",
+     "content": "$13.35"
+    },
+    {
+     "id": "option-d",
+     "content": "$16.35"
+    },
+    {
+     "id": "option-e",
+     "content": "$15.35"
+    },
+    {
+     "id": "option-f",
+     "content": "$14.85"
+    },
+    {
+     "id": "option-g",
+     "content": "$14.35"
+    },
+    {
+     "id": "option-h",
+     "content": "$13.85"
+    },
+    {
+     "id": "option-i",
+     "content": "$12.85"
+    },
+    {
+     "id": "option-j",
+     "content": "$12.35"
+    }
+   ]
+  },
+  {
+   "id": "s-m00252",
+   "kind": "gabarito",
+   "category": "business",
+   "versao": "sorteado",
+   "par": "m00252",
+   "parametros": {
+    "c": 265.0,
+    "r": 17.0,
+    "m": 7.0
+   },
+   "question": "A bicycle selling for $265 can be purchased on the installment plan with no down-payment, but a 17% per year finance charge. How much should each of the monthly payments be to pay off the bicycle in 7 months?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$31.21"
+    },
+    {
+     "id": "option-b",
+     "content": "$47.85"
+    },
+    {
+     "id": "option-c",
+     "content": "$37.86"
+    },
+    {
+     "id": "option-d",
+     "content": "$37.45"
+    },
+    {
+     "id": "option-e",
+     "content": "$45.77"
+    },
+    {
+     "id": "option-f",
+     "content": "$33.29"
+    },
+    {
+     "id": "option-g",
+     "content": "$52.01"
+    },
+    {
+     "id": "option-h",
+     "content": "$41.61"
+    },
+    {
+     "id": "option-i",
+     "content": "$44.29"
+    },
+    {
+     "id": "option-j",
+     "content": "$20.81"
+    }
+   ]
+  },
+  {
+   "id": "c-m00348",
+   "kind": "gabarito",
+   "category": "business",
+   "versao": "classico",
+   "par": "m00348",
+   "question": "Norman Stevens lives in a town where 28% of the property tax is passed along to the county government. Mr. Stevens owns a home which was assessed for $17,400. If the town's tax rate is $24.90 per $1,000, how much of his tax was passed along to the county government?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$152.31"
+    },
+    {
+     "id": "option-b",
+     "content": "$162.29"
+    },
+    {
+     "id": "option-c",
+     "content": "$311.95"
+    },
+    {
+     "id": "option-d",
+     "content": "$88.76"
+    },
+    {
+     "id": "option-e",
+     "content": "$205.85"
+    },
+    {
+     "id": "option-f",
+     "content": "$121.31"
+    },
+    {
+     "id": "option-g",
+     "content": "$96.42"
+    },
+    {
+     "id": "option-h",
+     "content": "$134.58"
+    },
+    {
+     "id": "option-i",
+     "content": "$181.56"
+    },
+    {
+     "id": "option-j",
+     "content": "$312.26"
+    }
+   ]
+  },
+  {
+   "id": "s-m00348",
+   "kind": "gabarito",
+   "category": "business",
+   "versao": "sorteado",
+   "par": "m00348",
+   "parametros": {
+    "k": 44.0,
+    "a": 69300.0,
+    "t": 35.76
+   },
+   "question": "Laura Fischer lives in a town where 44% of the property tax is passed along to the county government. Laura Fischer owns a home which was assessed for $69,300. If the town's tax rate is $35.76 per $1,000, how much of the tax was passed along to the county government?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$1,199.43"
+    },
+    {
+     "id": "option-b",
+     "content": "$1,090.39"
+    },
+    {
+     "id": "option-c",
+     "content": "$2,180.79"
+    },
+    {
+     "id": "option-d",
+     "content": "$817.80"
+    },
+    {
+     "id": "option-e",
+     "content": "$872.32"
+    },
+    {
+     "id": "option-f",
+     "content": "$1,387.77"
+    },
+    {
+     "id": "option-g",
+     "content": "$981.35"
+    },
+    {
+     "id": "option-h",
+     "content": "$545.20"
+    },
+    {
+     "id": "option-i",
+     "content": "$1,253.95"
+    },
+    {
+     "id": "option-j",
+     "content": "$2,478.17"
+    }
+   ]
+  },
+  {
+   "id": "c-m00658",
+   "kind": "gabarito",
+   "category": "business",
+   "versao": "classico",
+   "par": "m00658",
+   "question": "James took a loan of $240 for 30 days at 6% interest. How much interest did he have to pay?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$0.36"
+    },
+    {
+     "id": "option-b",
+     "content": "$14.40"
+    },
+    {
+     "id": "option-c",
+     "content": "$3.60"
+    },
+    {
+     "id": "option-d",
+     "content": "$2.40"
+    },
+    {
+     "id": "option-e",
+     "content": "$7.20"
+    },
+    {
+     "id": "option-f",
+     "content": "$12.00"
+    },
+    {
+     "id": "option-g",
+     "content": "$0.60"
+    },
+    {
+     "id": "option-h",
+     "content": "$4.80"
+    },
+    {
+     "id": "option-i",
+     "content": "$1.80"
+    },
+    {
+     "id": "option-j",
+     "content": "$1.20"
+    }
+   ]
+  },
+  {
+   "id": "s-m00658",
+   "kind": "gabarito",
+   "category": "business",
+   "versao": "sorteado",
+   "par": "m00658",
+   "parametros": {
+    "c": 207.0,
+    "d": 29.0,
+    "r": 14.0
+   },
+   "question": "Omar Haddad took a loan of $207 for 29 days at 14% interest. How much interest had to be paid?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$2.33"
+    },
+    {
+     "id": "option-b",
+     "content": "$2.57"
+    },
+    {
+     "id": "option-c",
+     "content": "$2.42"
+    },
+    {
+     "id": "option-d",
+     "content": "$1.87"
+    },
+    {
+     "id": "option-e",
+     "content": "$1.17"
+    },
+    {
+     "id": "option-f",
+     "content": "$2.10"
+    },
+    {
+     "id": "option-g",
+     "content": "$28.98"
+    },
+    {
+     "id": "option-h",
+     "content": "$1.75"
+    },
+    {
+     "id": "option-i",
+     "content": "$2.68"
+    },
+    {
+     "id": "option-j",
+     "content": "$2.30"
+    }
+   ]
+  },
+  {
+   "id": "c-m05641",
+   "kind": "gabarito",
+   "category": "other",
+   "versao": "classico",
+   "par": "m05641",
+   "question": "A company sells DVD players for $200 per unit. The players have a unit variable cost of $160. The company estimates that it will sell one home entertainment system for every four DVD players sold. Home entertainment systems have a unit variable cost of $460 and sell for $600 per unit. The company's fixed costs are $90000. Assuming that the sales mix estimate is correct how many DVD players need to be sold for the company to break even?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "300"
+    },
+    {
+     "id": "option-b",
+     "content": "2000"
+    },
+    {
+     "id": "option-c",
+     "content": "500"
+    },
+    {
+     "id": "option-d",
+     "content": "400"
+    },
+    {
+     "id": "option-e",
+     "content": "700"
+    },
+    {
+     "id": "option-f",
+     "content": "1200"
+    },
+    {
+     "id": "option-g",
+     "content": "1000"
+    },
+    {
+     "id": "option-h",
+     "content": "800"
+    },
+    {
+     "id": "option-i",
+     "content": "600"
+    },
+    {
+     "id": "option-j",
+     "content": "1500"
+    }
+   ]
+  },
+  {
+   "id": "s-m05641",
+   "kind": "gabarito",
+   "category": "other",
+   "versao": "sorteado",
+   "par": "m05641",
+   "parametros": {
+    "p1": 170.0,
+    "c1": 130.0,
+    "k": 4.0,
+    "c2": 420.0,
+    "p2": 620.0,
+    "f": 100000.0
+   },
+   "question": "A company sells DVD players for $170 per unit. The players have a unit variable cost of $130. The company estimates that it will sell one home entertainment system for every 4 DVD players sold. Home entertainment systems have a unit variable cost of $420 and sell for $620 per unit. The company's fixed costs are $100,000. Assuming that the sales mix estimate is correct how many DVD players need to be sold for the company to break even?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "1,222"
+    },
+    {
+     "id": "option-b",
+     "content": "2,500"
+    },
+    {
+     "id": "option-c",
+     "content": "889"
+    },
+    {
+     "id": "option-d",
+     "content": "833"
+    },
+    {
+     "id": "option-e",
+     "content": "556"
+    },
+    {
+     "id": "option-f",
+     "content": "1,111"
+    },
+    {
+     "id": "option-g",
+     "content": "1,278"
+    },
+    {
+     "id": "option-h",
+     "content": "278"
+    },
+    {
+     "id": "option-i",
+     "content": "1,000"
+    },
+    {
+     "id": "option-j",
+     "content": "1,389"
+    }
+   ]
+  },
+  {
+   "id": "c-m03782",
+   "kind": "gabarito",
+   "category": "chemistry",
+   "versao": "classico",
+   "par": "m03782",
+   "question": "Baking powder consists of a mixture of cream of tartar (potassium hydrogen tartrate, KHC_4 H_4 O_6, molecular weight = 188 g/mole) and baking soda (sodium bicarbonate, NaHC0_3, molecular weight = 84 g/mole). These two components react according to the equation KHC_4 H_4 O_6 + NaHCO_3 \\rightarrow KNaC_4 H_4 O_6 + H_2 O + CO_2. How much baking soda must be added to 8.0 g of cream of tartar for both materials to react completely?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "2.8 g of baking soda"
+    },
+    {
+     "id": "option-b",
+     "content": "5.1 g of baking soda"
+    },
+    {
+     "id": "option-c",
+     "content": "6.2 g of baking soda"
+    },
+    {
+     "id": "option-d",
+     "content": "3.2 g of baking soda"
+    },
+    {
+     "id": "option-e",
+     "content": "7.0 g of baking soda"
+    },
+    {
+     "id": "option-f",
+     "content": "2.2 g of baking soda"
+    },
+    {
+     "id": "option-g",
+     "content": "4.0 g of baking soda"
+    },
+    {
+     "id": "option-h",
+     "content": "4.3 g of baking soda"
+    },
+    {
+     "id": "option-i",
+     "content": "1.7 g of baking soda"
+    },
+    {
+     "id": "option-j",
+     "content": "3.6 g of baking soda"
+    }
+   ]
+  },
+  {
+   "id": "s-m03782",
+   "kind": "gabarito",
+   "category": "chemistry",
+   "versao": "sorteado",
+   "par": "m03782",
+   "parametros": {
+    "m": 8.0
+   },
+   "question": "Baking powder consists of a mixture of cream of tartar (potassium hydrogen tartrate, KHC_4 H_4 O_6, molecular weight = 188 g/mole) and baking soda (sodium bicarbonate, NaHCO_3, molecular weight = 84 g/mole). These two components react according to the equation KHC_4 H_4 O_6 + NaHCO_3 \\rightarrow KNaC_4 H_4 O_6 + H_2 O + CO_2. How much baking soda must be added to 8.0 g of cream of tartar for both materials to react completely?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "3.2 g of baking soda"
+    },
+    {
+     "id": "option-b",
+     "content": "1.8 g of baking soda"
+    },
+    {
+     "id": "option-c",
+     "content": "5.4 g of baking soda"
+    },
+    {
+     "id": "option-d",
+     "content": "7.1 g of baking soda"
+    },
+    {
+     "id": "option-e",
+     "content": "4.1 g of baking soda"
+    },
+    {
+     "id": "option-f",
+     "content": "2.7 g of baking soda"
+    },
+    {
+     "id": "option-g",
+     "content": "3.6 g of baking soda"
+    },
+    {
+     "id": "option-h",
+     "content": "3.9 g of baking soda"
+    },
+    {
+     "id": "option-i",
+     "content": "2.9 g of baking soda"
+    },
+    {
+     "id": "option-j",
+     "content": "4.5 g of baking soda"
+    }
+   ]
+  },
+  {
+   "id": "c-m04054",
+   "kind": "gabarito",
+   "category": "chemistry",
+   "versao": "classico",
+   "par": "m04054",
+   "question": "How much energy is emitted by Avogadro number of atoms, if they each emit a light wave of 400 nm wavelength?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "5.20 × 10^5 J"
+    },
+    {
+     "id": "option-b",
+     "content": "2.58 × 10^5 J"
+    },
+    {
+     "id": "option-c",
+     "content": "2.20 × 10^5 J"
+    },
+    {
+     "id": "option-d",
+     "content": "3.50 × 10^5 J"
+    },
+    {
+     "id": "option-e",
+     "content": "1.98 × 10^5 J"
+    },
+    {
+     "id": "option-f",
+     "content": "2.98 × 10^5 J"
+    },
+    {
+     "id": "option-g",
+     "content": "4.98 × 10^5 J"
+    },
+    {
+     "id": "option-h",
+     "content": "3.98 × 10^5 J"
+    },
+    {
+     "id": "option-i",
+     "content": "1.50 × 10^5 J"
+    },
+    {
+     "id": "option-j",
+     "content": "6.02 × 10^5 J"
+    }
+   ]
+  },
+  {
+   "id": "s-m04054",
+   "kind": "gabarito",
+   "category": "chemistry",
+   "versao": "sorteado",
+   "par": "m04054",
+   "parametros": {
+    "l": 262.0
+   },
+   "question": "How much energy is emitted by Avogadro number of atoms, if they each emit a light wave of 262 nm wavelength?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "3.42e+05 J"
+    },
+    {
+     "id": "option-b",
+     "content": "4.57e+05 J"
+    },
+    {
+     "id": "option-c",
+     "content": "2.28e+05 J"
+    },
+    {
+     "id": "option-d",
+     "content": "4.11e+05 J"
+    },
+    {
+     "id": "option-e",
+     "content": "5.02e+05 J"
+    },
+    {
+     "id": "option-f",
+     "content": "5.25e+05 J"
+    },
+    {
+     "id": "option-g",
+     "content": "3.65e+05 J"
+    },
+    {
+     "id": "option-h",
+     "content": "6.85e+05 J"
+    },
+    {
+     "id": "option-i",
+     "content": "5.71e+05 J"
+    },
+    {
+     "id": "option-j",
+     "content": "7.58e+04 J"
+    }
+   ]
+  },
+  {
+   "id": "c-m04139",
+   "kind": "gabarito",
+   "category": "chemistry",
+   "versao": "classico",
+   "par": "m04139",
+   "question": "The same quantity of electricity was passed through two separate electrolytic cells. The first of these contained a solution of copper sulfate (CuSO_4) and exhibited the following cathode reaction (reduction): Cu^2+ + 2e^- \\rightarrow Cu(s) . The second of these contained a solution of silver nitrate (AgNO_3) and exhibited the following cathode reaction: Ag^+ + e^- \\rightarrow Ag(s). If 3.18g of Cu were deposited in the first cell, how much (Ag) was de-posited in the second cell?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "6.3g"
+    },
+    {
+     "id": "option-b",
+     "content": "11.8g"
+    },
+    {
+     "id": "option-c",
+     "content": "14.7g"
+    },
+    {
+     "id": "option-d",
+     "content": "10.8g"
+    },
+    {
+     "id": "option-e",
+     "content": "13.9g"
+    },
+    {
+     "id": "option-f",
+     "content": "8.1g"
+    },
+    {
+     "id": "option-g",
+     "content": "7.2g"
+    },
+    {
+     "id": "option-h",
+     "content": "12.8g"
+    },
+    {
+     "id": "option-i",
+     "content": "9.8g"
+    },
+    {
+     "id": "option-j",
+     "content": "5.4g"
+    }
+   ]
+  },
+  {
+   "id": "s-m04139",
+   "kind": "gabarito",
+   "category": "chemistry",
+   "versao": "sorteado",
+   "par": "m04139",
+   "parametros": {
+    "m": 3.39
+   },
+   "question": "The same quantity of electricity was passed through two separate electrolytic cells. The first of these contained a solution of copper sulfate (CuSO_4) and exhibited the following cathode reaction (reduction): Cu^2+ + 2e^- \\rightarrow Cu(s) . The second of these contained a solution of silver nitrate (AgNO_3) and exhibited the following cathode reaction: Ag^+ + e^- \\rightarrow Ag(s). If 3.39g of Cu were deposited in the first cell, how much (Ag) was de-posited in the second cell?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "13.2g"
+    },
+    {
+     "id": "option-b",
+     "content": "8.6g"
+    },
+    {
+     "id": "option-c",
+     "content": "2.9g"
+    },
+    {
+     "id": "option-d",
+     "content": "14.4g"
+    },
+    {
+     "id": "option-e",
+     "content": "5.8g"
+    },
+    {
+     "id": "option-f",
+     "content": "11.5g"
+    },
+    {
+     "id": "option-g",
+     "content": "6.8g"
+    },
+    {
+     "id": "option-h",
+     "content": "9.2g"
+    },
+    {
+     "id": "option-i",
+     "content": "12.7g"
+    },
+    {
+     "id": "option-j",
+     "content": "10.4g"
+    }
+   ]
+  },
+  {
+   "id": "c-m04546",
+   "kind": "gabarito",
+   "category": "chemistry",
+   "versao": "classico",
+   "par": "m04546",
+   "question": "Exactly one mole of gaseous methane is oxidized at fixed volume and at 25°C according to the reaction CH_4(g) + 2O_2 (g) \\rightarrow CO_2(g) + 2H_2O(l). If 212 Kcal is liberated, what is the change in enthalpy, ∆H?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "- 213 Kcal"
+    },
+    {
+     "id": "option-b",
+     "content": "298 K"
+    },
+    {
+     "id": "option-c",
+     "content": "- 1180 cal"
+    },
+    {
+     "id": "option-d",
+     "content": "+ 1180 cal"
+    },
+    {
+     "id": "option-e",
+     "content": "+ 212 Kcal"
+    },
+    {
+     "id": "option-f",
+     "content": "- 50 Kcal"
+    },
+    {
+     "id": "option-g",
+     "content": "- 212 cal"
+    },
+    {
+     "id": "option-h",
+     "content": "- 212 Kcal"
+    },
+    {
+     "id": "option-i",
+     "content": "0 Kcal"
+    },
+    {
+     "id": "option-j",
+     "content": "- 500 Kcal"
+    }
+   ]
+  },
+  {
+   "id": "s-m04546",
+   "kind": "gabarito",
+   "category": "chemistry",
+   "versao": "sorteado",
+   "par": "m04546",
+   "parametros": {
+    "t": 11.0,
+    "q": 194.0
+   },
+   "question": "Exactly one mole of gaseous methane is oxidized at fixed volume and at 11°C according to the reaction CH_4(g) + 2O_2 (g) \\rightarrow CO_2(g) + 2H_2O(l). If 194 Kcal is liberated, what is the change in enthalpy, ∆H?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "-224.4 Kcal"
+    },
+    {
+     "id": "option-b",
+     "content": "-97.6 Kcal"
+    },
+    {
+     "id": "option-c",
+     "content": "-156.1 Kcal"
+    },
+    {
+     "id": "option-d",
+     "content": "-146.3 Kcal"
+    },
+    {
+     "id": "option-e",
+     "content": "-175.6 Kcal"
+    },
+    {
+     "id": "option-f",
+     "content": "-192.9 Kcal"
+    },
+    {
+     "id": "option-g",
+     "content": "194.0 Kcal"
+    },
+    {
+     "id": "option-h",
+     "content": "-194.0 Kcal"
+    },
+    {
+     "id": "option-i",
+     "content": "-214.6 Kcal"
+    },
+    {
+     "id": "option-j",
+     "content": "-195.1 Kcal"
+    }
+   ]
+  },
+  {
+   "id": "c-m09455",
+   "kind": "gabarito",
+   "category": "physics",
+   "versao": "classico",
+   "par": "m09455",
+   "question": "A uniformly charged conducting sphere of $1.2 \\mathrm{~m}$ diameter has surface charge density $8.1 \\mu \\mathrm{C} / \\mathrm{m}^2$. Find the net charge on the sphere.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "$97 \\mu \\mathrm{C}$"
+    },
+    {
+     "id": "option-b",
+     "content": "$37$$\\mu \\mathrm{C}$ "
+    },
+    {
+     "id": "option-c",
+     "content": "$77 \\mu \\mathrm{C}$"
+    },
+    {
+     "id": "option-d",
+     "content": "$87 \\mu \\mathrm{C}$"
+    },
+    {
+     "id": "option-e",
+     "content": "$17 \\mu \\mathrm{C}$"
+    },
+    {
+     "id": "option-f",
+     "content": "$57 \\mu \\mathrm{C}$"
+    },
+    {
+     "id": "option-g",
+     "content": "$47 \\mu \\mathrm{C}$"
+    },
+    {
+     "id": "option-h",
+     "content": "$67 \\mu \\mathrm{C}$"
+    },
+    {
+     "id": "option-i",
+     "content": "$107 \\mu \\mathrm{C}$"
+    },
+    {
+     "id": "option-j",
+     "content": "$27 \\mu \\mathrm{C}$"
+    }
+   ]
+  },
+  {
+   "id": "s-m09455",
+   "kind": "gabarito",
+   "category": "physics",
+   "versao": "sorteado",
+   "par": "m09455",
+   "parametros": {
+    "d": 0.4,
+    "s": 19.0
+   },
+   "question": "A uniformly charged conducting sphere of 0.4 m diameter has surface charge density 19.0 μC/m^2. Find the net charge on the sphere.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "5 μC"
+    },
+    {
+     "id": "option-b",
+     "content": "38 μC"
+    },
+    {
+     "id": "option-c",
+     "content": "7 μC"
+    },
+    {
+     "id": "option-d",
+     "content": "9 μC"
+    },
+    {
+     "id": "option-e",
+     "content": "11 μC"
+    },
+    {
+     "id": "option-f",
+     "content": "10 μC"
+    },
+    {
+     "id": "option-g",
+     "content": "2 μC"
+    },
+    {
+     "id": "option-h",
+     "content": "8 μC"
+    },
+    {
+     "id": "option-i",
+     "content": "1 μC"
+    },
+    {
+     "id": "option-j",
+     "content": "12 μC"
+    }
+   ]
+  },
+  {
+   "id": "c-m09890",
+   "kind": "gabarito",
+   "category": "physics",
+   "versao": "classico",
+   "par": "m09890",
+   "question": "What is the force between two positive charges of 100\\mu coulombs and 200\\mu coulombs, respectively, when they are separated a distance of 3 centimeters?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "5 x 10^5nt"
+    },
+    {
+     "id": "option-b",
+     "content": "1 x 10^5nt"
+    },
+    {
+     "id": "option-c",
+     "content": "7 x 10^5nt"
+    },
+    {
+     "id": "option-d",
+     "content": "3 x 10^5nt"
+    },
+    {
+     "id": "option-e",
+     "content": "6 x 10^5nt"
+    },
+    {
+     "id": "option-f",
+     "content": "4 x 10^5nt"
+    },
+    {
+     "id": "option-g",
+     "content": "8 x 10^5nt"
+    },
+    {
+     "id": "option-h",
+     "content": "9 x 10^5nt"
+    },
+    {
+     "id": "option-i",
+     "content": "1 x 10^6nt"
+    },
+    {
+     "id": "option-j",
+     "content": "2 x 10^5nt"
+    }
+   ]
+  },
+  {
+   "id": "s-m09890",
+   "kind": "gabarito",
+   "category": "physics",
+   "versao": "sorteado",
+   "par": "m09890",
+   "parametros": {
+    "q1": 120.0,
+    "q2": 90.0,
+    "r": 9.0
+   },
+   "question": "What is the force between two positive charges of 120μ coulombs and 90μ coulombs, respectively, when they are separated a distance of 9 centimeters?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "5.99e+03 N"
+    },
+    {
+     "id": "option-b",
+     "content": "1.32e+04 N"
+    },
+    {
+     "id": "option-c",
+     "content": "1.20e+04 N"
+    },
+    {
+     "id": "option-d",
+     "content": "1.38e+04 N"
+    },
+    {
+     "id": "option-e",
+     "content": "1.08e+04 N"
+    },
+    {
+     "id": "option-f",
+     "content": "1.20e+02 N"
+    },
+    {
+     "id": "option-g",
+     "content": "9.59e+03 N"
+    },
+    {
+     "id": "option-h",
+     "content": "1.50e+04 N"
+    },
+    {
+     "id": "option-i",
+     "content": "1.08e+03 N"
+    },
+    {
+     "id": "option-j",
+     "content": "8.99e+03 N"
+    }
+   ]
+  },
+  {
+   "id": "c-m09911",
+   "kind": "gabarito",
+   "category": "physics",
+   "versao": "classico",
+   "par": "m09911",
+   "question": "A baseball pitcher throws a ball weighing 1/3 pound with an acceleration of 480 feet per second^2. How much force does he apply to the ball?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "7.5 lbs. of force"
+    },
+    {
+     "id": "option-b",
+     "content": "3 lbs. of force"
+    },
+    {
+     "id": "option-c",
+     "content": "4 lbs. of force"
+    },
+    {
+     "id": "option-d",
+     "content": "10 lbs. of force"
+    },
+    {
+     "id": "option-e",
+     "content": "0.5 lbs. of force"
+    },
+    {
+     "id": "option-f",
+     "content": "2 lbs. of force"
+    },
+    {
+     "id": "option-g",
+     "content": "5 lbs. of force"
+    },
+    {
+     "id": "option-h",
+     "content": "6 lbs. of force"
+    },
+    {
+     "id": "option-i",
+     "content": "8 lbs. of force"
+    },
+    {
+     "id": "option-j",
+     "content": "160 lbs. of force"
+    }
+   ]
+  },
+  {
+   "id": "s-m09911",
+   "kind": "gabarito",
+   "category": "physics",
+   "versao": "sorteado",
+   "par": "m09911",
+   "parametros": {
+    "w": 1.34,
+    "a": 230.0
+   },
+   "question": "A baseball pitcher throws a ball weighing 1.34 pound with an acceleration of 230 feet per second^2. How much force does he apply to the ball?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "4.82 lbs. of force"
+    },
+    {
+     "id": "option-b",
+     "content": "31.45 lbs. of force"
+    },
+    {
+     "id": "option-c",
+     "content": "11.08 lbs. of force"
+    },
+    {
+     "id": "option-d",
+     "content": "7.71 lbs. of force"
+    },
+    {
+     "id": "option-e",
+     "content": "9.63 lbs. of force"
+    },
+    {
+     "id": "option-f",
+     "content": "7.22 lbs. of force"
+    },
+    {
+     "id": "option-g",
+     "content": "10.59 lbs. of force"
+    },
+    {
+     "id": "option-h",
+     "content": "0.19 lbs. of force"
+    },
+    {
+     "id": "option-i",
+     "content": "8.67 lbs. of force"
+    },
+    {
+     "id": "option-j",
+     "content": "308.20 lbs. of force"
+    }
+   ]
+  },
+  {
+   "id": "c-m10078",
+   "kind": "gabarito",
+   "category": "physics",
+   "versao": "classico",
+   "par": "m10078",
+   "question": "In a holography experiment, the reference source and the object are both 1 m from the hologram plate, and they are 100 mm apart. Estimate the scale of detail in the hologram fringes if the wavelength is 632.8 nm.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "3.16 × 10^-6 m"
+    },
+    {
+     "id": "option-b",
+     "content": "8.44 × 10^-6 m"
+    },
+    {
+     "id": "option-c",
+     "content": "5.01 × 10^-6 m"
+    },
+    {
+     "id": "option-d",
+     "content": "6.33 × 10^-6 m"
+    },
+    {
+     "id": "option-e",
+     "content": "4.27 × 10^-6 m"
+    },
+    {
+     "id": "option-f",
+     "content": "7.89 × 10^-6 m"
+    },
+    {
+     "id": "option-g",
+     "content": "9.65 × 10^-6 m"
+    },
+    {
+     "id": "option-h",
+     "content": "1.25 × 10^-6 m"
+    },
+    {
+     "id": "option-i",
+     "content": "7.52 × 10^-6 m"
+    },
+    {
+     "id": "option-j",
+     "content": "2.11 × 10^-6 m"
+    }
+   ]
+  },
+  {
+   "id": "s-m10078",
+   "kind": "gabarito",
+   "category": "physics",
+   "versao": "sorteado",
+   "par": "m10078",
+   "parametros": {
+    "L": 2.4,
+    "s": 64.0,
+    "l": 697.1
+   },
+   "question": "In a holography experiment, the reference source and the object are both 2.4 m from the hologram plate, and they are 64 mm apart. Estimate the scale of detail in the hologram fringes if the wavelength is 697.1 nm.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "1.96e-05 m"
+    },
+    {
+     "id": "option-b",
+     "content": "1.86e-05 m"
+    },
+    {
+     "id": "option-c",
+     "content": "3.27e-05 m"
+    },
+    {
+     "id": "option-d",
+     "content": "2.88e-05 m"
+    },
+    {
+     "id": "option-e",
+     "content": "2.61e-05 m"
+    },
+    {
+     "id": "option-f",
+     "content": "3.92e-05 m"
+    },
+    {
+     "id": "option-g",
+     "content": "2.09e-05 m"
+    },
+    {
+     "id": "option-h",
+     "content": "3.01e-05 m"
+    },
+    {
+     "id": "option-i",
+     "content": "2.35e-05 m"
+    },
+    {
+     "id": "option-j",
+     "content": "1.31e-05 m"
+    }
+   ]
+  },
+  {
+   "id": "c-m10189",
+   "kind": "gabarito",
+   "category": "physics",
+   "versao": "classico",
+   "par": "m10189",
+   "question": "A solution of camphor in alcohol in a tube 20 cm long rotates the plane of vibration of light passing through it 33°. What must the density of camphor be in the solution? The specific rotation of camphor is + 54°.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": ".450 grams per cc"
+    },
+    {
+     "id": "option-b",
+     "content": ".615 grams per cc"
+    },
+    {
+     "id": "option-c",
+     "content": ".306 grams per cc"
+    },
+    {
+     "id": "option-d",
+     "content": ".150 grams per cc"
+    },
+    {
+     "id": "option-e",
+     "content": ".350 grams per cc"
+    },
+    {
+     "id": "option-f",
+     "content": ".500 grams per cc"
+    },
+    {
+     "id": "option-g",
+     "content": ".405 grams per cc"
+    },
+    {
+     "id": "option-h",
+     "content": ".275 grams per cc"
+    },
+    {
+     "id": "option-i",
+     "content": ".250 grams per cc"
+    },
+    {
+     "id": "option-j",
+     "content": ".750 grams per cc"
+    }
+   ]
+  },
+  {
+   "id": "s-m10189",
+   "kind": "gabarito",
+   "category": "physics",
+   "versao": "sorteado",
+   "par": "m10189",
+   "parametros": {
+    "l": 29.0,
+    "a": 16.0,
+    "s": 80.0
+   },
+   "question": "A solution of camphor in alcohol in a tube 29 cm long rotates the plane of vibration of light passing through it 16°. What must the density of camphor be in the solution? The specific rotation of camphor is + 80°.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "0.200 grams per cc"
+    },
+    {
+     "id": "option-b",
+     "content": "0.052 grams per cc"
+    },
+    {
+     "id": "option-c",
+     "content": "0.055 grams per cc"
+    },
+    {
+     "id": "option-d",
+     "content": "1.724 grams per cc"
+    },
+    {
+     "id": "option-e",
+     "content": "0.076 grams per cc"
+    },
+    {
+     "id": "option-f",
+     "content": "0.062 grams per cc"
+    },
+    {
+     "id": "option-g",
+     "content": "0.069 grams per cc"
+    },
+    {
+     "id": "option-h",
+     "content": "0.007 grams per cc"
+    },
+    {
+     "id": "option-i",
+     "content": "0.079 grams per cc"
+    },
+    {
+     "id": "option-j",
+     "content": "0.034 grams per cc"
+    }
+   ]
+  },
+  {
+   "id": "c-m11964",
+   "kind": "gabarito",
+   "category": "engineering",
+   "versao": "classico",
+   "par": "m11964",
+   "question": "Assuming that a dipole antenna is placed 2 meters above theearth's surface, determine its operating frequency if the antennais placed one-quarter of a wavelength above the earth'ssurface.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "18.75MHz"
+    },
+    {
+     "id": "option-b",
+     "content": "50MHz"
+    },
+    {
+     "id": "option-c",
+     "content": "60MHz"
+    },
+    {
+     "id": "option-d",
+     "content": "90MHz"
+    },
+    {
+     "id": "option-e",
+     "content": "45MHz"
+    },
+    {
+     "id": "option-f",
+     "content": "100MHz"
+    },
+    {
+     "id": "option-g",
+     "content": "25MHz"
+    },
+    {
+     "id": "option-h",
+     "content": "37.5MHz"
+    },
+    {
+     "id": "option-i",
+     "content": "12.5MHz"
+    },
+    {
+     "id": "option-j",
+     "content": "75MHz"
+    }
+   ]
+  },
+  {
+   "id": "s-m11964",
+   "kind": "gabarito",
+   "category": "engineering",
+   "versao": "sorteado",
+   "par": "m11964",
+   "parametros": {
+    "h": 4.4
+   },
+   "question": "Assuming that a dipole antenna is placed 4.4 meters above the earth's surface, determine its operating frequency if the antenna is placed one-quarter of a wavelength above the earth's surface.",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "8.52MHz"
+    },
+    {
+     "id": "option-b",
+     "content": "68.18MHz"
+    },
+    {
+     "id": "option-c",
+     "content": "13.64MHz"
+    },
+    {
+     "id": "option-d",
+     "content": "17.05MHz"
+    },
+    {
+     "id": "option-e",
+     "content": "15.34MHz"
+    },
+    {
+     "id": "option-f",
+     "content": "18.75MHz"
+    },
+    {
+     "id": "option-g",
+     "content": "21.31MHz"
+    },
+    {
+     "id": "option-h",
+     "content": "12.78MHz"
+    },
+    {
+     "id": "option-i",
+     "content": "19.60MHz"
+    },
+    {
+     "id": "option-j",
+     "content": "34.09MHz"
+    }
+   ]
+  },
+  {
+   "id": "c-m12145",
+   "kind": "gabarito",
+   "category": "engineering",
+   "versao": "classico",
+   "par": "m12145",
+   "question": "Water (density) = 62.4 lb/ft^3, viscosity = 0.000672 lb/(ft) (sec) flows in a tube of 0.25 in. bore at a velocity of 1 fps. What is the drop in pressure in a length of 10 ft?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "15.38psf"
+    },
+    {
+     "id": "option-b",
+     "content": "8.22psf"
+    },
+    {
+     "id": "option-c",
+     "content": "17.89psf"
+    },
+    {
+     "id": "option-d",
+     "content": "9.78psf"
+    },
+    {
+     "id": "option-e",
+     "content": "20.25psf"
+    },
+    {
+     "id": "option-f",
+     "content": "18.67psf"
+    },
+    {
+     "id": "option-g",
+     "content": "10.5psf"
+    },
+    {
+     "id": "option-h",
+     "content": "23.45psf"
+    },
+    {
+     "id": "option-i",
+     "content": "12.15psf"
+    },
+    {
+     "id": "option-j",
+     "content": "11.00psf"
+    }
+   ]
+  },
+  {
+   "id": "s-m12145",
+   "kind": "gabarito",
+   "category": "engineering",
+   "versao": "sorteado",
+   "par": "m12145",
+   "parametros": {
+    "d": 0.12,
+    "u": 1.5,
+    "L": 9.0
+   },
+   "question": "Water (density) = 62.4 lb/ft^3, viscosity = 0.000672 lb/(ft) (sec) flows in a tube of 0.12 in. bore at a velocity of 1.5 fps. What is the drop in pressure in a length of 9 ft?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "2903.04psf"
+    },
+    {
+     "id": "option-b",
+     "content": "99.25psf"
+    },
+    {
+     "id": "option-c",
+     "content": "81.21psf"
+    },
+    {
+     "id": "option-d",
+     "content": "112.79psf"
+    },
+    {
+     "id": "option-e",
+     "content": "22.56psf"
+    },
+    {
+     "id": "option-f",
+     "content": "67.67psf"
+    },
+    {
+     "id": "option-g",
+     "content": "72.18psf"
+    },
+    {
+     "id": "option-h",
+     "content": "103.76psf"
+    },
+    {
+     "id": "option-i",
+     "content": "45.11psf"
+    },
+    {
+     "id": "option-j",
+     "content": "90.23psf"
+    }
+   ]
+  },
+  {
+   "id": "c-m08838",
+   "kind": "gabarito",
+   "category": "math",
+   "versao": "classico",
+   "par": "m08838",
+   "question": "Consider a group of 10 people {A,B,C,D,E,F,G,H,I,J} and we are to choose a committee of 4 people from them. Given that (1) A and B should not be chosen together, and that (2) A, C, F should not be chosen together, then how many ways are there to choose such a committee?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "184"
+    },
+    {
+     "id": "option-b",
+     "content": "200"
+    },
+    {
+     "id": "option-c",
+     "content": "220"
+    },
+    {
+     "id": "option-d",
+     "content": "150"
+    },
+    {
+     "id": "option-e",
+     "content": "135"
+    },
+    {
+     "id": "option-f",
+     "content": "176"
+    },
+    {
+     "id": "option-g",
+     "content": "210"
+    },
+    {
+     "id": "option-h",
+     "content": "190"
+    },
+    {
+     "id": "option-i",
+     "content": "126"
+    },
+    {
+     "id": "option-j",
+     "content": "165"
+    }
+   ]
+  },
+  {
+   "id": "s-m08838",
+   "kind": "gabarito",
+   "category": "math",
+   "versao": "sorteado",
+   "par": "m08838",
+   "parametros": {
+    "n": 14.0,
+    "k": 4.0
+   },
+   "question": "Consider a group of 14 people labelled A, B, C, ... and we are to choose a committee of 4 people from them. Given that (1) A and B should not be chosen together, and that (2) A, C, F should not be chosen together, then how many ways are there to choose such a committee?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "1001"
+    },
+    {
+     "id": "option-b",
+     "content": "694"
+    },
+    {
+     "id": "option-c",
+     "content": "925"
+    },
+    {
+     "id": "option-d",
+     "content": "740"
+    },
+    {
+     "id": "option-e",
+     "content": "935"
+    },
+    {
+     "id": "option-f",
+     "content": "462"
+    },
+    {
+     "id": "option-g",
+     "content": "1018"
+    },
+    {
+     "id": "option-h",
+     "content": "924"
+    },
+    {
+     "id": "option-i",
+     "content": "1064"
+    },
+    {
+     "id": "option-j",
+     "content": "832"
+    }
+   ]
+  },
+  {
+   "id": "c-m07846",
+   "kind": "gabarito",
+   "category": "math",
+   "versao": "classico",
+   "par": "m07846",
+   "question": "On a Cartesian coordinate plane, points $(1,2)$ and $(7, 4)$ are opposite vertices of a square. What is the area of the square?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "\\sqrt{30}"
+    },
+    {
+     "id": "option-b",
+     "content": "20"
+    },
+    {
+     "id": "option-c",
+     "content": "\\sqrt{20}"
+    },
+    {
+     "id": "option-d",
+     "content": "\\sqrt{40}"
+    },
+    {
+     "id": "option-e",
+     "content": "10"
+    },
+    {
+     "id": "option-f",
+     "content": "40"
+    },
+    {
+     "id": "option-g",
+     "content": "34"
+    },
+    {
+     "id": "option-h",
+     "content": "25"
+    },
+    {
+     "id": "option-i",
+     "content": "50"
+    },
+    {
+     "id": "option-j",
+     "content": "30"
+    }
+   ]
+  },
+  {
+   "id": "s-m07846",
+   "kind": "gabarito",
+   "category": "math",
+   "versao": "sorteado",
+   "par": "m07846",
+   "parametros": {
+    "x1": 0.0,
+    "y1": 5.0,
+    "x2": 9.0,
+    "y2": 7.0
+   },
+   "question": "On a Cartesian coordinate plane, points $(0,5)$ and $(9, 7)$ are opposite vertices of a square. What is the area of the square?",
+   "options": [
+    {
+     "id": "option-a",
+     "content": "85"
+    },
+    {
+     "id": "option-b",
+     "content": "34"
+    },
+    {
+     "id": "option-c",
+     "content": "46.75"
+    },
+    {
+     "id": "option-d",
+     "content": "42.5"
+    },
+    {
+     "id": "option-e",
+     "content": "9.21954"
+    },
+    {
+     "id": "option-f",
+     "content": "48.875"
+    },
+    {
+     "id": "option-g",
+     "content": "21.25"
+    },
+    {
+     "id": "option-h",
+     "content": "18"
+    },
+    {
+     "id": "option-i",
+     "content": "38.25"
+    },
+    {
+     "id": "option-j",
+     "content": "31.875"
+    }
+   ]
+  }
+ ]
+}
