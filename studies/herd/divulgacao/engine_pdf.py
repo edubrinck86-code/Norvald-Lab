@@ -15,7 +15,7 @@ def t(x, y, s, **k): ax.text(x, y, s, va="top", **k)
 ax.add_patch(Rectangle((0, 112), 100, 29.4, color=NAVY))
 t(7, 136, "NORVALD", color=CYAN, fontsize=11, weight="bold")
 t(7, 131, "Engine Documental", color="white", fontsize=30, weight="bold")
-t(7, 122.5, "Sua IA estável, previsível e rastreável.", color="#CBD5E1", fontsize=14)
+t(7, 122.5, "Estabilidade comprovada para a IA da sua empresa.", color="#CBD5E1", fontsize=14)
 
 # Dor
 t(7, 107, "Sua IA muda de resposta sem motivo?", color=INK, fontsize=16, weight="bold")
