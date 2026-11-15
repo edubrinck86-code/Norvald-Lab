@@ -1,0 +1,29 @@
+{
+ "B1": {
+  "perguntas": 139,
+  "acerto_por_modelo": {
+   "analyst-1": 0.7967479674796748,
+   "analyst-2": 0.6402877697841727,
+   "analyst-3": 0.6666666666666666,
+   "analyst-4": 0.7794117647058824,
+   "analyst-5": 0.7481481481481481
+  },
+  "melhor": 0.7967479674796748,
+  "voto_real": 0.7482014388489209,
+  "voto_se_independentes": 0.8725168969452739
+ },
+ "E": {
+  "perguntas": 140,
+  "acerto_por_modelo": {
+   "analyst-1": 0.8,
+   "analyst-2": 0.7122302158273381,
+   "analyst-3": 0.725925925925926,
+   "analyst-4": 0.7867647058823529,
+   "analyst-5": 0.7703703703703704
+  },
+  "melhor": 0.8,
+  "voto_real": 0.7785714285714286,
+  "voto_se_independentes": 0.9066442926994641
+ }
+}
+[exited with code 0]
