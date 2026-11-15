@@ -16,9 +16,9 @@ Uma engine que entrega a informação ao modelo de IA estruturada, rastreável e
 | Mudanças de resposta sem motivo | 10,3% | **3,9%** (−62%) |
 | Troca de um erro por outro erro | 20 casos | **4 casos** |
 | Acerto | igual | igual |
-| Custo por chamada | US$ 0,00100 | **US$ 0,00094** (−6,6%) |
+| Custo por chamada (bônus) | US$ 0,00100 | US$ 0,00094 (−6,6%) |
 
-**Em uma frase:** o modelo fica mais estável e previsível, sem perder acerto e sem custar mais.
+**Em uma frase:** o modelo fica estável e previsível: muda de resposta 62% menos, sem perder acerto. E ainda sai um pouco mais barato.
 
 ## Por que importa
 Sistemas em que a IA revisa o próprio trabalho em várias etapas (atendimento, análise de documentos, produção de conteúdo, agentes) sofrem com respostas que mudam sem motivo. Cada mudança à toa é retrabalho, inconsistência e perda de confiança do usuário.
