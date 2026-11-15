@@ -25,17 +25,15 @@ t(7, 101.5, "Você pede para ela revisar e ela troca uma resposta certa por outr
             "Quase sempre o problema não é o modelo: é a informação chegando solta e sem ordem.",
   color=GREY, fontsize=10.5, linespacing=1.5)
 
-# Número grande
+# Dois números em destaque (15/11, pedido dele): resultado e volume de prova
 ax.add_patch(FancyBboxPatch((7, 64), 86, 22, boxstyle="round,pad=0,rounding_size=2", color=LIGHT))
-t(11, 83, "62%", color=CYAN, fontsize=54, weight="bold")
-t(11, 69.5, "menos mudanças de resposta", color=INK, fontsize=12, weight="bold")
-# barras 1 em 10 x 1 em 25
-for i, (lab, v, c) in enumerate([("Sem a engine: 1 a cada 10 revisões", 10.3, "#BDB3A6"),
-                                 ("Com a engine: 1 a cada 25", 3.9, CYAN)]):
-    y = 82.5 - i * 7.5
-    t(50, y, lab, color=INK, fontsize=9.5)
-    ax.add_patch(Rectangle((50, y - 5), 40 * v / 10.3, 2.6, color=c))
-t(50, 67.5, "Acerto mantido · ainda ~7% mais barato", color=GREY, fontsize=9)
+ax.plot([50, 50], [67, 83], color="#D9CFBF", lw=1)
+t(11, 83, "62%", color=CYAN, fontsize=42, weight="bold")
+t(11, 71.5, "menos mudanças de resposta", color=INK, fontsize=12, weight="bold")
+t(11, 67.8, "de 1 a cada 10 revisões para 1 a cada 25", color=GREY, fontsize=9)
+t(54, 83, "10.649+", color=CYAN, fontsize=42, weight="bold")
+t(54, 71.5, "respostas coletadas", color=INK, fontsize=12, weight="bold")
+t(54, 67.8, "acerto mantido · ainda ~7% mais barato", color=GREY, fontsize=9)
 
 # Como funciona
 t(7, 58, "Como funciona", color=INK, fontsize=14, weight="bold")
@@ -45,8 +43,8 @@ t(7, 53, "A engine organiza a informação antes de entregá-la à IA: cada dado
 
 # Provas em 3 colunas
 cols = [("30+", "modelos de IA testados,\nde empresas diferentes"),
-        ("10.649", "respostas registradas\nno laboratório"),
-        ("3", "sistemas em produção\ne 3 pesquisas publicadas")]
+        ("3", "sistemas da Norvald\nusando a engine"),
+        ("3", "pesquisas publicadas,\ncom dados abertos")]
 for i, (big, small) in enumerate(cols):
     x = 7 + i * 29.5
     ax.add_patch(FancyBboxPatch((x, 27), 26.5, 16, boxstyle="round,pad=0,rounding_size=1.5", color=NAVY))
