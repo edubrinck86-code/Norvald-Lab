@@ -18,11 +18,12 @@ t(7, 136, "NORVALD", color=CYAN, fontsize=11, weight="bold")
 t(7, 131, "Engine Documental", color="white", fontsize=30, weight="bold")
 t(7, 122.5, "Estabilidade comprovada para a IA da sua empresa.", color="#E6DCCB", fontsize=14)
 
-# Para quem + dor, juntos e com chamariz (15/11, pedido dele)
-t(7, 107, "Para empresas que não podem ter uma IA que muda de ideia", color=INK, fontsize=15, weight="bold")
-t(7, 101.5, "Atendimento, análise de documentos e contratos, produção de conteúdo, agentes que\n"
-            "decidem. Se a sua IA revisa o próprio trabalho e troca uma resposta certa por outra,\n"
-            "o problema quase nunca é o modelo: é a informação chegando solta. A engine resolve isso.",
+# Para quem + dor, juntos (15/11; tom mais humano a pedido dele)
+t(7, 107, "Feita para quem usa IA no dia a dia", color=INK, fontsize=15, weight="bold")
+t(7, 101.5, "No atendimento, na análise de contratos, na produção de conteúdo. Quando a IA\n"
+            "revisa o próprio trabalho, às vezes troca uma resposta certa por outra. Na maioria\n"
+            "das vezes, o modelo não é o problema: a informação é que chega desorganizada.\n"
+            "É isso que a engine corrige.",
   color=GREY, fontsize=10.5, linespacing=1.5)
 
 # Dois números em destaque (15/11, pedido dele): resultado e volume de prova
