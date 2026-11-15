@@ -56,3 +56,23 @@ Acerto = quantos do painel misto acertaram no B1. Ainda falta ver, uma por uma, 
 | physics | m09911 | stemez-Physics | 3/4 | A baseball pitcher throws a ball weighing 1/3 pound with an acceleration of 480  |
 | physics | m10078 | stemez-Optics | 5/5 | In a holography experiment, the reference source and the object are both 1 m fro |
 | physics | m10189 | stemez-Optics | 5/5 | A solution of camphor in alcohol in a tube 20 cm long rotates the plane of vibra |
+
+## Conferência (15/11/2026)
+
+Cada gabarito foi recalculado à mão pelo Opus. "Parametrizável" = o gabarito sai de uma fórmula fechada, com constantes conhecidas.
+
+**Usáveis, com o gabarito recalculado e confirmado (38):**
+- Finanças: m00119, m00186, m00231, m00252, m00327, m00348, m00658, m00711, m05184, m05641.
+- Química: m03713, m03782, m04053, m04054, m04139, m04296, m04546.
+- Física: m09455, m09735, m09890, m09911, m10078, m10189, m11964 (antena), m12145 (Poiseuille).
+- Matemática: m07846, m08126, m08274, m08349, m08838, m08855, m08869, m09002.
+- Outras: m10540 (escala com σ²), m10574, m07542, m07661, m02954 (convenção de pares de genes: declarar no enunciado sorteado).
+
+**Fora (13):**
+- Gabarito com defeito: m00833 (pede pagamento mensal; o gabarito H, 4.638,83, é a parcela anual; a mensal seria cerca de 377); m10700 (pede "Gbytes", o gabarito 417 é em GiB; em GB seriam 448).
+- Enunciado truncado: m04145 (a concentração do Sn²⁺ está sem expoente).
+- Dependem de tabela ou correlação empírica, sem fórmula fechada: m11413, m11807, m11953, m12151, m12188.
+- A conferir (minha conta não bateu exatamente): m11461 (calculei 0,920; o gabarito é 0,915, talvez por queda nas escovas não citada), m09773 (precisa de tabela de Cp).
+- Sem parâmetro numérico: m10450 e m07963 (conceituais), m05962 (fato).
+
+**Consequência para o desenho:** as perguntas difíceis do conf2 (0 ou 1 acerto no painel) são quase todas as que ficaram fora. As 38 usáveis são, em maioria, fáceis para o painel (25 com 5 de 5). Elas servem para o nível "difícil" se o sorteio aumentar as etapas, mas o nível "mais difícil" precisa de clássicos de outra fonte (GPQA Diamond, livros-texto de graduação), escolhidos com o mesmo critério: fórmula fechada e gabarito recalculado.
