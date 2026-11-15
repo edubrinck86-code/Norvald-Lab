@@ -6,6 +6,8 @@ Rascunho de plano, 15/11/2026. Leitura pendente — proprietário. Ainda sem OSF
 
 O raciocínio de um LLM não cria o erro em comum entre modelos; ele mostra a memória em comum (os pesos, os dados de treino) que causa esse erro (reenquadramento do AROF, 12/11). Se isso vale, o raciocínio deve ter outra cara quando a pergunta está na memória e quando não está.
 
+**Relação com o C_adj do CC (corrigido em 15/11):** estimar a dependência entre modelos já tem quatro caminhos publicados (CAPA, CARE, Elahi v2, Liu; ver ~/Documents/Tese/06_Composicao_de_confianca_CC.md). A tese 4 não propõe outro estimador. Ela acrescenta (a) a causa da dependência, a memória em comum, que esses métodos não explicam, e (b) um sinal por resposta, lido no raciocínio antes da agregação, enquanto eles estimam o painel inteiro depois.
+
 ## Por que a memória é comum (fundamento, do Eduardo, 15/11)
 
 A origem é a mesma para todas as LLMs: a mesma arquitetura (o transformer), a mesma base de dados (a internet, os benchmarks publicados) e, por cima disso, a cópia entre modelos (dados sintéticos, destilação, feedback de IA, como no Constitutional AI da Anthropic, nos dados sintéticos do Llama 3 e na série Phi). Que existe memória em comum entre empresas não está em discussão. O que a tese mede é quanto dela aparece no raciocínio, e de que forma.
