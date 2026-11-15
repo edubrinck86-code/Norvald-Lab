@@ -72,3 +72,15 @@ Recomendação do Opus: reaproveitar o conf2-mmlu como bloco antigo, declarando 
 2. Filtro do Redux aplicado e congelado (lista de perguntas no repositório).
 3. Pré-registro no OSF.
 4. Coleta do bloco novo; análise com o script escrito antes da coleta.
+
+## Literatura próxima (busca de 15/11/2026; ler os textos completos antes do registro)
+
+- **O método do par não é nosso:** GSM-Symbolic (arXiv 2410.05229), Functional MATH (2402.19450), Putnam-AXIOM (2508.08292), MATH-Perturb (2502.06453). Todos medem a queda de **acerto**.
+- **Erro correlacionado:** Kim et al., "Correlated Errors in LLMs" (2506.07962), com 350 modelos e mais correlação dentro da mesma empresa; "The Oracle's Fingerprint" (2605.00844) cita a sobreposição de treino como causa possível, **sem testar**.
+- **Estrutura parecida no raciocínio:** ReasoningFlow (2606.05402): traços estruturalmente parecidos entre modelos de bases diferentes. "Same Answer, Different Reasons" (2610.29092): divergência no nível do traço.
+- **Memória e raciocínio:**
+  - ZCP (2605.21856): corta o CoT e compara com versões isomórficas;
+  - 2601.04301: memória não se sustenta em soluções longas;
+  - MemLens (2509.20909): amostras contaminadas travam na resposta cedo e com confiança alta, um sinal medido por dentro do modelo.
+
+**Lacuna, pela busca:** ninguém isola a memória de treino como causa do erro e do caminho em comum **entre empresas**, medido por fora (sem pesos, sem juiz), com pares clássico × sorteado. É a contribuição a declarar. O MemLens é o paralelo interno da hipótese "alta = memória" e deve ser citado como tal.
