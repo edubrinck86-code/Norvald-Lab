@@ -33,7 +33,7 @@ t = ObservationLoader(root, cat).load(['conf2-mmlu'])
 M = {c: {} for c in ('B1', 'B2')}
 for u in t.by_question_unit:
     for c in M: M[c][u[1]] = dict(t.options(u, c))
-ids = sorted(C['B1'])
+ids = sorted(q for q in C['B1'] if len([v for v in C['B1'][q].values() if v]) == 5 and len([v for v in C.get('B2',{}).get(q,{}).values() if v]) == 5)
 out = {}
 for nome, P in (('sonnet', C), ('misto', M)):
     out[nome] = {c: rho(P[c], ids) for c in ('B1', 'B2')}

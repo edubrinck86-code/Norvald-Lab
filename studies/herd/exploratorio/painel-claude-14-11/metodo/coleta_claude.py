@@ -13,7 +13,8 @@ out = sys.argv[1]; lim = int(sys.argv[2]) if len(sys.argv) > 2 and sys.argv[2] e
 feito = set()
 if os.path.exists(out):
     for l in open(out):
-        d = json.loads(l); feito.add((d['q'], d['cond'], d['analyst']))
+        d = json.loads(l)
+        if d.get('option'): feito.add((d['q'], d['cond'], d['analyst']))
 jobs = []
 for d in sorted(glob.glob(EXP + '/conf2-mmlu-m*-b1')):
     q = d.split('-')[-2]
@@ -33,6 +34,8 @@ def roda(j):
             '--output-format', 'json'], input=r['user_message'], capture_output=True, text=True, cwd=VAZIO)
         try:
             d = json.loads(p.stdout); txt = d.get('result') or ''
+            # 15/11: o aviso de limite vem como resposta normal; 797 chamadas se perderam assim
+            if 'limit' in txt.lower() and 'CONTRIBUTION' not in txt: return dict(q=q, cond=cond, analyst=a, option=None, error=txt)
             m = re.search(r'"relation_type"\s*:\s*"selects"[^}]*"target"\s*:\s*"(option-[a-j])"', txt)
             u = d.get('usage', {})
             return dict(q=q, cond=cond, analyst=a, option=m.group(1) if m else None, text=txt,
