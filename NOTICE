@@ -1,0 +1,16 @@
+Norvald Lab
+Copyright 2026 Eduardo Guedes (Norvald)
+
+O código deste repositório é licenciado sob a Apache License 2.0 (ver LICENSE),
+COM UMA EXCEÇÃO:
+
+  norvald_lab/vendor/  (norvald_execution e documental_engine)
+
+Esses diretórios são cópias de código do Norvald Studio, que é fechado. Estão
+aqui só para que os estudos possam ser conferidos e reproduzidos. Todos os
+direitos reservados: não estão cobertos pela Apache License 2.0 e não podem
+ser reutilizados, modificados ou redistribuídos fora deste repositório sem
+autorização escrita do autor.
+
+A parte aberta da engine documental está em um repositório próprio, sob
+Apache 2.0.
