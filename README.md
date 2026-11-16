@@ -151,3 +151,7 @@ Detalhes de origem, alterações e verificação estão em [docs/MIGRACAO.md](do
 ```
 
 Os testes incluem os módulos migrados, execução independente, isolamento entre condições/repetições, concorrência, falhas, cancelamento, integridade, ferramentas e API. A integração com um adapter real é testada com transporte HTTP simulado, sem chamadas pagas.
+
+## Licença
+
+Apache 2.0 (ver `LICENSE`), exceto `norvald_lab/vendor/`, que é código do Norvald Studio com todos os direitos reservados, incluído só para reproduzir os estudos. Detalhes em `NOTICE`.
