@@ -1,4 +1,4 @@
-# Norvald Lab
+<img src="docs/assets/banner.svg" alt="Norvald Lab — observing how LLMs deliberate together" width="100%">
 
 Laboratório independente para observar deliberação entre LLMs. Extraído do AROF do Norvald Studio e integrado ao **Norvald-Execution**. Funciona com o Studio desligado, com configurações e dados próprios.
 

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="230" viewBox="0 0 840 230">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#15110d"/>
+      <stop offset="1" stop-color="#0c0a08"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.85" cy="0.3" r="0.6">
+      <stop offset="0" stop-color="#d9ae78" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#d9ae78" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="0.5" y="0.5" width="839" height="229" rx="16" fill="url(#bg)" stroke="#2c241b"/>
+  <rect x="0.5" y="0.5" width="839" height="229" rx="16" fill="url(#glow)"/>
+  <!-- painel: cinco pontos que convergem em pouco mais de um -->
+  <g stroke="#b98a55" stroke-opacity="0.55" stroke-width="1.2" fill="none">
+    <path d="M610 52 C 680 70, 700 110, 742 118"/>
+    <path d="M610 86 C 680 96, 700 112, 742 118"/>
+    <path d="M610 120 C 680 120, 700 118, 742 118"/>
+    <path d="M610 154 C 680 142, 700 124, 742 118"/>
+    <path d="M610 188 C 680 168, 700 128, 742 118"/>
+  </g>
+  <g fill="#d9ae78">
+    <circle cx="610" cy="52" r="5"/><circle cx="610" cy="86" r="5"/><circle cx="610" cy="120" r="5"/>
+    <circle cx="610" cy="154" r="5"/><circle cx="610" cy="188" r="5"/>
+  </g>
+  <circle cx="742" cy="118" r="12" fill="none" stroke="#d9ae78" stroke-width="2"/>
+  <circle cx="742" cy="118" r="5" fill="#ece4d8"/>
+  <text x="742" y="160" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" fill="#d9ae78">5 → 1.4</text>
+
+  <text x="44" y="56" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" letter-spacing="2.4" fill="#d9ae78">INDEPENDENT LAB · NORVALD</text>
+  <text x="44" y="108" font-family="Georgia, 'Times New Roman', serif" font-size="44" fill="#ece4d8">Norvald Lab</text>
+  <text x="44" y="148" font-family="Georgia, 'Times New Roman', serif" font-size="21" fill="#d9ae78" font-style="italic">Observing how LLMs deliberate together.</text>
+  <text x="44" y="186" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a89a87">Panels of models, every request and answer stored and re-analyzable.</text>
+</svg>
