@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab · Ao vivo (referência v3)</title>
+<!-- Referência visual (26/11/2026), pedido do Eduardo: glassmorphism pesado, cards, drawers e overlays, "dashboard top by Apple".
+     Dados de demonstração neutros: o repositório é público, nada de estudo privado aqui. -->
+<style>
+:root{--t1:#14161f;--t2:rgba(20,22,31,.66);--t3:rgba(20,22,31,.45);--glass:rgba(255,255,255,.62);--glass2:rgba(255,255,255,.8);--line:rgba(255,255,255,.75);--edge:rgba(20,22,31,.08);--sub:rgba(255,255,255,.45);--sep:rgba(20,22,31,.07);
+--violet:#7c5cf0;--teal:#0fb39a;--coral:#f0713f;--amber:#c98a06;--red:#e5484d;--blur:saturate(170%) blur(22px)}
+*{box-sizing:border-box;margin:0}
+body{font:13px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;color:var(--t1);min-height:100vh;overflow-x:hidden;
+background:#eef0f7}
+.bg{position:fixed;inset:0;z-index:-1;background:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIwIDEyMDAiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIHNsaWNlIj4KPCEtLSBGdW5kbyBkbyBMYWIsIHZlcnPDo28gdmVyZGUgKDI2LzExLzIwMjYpOiBvbmRhcyBlbSBncmFkaWVudGUgZXNjdXJvLCBubyBlc3RpbG8gZG9zIHBhcMOpaXMgZGUgcGFyZWRlIGRvIG1hY09TLiBEZXNlbmhhZG8gw6AgbcOjbywgc2VtIGltYWdlbSBkZSB0ZXJjZWlyb3MuIC0tPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJiYXNlIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDQxYTE0Ii8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iIzA2MjYxZCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAyMGQwYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0ibzEiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIwIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwYjVhNDMiLz48c3RvcCBvZmZzZXQ9Ii42IiBzdG9wLWNvbG9yPSIjMTQ4MDVmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEzZjMxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJvMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzFmYTI3YSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBhNGEzOCIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0ibzMiIHgxPSIxIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMyZmMxOTMiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjMGY2YjUwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDUyOTFmIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iYiI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMzAiLz48L2ZpbHRlcj4KPGZpbHRlciBpZD0iYjIiPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjgiLz48L2ZpbHRlcj4KPC9kZWZzPgo8cmVjdCB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMjAwIiBmaWxsPSJ1cmwoI2Jhc2UpIi8+CjxnIGZpbHRlcj0idXJsKCNiKSI+CjxwYXRoIGQ9Ik0tMjAwIDgyMCBDIDMwMCA1NjAsIDcwMCAxMDQwLCAxMTUwIDc2MCBTIDE5MDAgNTIwLCAyMTUwIDcwMCBMIDIxNTAgMTMwMCBMIC0yMDAgMTMwMFoiIGZpbGw9InVybCgjbzEpIiBvcGFjaXR5PSIuOSIvPgo8cGF0aCBkPSJNLTIwMCAzMDAgQyAzNTAgMTIwLCA4MDAgNTIwLCAxMjUwIDMwMCBTIDE5NTAgNjAsIDIxNTAgMjIwIEwgMjE1MCAtMTAwIEwgLTIwMCAtMTAwWiIgZmlsbD0iIzBjNGEzOSIgb3BhY2l0eT0iLjgiLz4KPC9nPgo8ZyBmaWx0ZXI9InVybCgjYjIpIj4KPHBhdGggZD0iTS0yMDAgOTAwIEMgNDAwIDY4MCwgODAwIDEwODAsIDEzMDAgODYwIFMgMTk1MCA3MDAsIDIxNTAgODIwIEwgMjE1MCAxMzAwIEwgLTIwMCAxMzAwWiIgZmlsbD0idXJsKCNvMikiIG9wYWNpdHk9Ii41NSIvPgo8cGF0aCBkPSJNLTEwMCA2NDAgQyA0MjAgNDIwLCA5MDAgODYwLCAxNDAwIDYwMCBTIDIwMDAgNDIwLCAyMTUwIDUyMCBMIDIxNTAgNjEwIEMgMTk1MCA1MjAsIDE1MDAgNzIwLCAxMzgwIDY5MCBDIDkwMCA5NDAsIDQyMCA1MjAsIC0xMDAgNzMwWiIgZmlsbD0idXJsKCNvMykiIG9wYWNpdHk9Ii42NSIvPgo8cGF0aCBkPSJNLTEwMCA2OTAgQyA0MjAgNDgwLCA5MDAgOTAwLCAxNDAwIDY1MCBTIDIwMDAgNDgwLCAyMTUwIDU3MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjN2ZmMGM3IiBzdHJva2Utd2lkdGg9IjMiIG9wYWNpdHk9Ii4zNSIvPgo8L2c+CjxnIGZpbHRlcj0idXJsKCNiKSIgb3BhY2l0eT0iLjUiPgo8Y2lyY2xlIGN4PSIxNTUwIiBjeT0iMzgwIiByPSIyNjAiIGZpbGw9IiMxYThmNmEiLz4KPGNpcmNsZSBjeD0iMzIwIiBjeT0iOTgwIiByPSIyMjAiIGZpbGw9IiMwZTVjNDYiLz4KPC9nPgo8cmVjdCB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMjAwIiBmaWxsPSJ1cmwoI2Jhc2UpIiBvcGFjaXR5PSIuMTgiLz4KPC9zdmc+Cg==) center/cover no-repeat,#041a14}
+.bg:after{content:"";position:absolute;inset:0;background:transparent}
+.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:22px;
+outline:1px solid var(--edge);outline-offset:-1px;box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 1px 2px rgba(20,22,40,.06),0 12px 28px -8px rgba(0,20,12,.35),0 40px 80px -30px rgba(0,20,12,.55)}
+.app{display:grid;grid-template-columns:232px 1fr;gap:18px;padding:18px;min-height:100vh}
+nav{padding:18px 12px;display:flex;flex-direction:column;gap:2px;position:sticky;top:18px;height:calc(100vh - 36px)}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 10px 16px}
+.logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--violet),var(--teal));box-shadow:0 6px 18px rgba(167,139,250,.5)}
+.brand b{font-size:15px;font-weight:600;letter-spacing:-.01em}.brand small{display:block;color:var(--t3);font-size:11px}
+nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;color:var(--t2);text-decoration:none;font-weight:500}
+nav a:hover{background:rgba(255,255,255,.5)}nav a.on{background:var(--glass2);color:var(--t1);box-shadow:0 1px 2px rgba(20,22,40,.08),0 0 0 1px var(--edge)}
+nav a .n{margin-left:auto;font-size:11px;color:var(--t3)}
+.ico{width:18px;height:18px;opacity:.9}
+.live{width:8px;height:8px;border-radius:50%;background:var(--teal);margin-left:auto;box-shadow:0 0 0 0 rgba(94,234,212,.7);animation:pl 1.8s infinite}
+@keyframes pl{70%{box-shadow:0 0 0 8px rgba(94,234,212,0)}100%{box-shadow:0 0 0 0 rgba(94,234,212,0)}}
+.wallet{margin-top:auto;padding:14px;border-radius:16px;background:var(--sub);box-shadow:0 0 0 1px var(--edge);border:1px solid var(--line)}
+.wallet .row{display:flex;justify-content:space-between;padding:3px 0;color:var(--t2)}.wallet .row b{color:var(--t1);font-weight:500}
+.lbl{font-size:11px;color:var(--t3);text-transform:none;letter-spacing:.02em}
+main{display:grid;gap:18px;grid-template-columns:repeat(12,1fr);align-content:start}
+.hero{grid-column:1/-1;padding:22px 26px;display:flex;justify-content:space-between;align-items:center}
+.hero h1{font-size:26px;font-weight:600;letter-spacing:-.02em}.hero p{color:var(--t2)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--sub);border:1px solid var(--edge);font-size:12px;color:var(--t2)}
+.ring{position:relative;width:96px;height:96px}.ring svg{transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:20px;font-weight:600}
+.card{padding:18px 20px}.card h3{font-size:14px;font-weight:600;letter-spacing:-.01em;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.now{grid-column:1/8;position:relative;overflow:hidden}
+.now:before{content:"";position:absolute;inset:-40% 40% 40% -20%;background:radial-gradient(closest-side,rgba(124,92,240,.18),transparent);filter:blur(10px)}
+.voice{font:400 18px/1.55 "New York","Iowan Old Style",Georgia,serif;color:var(--t1);position:relative}
+.think{display:flex;gap:4px;margin-left:8px}.think i{width:5px;height:5px;border-radius:50%;background:var(--violet);animation:b 1.2s infinite}
+.think i:nth-child(2){animation-delay:.15s}.think i:nth-child(3){animation-delay:.3s}@keyframes b{50%{transform:translateY(-4px);opacity:.4}}
+.tags{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;position:relative}
+.tag{padding:4px 10px;border-radius:999px;font-size:11.5px;border:1px solid var(--edge);background:var(--sub)}
+.tag.w{background:rgba(250,200,60,.22);border-color:rgba(200,140,6,.35);color:#8a5a00}
+.stats{grid-column:8/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px}
+.stat{padding:14px;border-radius:16px;background:var(--sub);border:1px solid var(--edge);box-shadow:0 1px 2px rgba(20,22,40,.05)}
+.stat b{display:block;font-size:24px;font-weight:600;letter-spacing:-.02em}.stat em{font-style:normal;font-size:11px;color:var(--teal)}
+.lanes{grid-column:1/9}
+.lane{display:grid;grid-template-columns:120px 1fr 92px;align-items:center;gap:12px;padding:8px 0;border-top:1px solid var(--sep)}
+.dots{display:flex;flex-wrap:wrap;gap:4px}.dots span{width:11px;height:11px;border-radius:4px;cursor:pointer;transition:transform .15s}
+.dots span:hover{transform:scale(1.5)}
+.A{background:var(--coral)}.B{background:var(--teal)}.C{background:var(--violet)}.W{background:rgba(20,22,31,.1)}
+.badge{font-size:11px;padding:3px 9px;border-radius:999px;text-align:center}
+.legend{display:flex;gap:12px;font-size:11px;color:var(--t2);font-weight:400}.legend span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:5px;vertical-align:0;background:var(--c)}
+.heat{grid-column:9/-1}
+.hm{display:grid;grid-template-columns:34px repeat(4,1fr);gap:6px;text-align:center;font-size:12px}
+.hm div{padding:12px 0;border-radius:10px;font-weight:600;box-shadow:0 0 0 1px var(--edge)}
+.trail{grid-column:1/7}
+.ev{display:grid;grid-template-columns:44px 12px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--sep)}
+.ev i{width:9px;height:9px;border-radius:50%;margin-top:5px}
+.ev.err{background:linear-gradient(90deg,rgba(229,72,77,.12),transparent);border-radius:10px;padding-left:6px}
+.map{grid-column:7/-1}
+.cost{grid-column:1/-1;display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:12px;padding:14px}
+.drawer{position:fixed;top:18px;right:18px;bottom:18px;width:390px;padding:22px;z-index:20;background:rgba(255,255,255,.66);
+transform:translateX(0);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.drawer.closed{transform:translateX(430px)}
+.drawer h2{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:8px;margin:16px 0;font-size:12.5px}.kv span:nth-child(odd){color:var(--t3)}
+pre{white-space:pre-wrap;font:12px/1.6 ui-monospace,"SF Mono",Menlo,monospace;background:rgba(255,255,255,.55);border:1px solid var(--edge);border-radius:14px;padding:12px;color:var(--t2);max-height:220px;overflow:auto}
+.x{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;border:1px solid var(--edge);background:var(--glass2);color:var(--t1);cursor:pointer}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);padding:12px 18px;display:flex;gap:12px;align-items:center;z-index:30;border-radius:18px;animation:up .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translate(-50%,30px);opacity:0}}
+.btn{padding:7px 14px;border-radius:999px;border:1px solid var(--edge);background:var(--glass2);box-shadow:0 1px 2px rgba(20,22,40,.08);color:var(--t1);font:inherit;font-weight:500;cursor:pointer}
+.btn.p{background:#14161f;color:#fff}
+.overlay{position:fixed;inset:0;z-index:40;display:none;place-items:center;background:rgba(230,232,245,.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(8px)}
+.overlay.on{display:grid}.modal{width:min(520px,92vw);padding:24px}
+@media(max-width:980px){.app{grid-template-columns:1fr}nav{position:static;height:auto}main>*{grid-column:1/-1!important}.drawer{width:auto;left:18px}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="app">
+<nav class="glass">
+ <div class="brand"><div class="logo"></div><div><b>Norvald Lab</b><small>Opus trabalhando · 3 h 12 min</small></div></div>
+ <a class="on" href="#"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Ao vivo<span class="live"></span></a>
+ <a href="#"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h5a4 4 0 0 0 0-8h-2a4 4 0 0 1 0-8h5"/></svg>Trilha do Opus</a>
+ <a href="#"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/></svg>Estudos<span class="n">7</span></a>
+ <a href="#"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resultados</a>
+ <a href="#"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v5l-6 5M12 12l6 5"/></svg>Mapa das teses</a>
+ <a href="#"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M15 9h-4a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4H9M12 6v2M12 16v2"/></svg>Custos</a>
+ <a href="#"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Experimentos</a>
+ <a href="#"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h12a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2zM9 8h6M9 12h6"/></svg>Caderno</a>
+ <div class="wallet"><div class="lbl">Saldos</div>
+  <div class="row"><span>OpenRouter</span><b style="color:var(--amber)">US$ 1,20</b></div>
+  <div class="row"><span>Cohere</span><b>trial</b></div>
+  <div class="row"><span>Cota grátis</span><b>61%</b></div>
+ </div>
+</nav>
+
+<main>
+ <section class="glass hero">
+  <div><span class="chip"><span class="live" style="margin:0"></span> rodando agora</span>
+   <h1 style="margin-top:10px">Estudo 3 · formato da entrada</h1>
+   <p>coleta_b3t.py · 5 modelos · braços B3R, B3T · iniciada 15:30</p></div>
+  <div style="display:flex;gap:22px;align-items:center">
+   <div style="text-align:right"><div class="lbl">faltam</div><div style="font-size:22px;font-weight:600">~7 min</div><div class="lbl">0 erros · US$ 0,04</div></div>
+   <div class="ring"><svg width="96" height="96"><circle cx="48" cy="48" r="40" stroke="rgba(20,22,31,.08)" stroke-width="9" fill="none"/>
+   <circle cx="48" cy="48" r="40" stroke="url(#g)" stroke-width="9" fill="none" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="83"/>
+   <defs><linearGradient id="g"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#5eead4"/></linearGradient></defs></svg><b>67%</b></div>
+  </div>
+ </section>
+
+ <section class="glass card now">
+  <h3><span style="display:flex;align-items:center">Opus agora<span class="think"><i></i><i></i><i></i></span></span><span class="lbl">há 40 s</span></h3>
+  <p class="voice">“O B3T está mudando mais no MMLU-Pro que no banco. Antes de chamar isso de efeito, vou separar as perguntas fáceis: o banco erra 5%, e ali não há espaço para mudar.”</p>
+  <div class="tags"><span class="tag w">dúvida sobre o próprio recorte</span><span class="tag">próximo: estratificar por dificuldade</span><span class="tag">ler 10 respostas à mão</span></div>
+ </section>
+
+ <section class="glass stats">
+  <div class="stat"><span class="lbl">Chamadas</span><b>48<span style="font-size:14px;color:var(--t3)"> / 72</span></b><em>+6 no último minuto</em></div>
+  <div class="stat"><span class="lbl">Mudou de resposta</span><b>10,3%</b><em style="color:var(--coral)">B3T · ▲ 6,4 pp</em></div>
+  <div class="stat"><span class="lbl">Custo</span><b>US$ 0,04</b><em>teto US$ 0,20</em></div>
+  <div class="stat"><span class="lbl">N_eff do painel</span><b>1,41</b><em style="color:var(--t3)">de 5 modelos</em></div>
+ </section>
+
+ <section class="glass card lanes">
+  <h3>Raias por modelo <span class="legend"><span style="--c:var(--coral)">mudou</span><span style="--c:var(--teal)">manteve</span><span style="--c:var(--violet)">nova</span><span style="--c:rgba(255,255,255,.2)">aguardando</span></span></h3>
+  <div id="lanes"></div>
+ </section>
+
+ <section class="glass card heat">
+  <h3>Mudou por braço <span class="lbl">% · n por célula</span></h3>
+  <div class="hm">
+   <span></span><span class="lbl">B2</span><span class="lbl">B3</span><span class="lbl">B3T</span><span class="lbl">B3L</span>
+   <span class="lbl" style="align-self:center">MMLU</span><div style="background:rgba(251,143,107,.85)">25</div><div style="background:rgba(251,143,107,.15)">3</div><div style="background:rgba(251,143,107,.5)">14</div><div style="background:rgba(251,143,107,.7)">19</div>
+   <span class="lbl" style="align-self:center">Banco</span><div style="background:rgba(251,143,107,.75)">21</div><div style="background:rgba(251,143,107,.08)">1</div><div style="background:rgba(251,143,107,.2)">4</div><div style="background:rgba(251,143,107,.42)">10</div>
+  </div>
+  <p class="lbl" style="margin-top:12px">Toque numa célula para abrir as respostas.</p>
+ </section>
+
+ <section class="glass card trail">
+  <h3>Trilha do dia <span class="lbl">erros meus ficam marcados</span></h3>
+  <div class="ev err"><span class="lbl">15:58</span><i style="background:var(--red)"></i><span><b style="font-weight:600">Erro meu:</b> marcador contava a palavra em qualquer lugar do texto. Corrigido e registrado.</span></div>
+  <div class="ev"><span class="lbl">15:30</span><i style="background:var(--violet)"></i><span>Coleta iniciada · 72 chamadas previstas · teto US$ 0,20</span></div>
+  <div class="ev"><span class="lbl">14:10</span><i style="background:var(--teal)"></i><span>Paper lido: juízes de uma passada, sem erro em comum medido</span></div>
+  <div class="ev"><span class="lbl">10:05</span><i style="background:rgba(20,22,31,.3)"></i><span>Acessos do dia: Zenodo +11 visualizações</span></div>
+ </section>
+
+ <section class="glass card map">
+  <h3>Mapa das teses <span class="lbl">o que sustenta o quê</span></h3>
+  <svg viewBox="0 0 420 170" width="100%">
+   <defs><filter id="s"><feGaussianBlur stdDeviation="6"/></filter></defs>
+   <g font-size="11" text-anchor="middle" fill="#14161f">
+    <line x1="70" y1="45" x2="210" y2="130" stroke="rgba(167,139,250,.6)"/><line x1="210" y1="45" x2="210" y2="130" stroke="rgba(167,139,250,.6)"/>
+    <line x1="350" y1="45" x2="210" y2="130" stroke="rgba(94,234,212,.6)"/>
+    <circle cx="70" cy="40" r="26" fill="rgba(167,139,250,.5)" filter="url(#s)"/><circle cx="70" cy="40" r="22" fill="rgba(167,139,250,.28)" stroke="rgba(20,22,31,.18)"/><text x="70" y="44">Manada</text>
+    <circle cx="210" cy="40" r="22" fill="rgba(167,139,250,.28)" stroke="rgba(20,22,31,.18)"/><text x="210" y="44">N_eff</text>
+    <circle cx="350" cy="40" r="22" fill="rgba(94,234,212,.25)" stroke="rgba(20,22,31,.18)"/><text x="350" y="44">Formato</text>
+    <rect x="140" y="118" width="140" height="34" rx="17" fill="rgba(251,143,107,.25)" stroke="rgba(20,22,31,.18)"/><text x="210" y="139">Estudo em curso</text>
+    <text x="70" y="80" fill="rgba(20,22,31,.5)" font-size="10">DOI …239</text><text x="210" y="80" fill="rgba(20,22,31,.5)" font-size="10">DOI …355</text><text x="350" y="80" fill="rgba(20,22,31,.5)" font-size="10">DOI …357</text>
+   </g>
+  </svg>
+ </section>
+
+ <section class="glass cost">
+  <div class="stat"><span class="lbl">Gasto hoje</span><b>US$ 0,04</b>
+   <svg viewBox="0 0 200 40" width="100%" height="40"><defs><linearGradient id="f" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="rgba(94,234,212,.5)"/><stop offset="1" stop-color="rgba(94,234,212,0)"/></linearGradient></defs>
+   <path d="M0 38 L40 37 L80 35 L120 30 L160 22 L200 18 L200 40 L0 40Z" fill="url(#f)"/><path d="M0 38 L40 37 L80 35 L120 30 L160 22 L200 18" stroke="#5eead4" stroke-width="2" fill="none"/></svg></div>
+  <div class="stat"><span class="lbl">Por chamada</span><b>US$ 0,0008</b><em>média do dia</em></div>
+  <div class="stat"><span class="lbl">Grátis</span><b>252</b><em>chamadas sem custo</em></div>
+  <div class="stat"><span class="lbl">Alerta</span><b style="color:var(--amber)">saldo baixo</b><em style="color:var(--t3)">avisa antes de rodar</em></div>
+ </section>
+</main>
+</div>
+
+<aside class="glass drawer closed" id="drawer">
+ <button class="x" aria-label="Fechar" style="z-index:2">✕</button>
+ <span class="chip">chamada 41 · modelo C</span>
+ <h2 style="margin-top:12px">Mudou de B para D</h2>
+ <div class="kv"><span>Braço</span><span>B3T · texto corrido</span><span>Pergunta</span><span>m07045 · economia</span><span>Confiança</span><span>alta → média</span><span>Tokens</span><span>1.932 · US$ 0,0007</span><span>Tempo</span><span>11,4 s</span></div>
+ <div class="lbl" style="margin-bottom:6px">O que o modelo recebeu</div>
+ <pre>COMPLETE WORKING CONTEXT:
+own_previous_answer: "B — a curva desloca para a
+direita porque…" (confiança: alta)</pre>
+ <div class="lbl" style="margin:14px 0 6px">O que ele respondeu</div>
+ <pre>Revendo o raciocínio, a opção D descreve
+melhor o efeito de longo prazo…</pre>
+ <div style="display:flex;gap:8px;margin-top:16px"><button class="btn" onclick="ov.classList.add('on')">Comparar com B3R</button><button class="btn">Marcar para ler</button></div>
+</aside>
+
+<div class="glass toast"><span class="live" style="margin:0"></span><span>Cota grátis em 61%. A próxima rodada cabe.</span><button class="btn p" onclick="this.parentNode.remove()">Ok</button></div>
+
+<div class="overlay" id="ov" onclick="if(event.target===this)this.classList.remove('on')">
+ <div class="glass modal">
+  <h2 style="font-size:18px;font-weight:600">Mesma pergunta, dois formatos</h2>
+  <p style="color:var(--t2);margin:6px 0 16px">m07045 · modelo C</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+   <div class="stat"><span class="lbl">B3R · estruturado</span><b style="color:var(--teal)">manteve B</b><em>confiança alta</em></div>
+   <div class="stat"><span class="lbl">B3T · texto corrido</span><b style="color:var(--coral)">mudou p/ D</b><em style="color:var(--coral)">confiança média</em></div>
+  </div>
+  <div style="text-align:right;margin-top:18px"><button class="btn p" onclick="ov.classList.remove('on')">Fechar</button></div>
+ </div>
+</div>
+
+<script>
+const M=[["Modelo A","AABBBABBBBCBBABBWWWWWWWW","estável"],["Modelo B","BBABBBBCBBBBABBBWWWWWWWW","estável"],["Modelo C","AACABABCAABACABAWWWWWWWW","oscila"],["Modelo D","BBBBBBBBBBBBBBBBWWWWWWWW","firme"],["Modelo E","ABABCABBABAABBACWWWWWWWW","oscila"]];
+const col={estável:"rgba(15,179,154,.15);color:#0b6e60",oscila:"rgba(240,113,63,.16);color:#a2431b",firme:"rgba(124,92,240,.15);color:#4b34b8"};
+const D=document.getElementById('drawer'),O=document.getElementById('ov');
+const fechar=()=>{D.classList.add('closed');O.classList.remove('on')};
+D.querySelector('.x').addEventListener('click',e=>{e.stopPropagation();fechar()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')fechar()});
+document.addEventListener('click',e=>{if(!D.contains(e.target)&&!e.target.closest('.dots')&&!O.contains(e.target))D.classList.add('closed')});
+lanes.innerHTML=M.map(([n,s,b])=>`<div class="lane"><span style="color:var(--t2)">${n}</span><div class="dots">${[...s].map((c,i)=>`<span class="${c}" title="chamada ${i+1}" onclick="drawer.classList.remove('closed')"></span>`).join("")}</div><span class="badge" style="background:${col[b]}">${b}</span></div>`).join("");
+</script>
+</body>
+</html>

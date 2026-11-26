@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1200" preserveAspectRatio="xMidYMid slice">
+<!-- Fundo do Lab, versão verde (26/11/2026): ondas em gradiente escuro, no estilo dos papéis de parede do macOS. Desenhado à mão, sem imagem de terceiros. -->
+<defs>
+<linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#041a14"/><stop offset=".5" stop-color="#06261d"/><stop offset="1" stop-color="#020d0a"/></linearGradient>
+<linearGradient id="o1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0b5a43"/><stop offset=".6" stop-color="#14805f"/><stop offset="1" stop-color="#0a3f31"/></linearGradient>
+<linearGradient id="o2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1fa27a"/><stop offset="1" stop-color="#0a4a38"/></linearGradient>
+<linearGradient id="o3" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2fc193"/><stop offset=".5" stop-color="#0f6b50"/><stop offset="1" stop-color="#05291f"/></linearGradient>
+<filter id="b"><feGaussianBlur stdDeviation="30"/></filter>
+<filter id="b2"><feGaussianBlur stdDeviation="8"/></filter>
+</defs>
+<rect width="1920" height="1200" fill="url(#base)"/>
+<g filter="url(#b)">
+<path d="M-200 820 C 300 560, 700 1040, 1150 760 S 1900 520, 2150 700 L 2150 1300 L -200 1300Z" fill="url(#o1)" opacity=".9"/>
+<path d="M-200 300 C 350 120, 800 520, 1250 300 S 1950 60, 2150 220 L 2150 -100 L -200 -100Z" fill="#0c4a39" opacity=".8"/>
+</g>
+<g filter="url(#b2)">
+<path d="M-200 900 C 400 680, 800 1080, 1300 860 S 1950 700, 2150 820 L 2150 1300 L -200 1300Z" fill="url(#o2)" opacity=".55"/>
+<path d="M-100 640 C 420 420, 900 860, 1400 600 S 2000 420, 2150 520 L 2150 610 C 1950 520, 1500 720, 1380 690 C 900 940, 420 520, -100 730Z" fill="url(#o3)" opacity=".65"/>
+<path d="M-100 690 C 420 480, 900 900, 1400 650 S 2000 480, 2150 570" fill="none" stroke="#7ff0c7" stroke-width="3" opacity=".35"/>
+</g>
+<g filter="url(#b)" opacity=".5">
+<circle cx="1550" cy="380" r="260" fill="#1a8f6a"/>
+<circle cx="320" cy="980" r="220" fill="#0e5c46"/>
+</g>
+<rect width="1920" height="1200" fill="url(#base)" opacity=".18"/>
+</svg>
